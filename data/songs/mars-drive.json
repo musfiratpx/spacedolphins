@@ -6,44 +6,76 @@
   "stepsPerBar": 16,
   "swing": 0,
   "key": "D minor",
+  "genre": "synthwave",
   "instruments": {
     "kick": {
       "type": "synth.kick",
       "gain": 1,
       "role": "backbone",
-      "nasaLayer": "marsquake (sub hit on downbeats, Phase 2)"
+      "ducker": true,
+      "nasaLayer": "marsquake (sub hit on downbeats, once downloaded)"
     },
     "snare": {
       "type": "synth.snare",
-      "gain": 0.85,
-      "role": "backbone"
+      "gain": 0.8,
+      "role": "backbone",
+      "send": {
+        "reverb": 0.45
+      }
     },
     "hat": {
       "type": "synth.hat",
-      "gain": 0.6,
-      "role": "backbone"
+      "gain": 0.5,
+      "role": "backbone",
+      "send": {
+        "delay": 0.05
+      }
     },
     "bass": {
       "type": "synth.bass",
       "gain": 0.8,
       "role": "backbone",
-      "nasaLayer": "ingenuity-hum drone (Phase 2)"
+      "duck": 0.5,
+      "nasaLayer": "ingenuity-hum drone (once downloaded)"
     },
     "pad": {
       "type": "synth.pad",
-      "gain": 0.7,
+      "gain": 0.75,
       "role": "pad",
-      "nasaLayer": "mars-wind (Phase 2)"
+      "duck": 0.6,
+      "send": {
+        "reverb": 0.5
+      },
+      "nasaLayer": "mars-wind (once downloaded)"
     },
     "lead": {
       "type": "synth.lead",
-      "gain": 0.75,
-      "role": "lead"
+      "gain": 0.8,
+      "role": "lead",
+      "send": {
+        "reverb": 0.25,
+        "delay": 0.22
+      }
     },
     "riser": {
       "type": "synth.riser",
-      "gain": 0.8,
-      "role": "riser"
+      "gain": 0.6,
+      "role": "riser",
+      "send": {
+        "reverb": 0.3
+      }
+    },
+    "comet": {
+      "type": "sample.stardust-comet",
+      "gain": 0.6,
+      "role": "riser",
+      "trim": true,
+      "durationSteps": 32,
+      "fadeSteps": 6,
+      "send": {
+        "reverb": 0.3
+      },
+      "nasa": "Stardust: Passing Comet Tempel 1"
     }
   },
   "patterns": {
@@ -465,13 +497,50 @@
         "_",
         "_",
         "_"
+      ],
+      "up2": [
+        "C4",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_",
+        "_"
       ]
+    },
+    "comet": {
+      "once": "x..............................."
     }
   },
   "sections": [
     {
       "name": "intro",
-      "bars": 4,
+      "bars": 2,
       "play": {
         "kick": "half",
         "hat": "quarter",
@@ -480,7 +549,7 @@
     },
     {
       "name": "groove",
-      "bars": 8,
+      "bars": 4,
       "play": {
         "kick": "four",
         "snare": "back",
@@ -491,20 +560,21 @@
     },
     {
       "name": "build",
-      "bars": 4,
+      "bars": 2,
       "play": {
         "kick": "four",
         "snare": "ghost",
         "hat": "sixteen",
         "bass": "long",
-        "riser": "up"
+        "riser": "up2",
+        "comet": "once"
       }
     },
     {
       "name": "drop",
-      "bars": 8,
+      "bars": 4,
       "play": {
-        "kick": "drive",
+        "kick": "four",
         "snare": "back",
         "hat": "sixteen",
         "bass": "drive",
@@ -513,8 +583,8 @@
       }
     },
     {
-      "name": "breakdown",
-      "bars": 4,
+      "name": "data break",
+      "bars": 3,
       "play": {
         "kick": "half",
         "hat": "quarter",
@@ -524,9 +594,9 @@
     },
     {
       "name": "final",
-      "bars": 8,
+      "bars": 4,
       "play": {
-        "kick": "drive",
+        "kick": "four",
         "snare": "back",
         "hat": "sixteen",
         "bass": "drive",
@@ -536,7 +606,7 @@
     },
     {
       "name": "outro",
-      "bars": 2,
+      "bars": 1,
       "play": {
         "kick": "half",
         "pad": "prog"
@@ -563,10 +633,11 @@
     }
   },
   "dataBreak": {
-    "startBar": 25,
-    "bars": 4,
+    "startBar": 13,
+    "bars": 3,
     "sample": "marsquake",
-    "lanes": "alt",
-    "note": "Bars are 1-indexed. Phase 2: notes from marsquake peaks; backbone drops out."
+    "fallbackSample": "kepler-star",
+    "gain": 0.9,
+    "lanes": "alt"
   }
 }

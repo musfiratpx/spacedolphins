@@ -14,11 +14,40 @@ NASA does not endorse this project. NASA's insignia and logotype are not used.
 | InSight mission page | Card facts | https://science.nasa.gov/mission/insight/ | NASA |
 | Ingenuity mission page | Card facts | https://science.nasa.gov/mission/mars-2020-perseverance/ingenuity-mars-helicopter/ | NASA |
 
-### Models
-_Add one line per downloaded model: name, exact page URL, credit line from the page._
+### Models (NASA 3D Resources, https://github.com/nasa/NASA-3D-Resources, downloaded 2026-11-14)
+- Viking Lander: `3D Models/Viking Lander`. NASA
+- Mars Exploration Rover Opportunity (MER-B): `3D Models/Mars Exploration Rover - Opportunity (MER-B)`. NASA
+- InSight: `3D Models/InSight Cruise Lander` ("arm deployed" version). NASA/JPL-Caltech
+- Ingenuity Mars Helicopter: `3D Models/Ingenuity Mars Helicopter`. NASA/JPL-Caltech
+- Apollo Lunar Module: `3D Models/Apollo Lunar Module`. NASA
+- Lunar Reconnaissance Orbiter: `3D Models/Lunar Reconnaissance Orbiter (B)`. NASA
+- Voyager: `3D Models/Voyager Probe (B)`. NASA/JPL-Caltech
+- Cassini-Huygens: `3D Models/Cassini-Huygens (A)`. NASA/JPL-Caltech
+- New Horizons: NASA printable parts, https://science.nasa.gov/3d-resources/new-horizons/ (body, antenna, RTG), assembled per NASA's assembly sheet and colored by our team
+- Lunar Roving Vehicle and Blue Ghost lander: original Three.js models by our team (NASA has no 3D model of either), shaped after NASA photos; no company markings
+- Asteroid 1999 RQ36 (Bennu): `3D Models/1999 RQ36 asteroid` (downloaded; the game's asteroids are now original procedural rocks)
 
-### Sounds
-_Add one line per NASA sound: name, exact page URL, credit line from the page (some name a university partner)._
+### Planet textures
+- Earth: Blue Marble, NASA Goddard Space Flight Center Scientific Visualization Studio, https://svs.gsfc.nasa.gov/2915/
+- Moon color + elevation: CGI Moon Kit (LRO/LROC and LOLA data), NASA's Scientific Visualization Studio, https://svs.gsfc.nasa.gov/4720/
+- Mars, Phobos, Deimos: NASA 3D Resources `Images and Textures`
+- Deep space ringed planet: original art painted in code (not a NASA image)
+
+### Asteroid data
+- NeoWs snapshot (`data/asteroids.json`), NASA/JPL, via https://api.nasa.gov/. Each asteroid links to its JPL Small-Body Database record.
+
+### Sounds (https://www.nasa.gov/historical-sounds/, downloaded 2026-11-14). NASA
+- Atlas V: Launch (riser in the Mars song)
+- Quindar: Sound #1 (percussion beeps in the Mars song)
+- Kepler: Star KIC12268220C Light Curve Waves to Sound (Mars data break until the InSight marsquake is added)
+- Voyager: Lightning on Jupiter
+- Cassini: Saturn Radio Emissions #2
+- LCROSS: Water on the Moon Song
+- Stardust: Passing Comet Tempel 1
+- Skipped: the Sputnik beep (not a NASA spacecraft) and the University of Iowa chorus clip (credited to a third party).
+
+### Code
+- Draco mesh decoder (`assets/draco/`), Apache License 2.0, from Google's Draco via Three.js examples
 
 ## Music
 All music is original, written as code for this game and played with Web Audio synthesizers.

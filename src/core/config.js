@@ -3,20 +3,22 @@
 export const features = {
   // Phase 2
   realModels: true,        // loads .glb when present, placeholder otherwise
-  nasaSamples: false,      // sampler.js + NASA layers in songs
-  dataBreaks: false,
+  nasaSamples: true,      // sampler.js + NASA layers in songs
+  dataBreaks: true,
   holdNotes: false,
   scanUnlock: false,
   hotspots: false,
   machineLogs: false,      // log on card back with flip
   realStoryTags: false,
   radioReactions: false,
-  oneLaneMode: false,
-  moonRegion: false,
-  deepSpaceRegion: false,
-  cockpitHub: false,
-  whatYoureHearing: false,
+  oneLaneMode: true,
+  moonRegion: true,
+  deepSpaceRegion: true,
+  cockpitHub: true,
+  whatYoureHearing: true,
   // Phase 3
+  world3d: true,           // three/world.js: 3D space scene + cockpit behind every screen
+  ui3d: true,              // hologram panels with 3D tilt (ui/tilt.js)
   asteroids: false,
   numanMeter: false,
   musicReactive: false,
@@ -46,7 +48,7 @@ export const judging = {
   greatMs: 100,
   goodMs: 150,       // assumption: hits 100-150 ms count 0.25 (tune in playtesting)
   weights: { perfect: 1, great: 0.5, good: 0.25, miss: 0 },
-  clear: { easy: 0.6, normal: 0.7, hard: 0.7 },
+  clear: { easy: 0.5, normal: 0.6, hard: 0.6 },   // lowered from 60/70 per team request
   grades: [ ['S', 0.95], ['A', 0.85], ['B', 0.7], ['C', 0] ],
 };
 

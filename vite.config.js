@@ -22,4 +22,17 @@ export default defineConfig({
   publicDir: false,
   build: { outDir: 'dist', chunkSizeWarningLimit: 1200 },
   plugins: [copyRuntimeFolders()],
+  // pre-bundle three and its add-ons together so the dev server ships ONE copy of three
+  optimizeDeps: {
+    include: [
+      'three',
+      'three/examples/jsm/loaders/GLTFLoader.js',
+      'three/examples/jsm/loaders/DRACOLoader.js',
+      'three/examples/jsm/environments/RoomEnvironment.js',
+      'three/examples/jsm/controls/OrbitControls.js',
+      // dev-only: scripts/convert-new-horizons.js
+      'three/examples/jsm/loaders/STLLoader.js',
+      'three/examples/jsm/exporters/GLTFExporter.js',
+    ],
+  },
 });

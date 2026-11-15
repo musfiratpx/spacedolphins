@@ -35,7 +35,8 @@ async function checkAll() {
   ];
   await Promise.all(entries.map(async ([kind, id, entry]) => {
     const url = entry.file;
-    entry.present = url ? await exists(url) : false;
+    // procedural = an original model built in code (src/three/originals.js): always available
+    entry.present = entry.procedural ? true : url ? await exists(url) : false;
     if (!entry.present) missing.push(`${kind}:${id} (${url || 'no file set'})`);
   }));
   if (missing.length) {
@@ -50,12 +51,14 @@ async function checkAll() {
 /** @returns {{ url: string|null, placeholder: boolean, entry: object|null }} */
 export function getModel(id) {
   const entry = manifest.models?.[id] || null;
+  if (entry?.procedural) return { url: null, placeholder: false, procedural: entry.procedural, entry };
   if (entry?.present) return { url: entry.file, placeholder: false, entry };
   return { url: null, placeholder: true, entry };
 }
 
 export function getSound(id) {
   const entry = manifest.sounds?.[id] || null;
+  if (entry?.procedural) return { url: null, placeholder: false, procedural: entry.procedural, entry };
   if (entry?.present) return { url: entry.file, placeholder: false, entry };
   return { url: null, placeholder: true, entry };
 }

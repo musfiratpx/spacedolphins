@@ -6,6 +6,7 @@ import { HardwareViewer } from '../three/viewer.js';
 import { getModel } from '../core/manifest.js';
 
 let viewer = null;
+let onKey = null;
 
 function field(label, value, kind = 'real') {
   if (!value) return '';
@@ -29,10 +30,16 @@ export default {
           </div>
         </header>
         <div class="card-grid">
-          <div class="panel viewer-wrap">
-            <div class="viewer" aria-label="3D model of ${esc(m.name)}. Drag to rotate."></div>
+          <div class="panel viewer-wrap" data-tilt="off">
+            <div class="viewer" aria-label="3D model of ${esc(m.name)}. Drag to rotate, scroll or pinch to zoom."></div>
+            <div class="viewer-tools" role="toolbar" aria-label="Model controls">
+              <button class="tool" data-act="zoomIn" aria-label="Zoom in">＋</button>
+              <button class="tool" data-act="zoomOut" aria-label="Zoom out">－</button>
+              <button class="tool" data-act="reset" aria-label="Reset view">⟲</button>
+              <button class="tool tool-wide" data-act="inspect" aria-pressed="false">⤢ Inspect</button>
+            </div>
             <p class="viewer-note hidden">Model placeholder: download <code>${esc(entry?.file || m.model)}</code> from NASA 3D Resources.</p>
-            <p class="hint">Drag to rotate</p>
+            <p class="hint">Drag to rotate · scroll or pinch to zoom · right-drag to move</p>
           </div>
           <div class="panel card-fields">
             <dl>
@@ -48,10 +55,33 @@ export default {
           </div>
         </div>
       </section>`;
-    wire(el, go);
+    const wrap = el.querySelector('.viewer-wrap');
+    const setInspect = (on) => {
+      document.getElementById('app').scrollTop = 0;
+      wrap.classList.toggle('inspecting', on);
+      document.body.classList.toggle('inspect-open', on);
+      const b = el.querySelector('[data-act="inspect"]');
+      b.setAttribute('aria-pressed', String(on));
+      b.textContent = on ? '✕ Close' : '⤢ Inspect';
+      viewer?.setDetail(on);
+      viewer?.reset();
+    };
+    wire(el, go, {
+      zoomIn: () => viewer?.zoom(0.7),
+      zoomOut: () => viewer?.zoom(1.4),
+      reset: () => viewer?.reset(),
+      inspect: () => setInspect(!wrap.classList.contains('inspecting')),
+    });
+    onKey = (e) => { if (e.key === 'Escape' && wrap.classList.contains('inspecting')) setInspect(false); };
+    window.addEventListener('keydown', onKey);
     viewer = new HardwareViewer(el.querySelector('.viewer'));
-    const { placeholder } = await viewer.show(m.model);
+    const { placeholder } = await viewer.show(m.model, { scan: true });
     if (placeholder) el.querySelector('.viewer-note')?.classList.remove('hidden');
   },
-  unmount() { viewer?.dispose(); viewer = null; },
+  unmount() {
+    viewer?.dispose(); viewer = null;
+    document.body.classList.remove('inspect-open');
+    if (onKey) window.removeEventListener('keydown', onKey);
+    onKey = null;
+  },
 };

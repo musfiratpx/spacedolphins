@@ -6,9 +6,8 @@
       "name": "The Moon: Nearest Neighbors",
       "color": "#A7ADBA",
       "song": "moon-calm",
-      "songTitle": "TODO (Phase 2)",
-      "bpm": 100,
-      "lockedText": "Coming in Phase 2"
+      "songTitle": "Nearest Neighbors",
+      "bpm": 100
     },
     {
       "id": "mars",
@@ -23,9 +22,8 @@
       "name": "Deep Space: The Long Signal",
       "color": "#7B6CF6",
       "song": "deep-signal",
-      "songTitle": "TODO (Phase 2)",
-      "bpm": 140,
-      "lockedText": "Coming in Phase 2"
+      "songTitle": "The Long Signal",
+      "bpm": 140
     }
   ],
   "machines": [
@@ -55,11 +53,32 @@
       "model": "viking",
       "sound": "beeps",
       "hotspots": [
-        { "part": "Robot arm", "position": [0, 0, 0], "label": "Scooped soil for the biology labs. TODO_VERIFY position" },
-        { "part": "Camera", "position": [0, 0, 0], "label": "Took the first US photos from the Martian surface. TODO_VERIFY position" }
+        {
+          "part": "Robot arm",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "label": "Scooped soil for the biology labs. TODO_VERIFY position"
+        },
+        {
+          "part": "Camera",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "label": "Took the first US photos from the Martian surface. TODO_VERIFY position"
+        }
       ],
       "source": "https://science.nasa.gov/mission/viking-1/",
-      "tags": { "why": "real", "howItWorked": "real", "found": "real", "numanNote": "story" }
+      "tags": {
+        "why": "real",
+        "howItWorked": "real",
+        "found": "real",
+        "numanNote": "story"
+      }
     },
     {
       "id": "opportunity",
@@ -87,12 +106,41 @@
       "model": "opportunity",
       "sound": "mars-wind",
       "hotspots": [
-        { "part": "Solar panels", "position": [0, 0, 0], "label": "Turned sunlight into power. Dust storms blocked it. TODO_VERIFY position" },
-        { "part": "Robot arm", "position": [0, 0, 0], "label": "Held tools to study rocks up close. TODO_VERIFY position" },
-        { "part": "Wheels", "position": [0, 0, 0], "label": "Six wheels carried it about 28 miles. TODO_VERIFY position" }
+        {
+          "part": "Solar panels",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "label": "Turned sunlight into power. Dust storms blocked it. TODO_VERIFY position"
+        },
+        {
+          "part": "Robot arm",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "label": "Held tools to study rocks up close. TODO_VERIFY position"
+        },
+        {
+          "part": "Wheels",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "label": "Six wheels carried it about 28 miles. TODO_VERIFY position"
+        }
       ],
       "source": "https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/",
-      "tags": { "why": "real", "howItWorked": "real", "found": "real", "numanNote": "story" }
+      "tags": {
+        "why": "real",
+        "howItWorked": "real",
+        "found": "real",
+        "numanNote": "story"
+      }
     },
     {
       "id": "insight",
@@ -120,12 +168,41 @@
       "model": "insight",
       "sound": "marsquake",
       "hotspots": [
-        { "part": "Seismometer dome", "position": [0, 0, 0], "label": "Covered the seismometer to block wind and heat. TODO_VERIFY position" },
-        { "part": "Solar panels", "position": [0, 0, 0], "label": "Round panels made power until dust covered them. TODO_VERIFY position" },
-        { "part": "Robot arm", "position": [0, 0, 0], "label": "Placed instruments on the ground. TODO_VERIFY position" }
+        {
+          "part": "Seismometer dome",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "label": "Covered the seismometer to block wind and heat. TODO_VERIFY position"
+        },
+        {
+          "part": "Solar panels",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "label": "Round panels made power until dust covered them. TODO_VERIFY position"
+        },
+        {
+          "part": "Robot arm",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "label": "Placed instruments on the ground. TODO_VERIFY position"
+        }
       ],
       "source": "https://science.nasa.gov/mission/insight/",
-      "tags": { "why": "real", "howItWorked": "real", "found": "real", "numanNote": "story" }
+      "tags": {
+        "why": "real",
+        "howItWorked": "real",
+        "found": "real",
+        "numanNote": "story"
+      }
     },
     {
       "id": "ingenuity",
@@ -153,19 +230,278 @@
       "model": "ingenuity",
       "sound": "ingenuity-hum",
       "hotspots": [
-        { "part": "Rotors", "position": [0, 0, 0], "label": "Two rotors spun opposite ways to grip thin air. TODO_VERIFY position" },
-        { "part": "Solar panel", "position": [0, 0, 0], "label": "Charged its batteries between flights. TODO_VERIFY position" }
+        {
+          "part": "Rotors",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "label": "Two rotors spun opposite ways to grip thin air. TODO_VERIFY position"
+        },
+        {
+          "part": "Solar panel",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "label": "Charged its batteries between flights. TODO_VERIFY position"
+        }
       ],
       "source": "https://science.nasa.gov/mission/mars-2020-perseverance/ingenuity-mars-helicopter/",
-      "tags": { "why": "real", "howItWorked": "real", "found": "real", "numanNote": "story" }
+      "tags": {
+        "why": "real",
+        "howItWorked": "real",
+        "found": "real",
+        "numanNote": "story"
+      }
     },
-    { "id": "apollo11-descent", "name": "Apollo 11 descent stage", "region": "moon", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 1969, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "It was a launch pad for the trip home.", "power": "launch-pad", "model": "apollo-lm", "sound": "atlas-launch", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
-    { "id": "apollo17-rover", "name": "Apollo 17 rover", "region": "moon", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 1972, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "A car that drove on the Moon.", "power": "long-haul", "model": "apollo17-site", "sound": "beeps", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
-    { "id": "lro", "name": "Lunar Reconnaissance Orbiter", "region": "moon", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 2009, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "It maps the whole Moon from orbit.", "power": "map-ahead", "model": "lro", "sound": "lcross-moon", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
-    { "id": "blue-ghost", "name": "Blue Ghost Mission 1", "region": "moon", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 2025, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "It tested ways to clear dust off surfaces.", "power": "dust-shield", "model": "blue-ghost", "sound": "beeps", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
-    { "id": "voyager1", "name": "Voyager 1", "region": "deep", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 1977, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "Its signal takes almost a day to reach Earth.", "power": "long-range", "model": "voyager", "sound": "voyager-plasma", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
-    { "id": "voyager2", "name": "Voyager 2", "region": "deep", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 1977, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "Still sending signals from interstellar space.", "power": "long-range", "model": "voyager", "sound": "jupiter-lightning", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
-    { "id": "new-horizons", "name": "New Horizons", "region": "deep", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 2006, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "It hibernates to save power on long trips.", "power": "hibernate", "model": "new-horizons", "sound": "kepler-star", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
-    { "id": "cassini", "name": "Cassini", "region": "deep", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 1997, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "Its ending was planned to protect Saturn's moons.", "power": "guardian", "model": "cassini", "sound": "saturn-radio", "hotspots": [], "source": "TODO_VERIFY", "tags": {} }
+    {
+      "id": "apollo11-descent",
+      "name": "Apollo 11 descent stage",
+      "region": "moon",
+      "place": "Sea of Tranquility, Moon",
+      "lat": 0.69,
+      "lon": 23.43,
+      "coordsVerified": true,
+      "arrived": 1969,
+      "why": "To land the first astronauts on the Moon and bring them home safely.",
+      "howItWorked": "The lower half of the lander Eagle. When it was time to leave, the top half fired its engine and lifted off from it.",
+      "found": "Astronauts set up a laser reflector, a quake sensor and a solar wind experiment here.",
+      "status": "Still at Tranquility Base, with the plaque attached to it.",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "Sea of Tranquility. I landed here on July 20, 1969.",
+        "Two astronauts stepped down my ladder and walked on the Moon.",
+        "When it was time to go, the top half of me fired its engine and left.",
+        "I stayed behind, with a plaque on my leg."
+      ],
+      "numanNote": "The Numans call it 'the doorstep.'",
+      "teaser": "It was a launch pad for the trip home.",
+      "power": "launch-pad",
+      "model": "apollo-lm",
+      "sound": "beeps",
+      "hotspots": [],
+      "source": "https://www.nasa.gov/history/apollo-11-mission-overview/",
+      "tags": {
+        "numanNote": "story"
+      }
+    },
+    {
+      "id": "apollo17-rover",
+      "name": "Apollo 17 Lunar Roving Vehicle",
+      "region": "moon",
+      "place": "Taurus-Littrow valley, Moon",
+      "lat": 20.16,
+      "lon": 30.77,
+      "coordsVerified": true,
+      "arrived": 1972,
+      "why": "To let astronauts drive farther and explore more of the Moon.",
+      "howItWorked": "A battery-powered car. Two astronauts sat side by side and drove it across the dusty valley.",
+      "found": "It carried the crew around Taurus-Littrow, the last Apollo landing site.",
+      "status": "Still parked at Taurus-Littrow.",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "Taurus-Littrow. I arrived in December 1972, folded up on the side of a lander.",
+        "I ran on batteries and drove 30.5 kilometers in all.",
+        "I was the last Apollo rover. I am still parked in the valley."
+      ],
+      "numanNote": "The Numans like that it has wheels. They do not.",
+      "teaser": "A car that drove on the Moon.",
+      "power": "long-haul",
+      "model": "lrv",
+      "sound": "beeps",
+      "hotspots": [],
+      "source": "https://www.nasa.gov/missions/apollo/apollo-17-mission-details/",
+      "tags": {
+        "numanNote": "story"
+      }
+    },
+    {
+      "id": "lro",
+      "name": "Lunar Reconnaissance Orbiter",
+      "region": "moon",
+      "place": "Orbiting the Moon",
+      "lat": null,
+      "lon": null,
+      "coordsVerified": true,
+      "arrived": 2009,
+      "why": "To map the Moon and find good, safe places for future explorers.",
+      "howItWorked": "A laser called LOLA measures how high or low the ground is, building a 3D map.",
+      "found": "It mapped the Moon's surface, temperature and radiation, and helps find water near the South Pole.",
+      "status": "Still working. The longest-lived Moon orbiter ever.",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "Launched June 18, 2009. I have circled the Moon ever since.",
+        "I measure every hill and crater with a laser.",
+        "I look for water ice near the South Pole for future explorers."
+      ],
+      "numanNote": "The Numans say LRO knows the Moon better than the Moon does.",
+      "teaser": "It maps the whole Moon from orbit.",
+      "power": "map-ahead",
+      "model": "lro",
+      "sound": "lcross-moon",
+      "hotspots": [],
+      "source": "https://science.nasa.gov/mission/lro/",
+      "tags": {
+        "numanNote": "story"
+      }
+    },
+    {
+      "id": "blue-ghost",
+      "name": "Blue Ghost Mission 1 lander",
+      "region": "moon",
+      "place": "Mare Crisium, Moon",
+      "lat": null,
+      "lon": null,
+      "coordsVerified": false,
+      "arrived": 2025,
+      "why": "To deliver 10 NASA science payloads to the Moon.",
+      "howItWorked": "Its Electrodynamic Dust Shield used electric fields to push dust off surfaces.",
+      "found": "It tested how lunar dust sticks to materials and ways to keep dust off.",
+      "status": "TODO_VERIFY",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "Mare Crisium. I carried 10 NASA experiments to the Moon.",
+        "One used electricity to push sticky Moon dust off a camera and a panel.",
+        "Moon dust gets into everything. Now we know more about stopping it."
+      ],
+      "numanNote": "The Numans named it 'the dust whisperer.'",
+      "teaser": "It tested ways to clear dust off surfaces.",
+      "power": "dust-shield",
+      "model": "blue-ghost",
+      "sound": "beeps",
+      "hotspots": [],
+      "source": "https://science.nasa.gov/lunar-science/clps-deliveries/to19d-firefly/",
+      "tags": {
+        "numanNote": "story"
+      },
+      "todo": "Landing date and end of mission not shown on the linked NASA page; arrived year 2025 from the team outline."
+    },
+    {
+      "id": "voyager1",
+      "name": "Voyager 1",
+      "region": "deep",
+      "place": "Interstellar space",
+      "lat": null,
+      "lon": null,
+      "coordsVerified": true,
+      "arrived": 1977,
+      "why": "To fly by Jupiter and Saturn, then keep going.",
+      "howItWorked": "A big dish antenna points home to send data across billions of miles.",
+      "found": "It became the first human-made object in interstellar space, in August 2012.",
+      "status": "Still sending data. More than 16 billion miles away, nearing one light-day from Earth.",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "I launched in 1977 and flew past Jupiter and Saturn.",
+        "In August 2012 I left the Sun's bubble and entered interstellar space.",
+        "Engineers turn my instruments off one by one to save power.",
+        "I am still talking to Earth."
+      ],
+      "numanNote": "The Numans can hear it humming far away.",
+      "teaser": "Its signal takes almost a day to reach Earth.",
+      "power": "long-range",
+      "model": "voyager",
+      "sound": "jupiter-lightning",
+      "hotspots": [],
+      "source": "https://science.nasa.gov/mission/voyager/voyager-1/",
+      "tags": {
+        "numanNote": "story"
+      }
+    },
+    {
+      "id": "voyager2",
+      "name": "Voyager 2",
+      "region": "deep",
+      "place": "Interstellar space",
+      "lat": null,
+      "lon": null,
+      "coordsVerified": true,
+      "arrived": 1977,
+      "why": "To study the giant outer planets up close.",
+      "howItWorked": "It used each planet's gravity to swing on to the next one.",
+      "found": "The only spacecraft to visit Uranus and Neptune. It found new moons and rings at both.",
+      "status": "In interstellar space since 2018, still sending data.",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "I launched on August 20, 1977.",
+        "I am the only spacecraft to visit Uranus and Neptune.",
+        "At Neptune I found five moons, four rings and a Great Dark Spot.",
+        "In 2018 I joined my twin in interstellar space."
+      ],
+      "numanNote": "The Numans think Voyager 2 is the braver twin. Do not tell Voyager 1.",
+      "teaser": "The only visitor to Uranus and Neptune.",
+      "power": "long-range",
+      "model": "voyager",
+      "sound": "jupiter-lightning",
+      "hotspots": [],
+      "source": "https://science.nasa.gov/mission/voyager/voyager-2/",
+      "tags": {
+        "numanNote": "story"
+      }
+    },
+    {
+      "id": "new-horizons",
+      "name": "New Horizons",
+      "region": "deep",
+      "place": "Kuiper Belt",
+      "lat": null,
+      "lon": null,
+      "coordsVerified": true,
+      "arrived": 2006,
+      "why": "To study Pluto, its moons and other icy worlds in the Kuiper Belt.",
+      "howItWorked": "A nuclear power source (an RTG, a spare from Cassini) made about 250 watts at launch.",
+      "found": "The first close look at Pluto (2015) and at Arrokoth (2019), the most distant object ever explored up close.",
+      "status": "Still flying outward through the Kuiper Belt.",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "I launched on January 19, 2006.",
+        "On July 14, 2015, I flew past Pluto and its moons.",
+        "In 2019 I reached Arrokoth, the farthest world ever explored up close.",
+        "I am still heading out into the dark."
+      ],
+      "numanNote": "The Numans say it took the long way and enjoyed it.",
+      "teaser": "It hibernates to save power on long trips.",
+      "power": "hibernate",
+      "model": "new-horizons",
+      "sound": "kepler-star",
+      "hotspots": [],
+      "source": "https://science.nasa.gov/mission/new-horizons/",
+      "tags": {
+        "numanNote": "story"
+      }
+    },
+    {
+      "id": "cassini",
+      "name": "Cassini",
+      "region": "deep",
+      "place": "Saturn (ended inside the planet)",
+      "lat": null,
+      "lon": null,
+      "coordsVerified": true,
+      "arrived": 1997,
+      "why": "To study Saturn, its rings and its moons in great detail.",
+      "howItWorked": "It was the first spacecraft to orbit Saturn, circling it for 13 years.",
+      "found": "Water ice and vapor spraying from the moon Enceladus.",
+      "status": "Mission ended September 2017. It was steered into Saturn on purpose.",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "I launched in 1997 and began orbiting Saturn in 2004.",
+        "I saw ice spraying from the moon Enceladus.",
+        "When my fuel ran low, I dove into Saturn on purpose.",
+        "That kept Enceladus and Titan clean for future explorers."
+      ],
+      "numanNote": "The Numans call this 'the kindest ending.'",
+      "teaser": "Its ending was planned to protect Saturn's moons.",
+      "power": "guardian",
+      "model": "cassini",
+      "sound": "saturn-radio",
+      "hotspots": [],
+      "source": "https://science.nasa.gov/mission/cassini/",
+      "tags": {
+        "numanNote": "story"
+      }
+    }
   ]
 }

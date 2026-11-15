@@ -14,7 +14,7 @@ const RULES = {
 /**
  * @param song  score JSON
  * @param difficulty 'easy' | 'normal' | 'hard'
- * @param opts { oneLane?: boolean, peaks?: { [sampleId]: number[] } }  (peaks: data breaks, Phase 2)
+ * @param opts { oneLane?: boolean, dataBreak?: { startSec, endSec, peaksMs } }
  * @returns {{ notes: Array<{t:number, lane:'L'|'R', hold?:number, track:string}>, lengthMs:number }}
  */
 export function generateChart(song, difficulty = 'normal', opts = {}) {
@@ -43,10 +43,17 @@ export function generateChart(song, difficulty = 'normal', opts = {}) {
     candidates.push(note);
   }
 
-  // Data break notes (Phase 2): opts.peaks[sampleId] = peak times in ms from song start.
-  if (features.dataBreaks && song.dataBreak && opts.peaks?.[song.dataBreak.sample]) {
+  // Data break: notes sit on the recording's loudest peaks instead of the backbone.
+  // opts.dataBreak = { startSec, endSec, peaksMs } from sampler.prepareSong.
+  const db = features.dataBreaks ? opts.dataBreak : null;
+  if (db) {
+    const s0 = db.startSec * 1000; const s1 = db.endSec * 1000;
+    candidates = candidates.filter((n) => {
+      const role = song.instruments?.[n.track]?.role;
+      return !(role === 'backbone' && n.t >= s0 && n.t < s1);
+    });
     let i = 0;
-    for (const t of opts.peaks[song.dataBreak.sample]) {
+    for (const t of db.peaksMs) {
       candidates.push({ t, lane: i++ % 2 ? 'R' : 'L', track: 'dataBreak', priority: -1 });
     }
   }

@@ -168,7 +168,7 @@ become notes, on which lane (`L`, `R`, or `alt`), and from which difficulty up. 
 ## Judging
 Perfect ≤ 50 ms, Great ≤ 100 ms, Good ≤ 150 ms (assumption: counts 0.25; tune in
 playtesting), Miss beyond 150 ms. Accuracy = (Perfect×1 + Great×0.5 + Good×0.25) / notes.
-Clear: 60% Easy, 70% Normal/Hard. Grades: S ≥ 95, A ≥ 85, B ≥ 70, C below.
+Clear: 50% Easy, 60% Normal/Hard (lowered from 60/70 on 2026-11-14 at the team's request). Grades: S ≥ 95, A ≥ 85, B ≥ 70, C below.
 
 ## Musical roles
 

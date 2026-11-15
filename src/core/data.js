@@ -32,3 +32,19 @@ export async function loadSong(id) {
   }
   return songs.get(id);
 }
+
+// NeoWs snapshot (real near-Earth asteroids); saved by scripts/fetch-asteroids.js
+let asteroids = null;
+export async function loadAsteroids() {
+  if (asteroids) return asteroids;
+  try {
+    const res = await fetch('data/asteroids.json', { cache: 'no-store' });
+    asteroids = await res.json();
+  } catch (err) {
+    console.warn('[data] data/asteroids.json missing; run node scripts/fetch-asteroids.js', err);
+    asteroids = { asteroids: [] };
+  }
+  return asteroids;
+}
+export function getAsteroids() { return asteroids?.asteroids || []; }
+export function getAsteroidSnapshot() { return asteroids; }

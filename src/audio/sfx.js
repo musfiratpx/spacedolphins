@@ -20,10 +20,12 @@ export const sfx = {
   hover() { tone(1400, 0.04, 'sine', 0.04); },
   click() { tone(900, 0.06, 'square', 0.06); },
   back() { tone(500, 0.08, 'square', 0.05, 'sfx', 350); },
-  hit(judgement) {
-    if (judgement === 'perfect') tone(1760, 0.07, 'triangle', 0.12);
-    else tone(1320, 0.06, 'triangle', 0.09);
+  hit(judgement, combo = 0) {
+    const lift = 1 + Math.min(combo, 60) * 0.004;     // up to ~a minor third over a long streak
+    if (judgement === 'perfect') tone(1760 * lift, 0.07, 'triangle', 0.12);
+    else tone(1320 * lift, 0.06, 'triangle', 0.09);
   },
+  milestone() { tone(880, 0.09, 'triangle', 0.08); setTimeout(() => tone(1320, 0.12, 'triangle', 0.08), 90); },
   miss() { tone(120, 0.12, 'sine', 0.12, 'sfx', 80); },   // soft low thud, never harsh
   type() { tone(2200 + Math.random() * 300, 0.015, 'square', 0.02, 'radio'); },
   static(dur = 0.25) {

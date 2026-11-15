@@ -44,7 +44,9 @@ export function recordBest(songId, difficulty, result) {
   if (!prev || result.accuracy > prev.accuracy) {
     state.best[k] = { grade: result.grade, accuracy: result.accuracy };
     save();
+    return { improved: true, prev };
   }
+  return { improved: false, prev };
 }
 
 export function resetProgress() {

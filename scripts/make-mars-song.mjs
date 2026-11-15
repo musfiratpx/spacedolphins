@@ -12,14 +12,19 @@ const song = {
   stepsPerBar: 16,
   swing: 0,
   key: 'D minor',
+  genre: 'synthwave',
   instruments: {
-    kick:  { type: 'synth.kick',  gain: 1.0,  role: 'backbone', nasaLayer: 'marsquake (sub hit on downbeats, Phase 2)' },
-    snare: { type: 'synth.snare', gain: 0.85, role: 'backbone' },
-    hat:   { type: 'synth.hat',   gain: 0.6,  role: 'backbone' },
-    bass:  { type: 'synth.bass',  gain: 0.8,  role: 'backbone', nasaLayer: 'ingenuity-hum drone (Phase 2)' },
-    pad:   { type: 'synth.pad',   gain: 0.7,  role: 'pad', nasaLayer: 'mars-wind (Phase 2)' },
-    lead:  { type: 'synth.lead',  gain: 0.75, role: 'lead' },
-    riser: { type: 'synth.riser', gain: 0.8,  role: 'riser' },
+    // send = { reverb, delay } amounts; duck = dips under the kick so the beat stays clear
+    kick:  { type: 'synth.kick',  gain: 1.0,  role: 'backbone', ducker: true, nasaLayer: 'marsquake (sub hit on downbeats, once downloaded)' },
+    snare: { type: 'synth.snare', gain: 0.8,  role: 'backbone', send: { reverb: 0.45 } },
+    hat:   { type: 'synth.hat',   gain: 0.5,  role: 'backbone', send: { delay: 0.05 } },
+    bass:  { type: 'synth.bass',  gain: 0.8,  role: 'backbone', duck: 0.5, nasaLayer: 'ingenuity-hum drone (once downloaded)' },
+    pad:   { type: 'synth.pad',   gain: 0.75, role: 'pad', duck: 0.6, send: { reverb: 0.5 }, nasaLayer: 'mars-wind (once downloaded)' },
+    lead:  { type: 'synth.lead',  gain: 0.8,  role: 'lead', send: { reverb: 0.25, delay: 0.22 } },
+    riser: { type: 'synth.riser', gain: 0.6,  role: 'riser', send: { reverb: 0.3 } },
+    // NASA layers (real recordings; they sit under the backbone, never mask it)
+    // NASA layer (no vocals): Stardust's comet-flyby sonification as the whoosh into the drop
+    comet: { type: 'sample.stardust-comet', gain: 0.6, role: 'riser', trim: true, durationSteps: 32, fadeSteps: 6, send: { reverb: 0.3 }, nasa: 'Stardust: Passing Comet Tempel 1' },
   },
   patterns: {
     kick:  { four: 'o...x...o...x...', drive: 'o..x..x.o...x...', half: 'o.......o.......', fill: 'o...x...o.x.x.xx' },
@@ -44,16 +49,18 @@ const song = {
         ['A4', '_', '_', '_', 'C#5', '_', '_', '_', 'E5', '_', '_', '_', 'D5', '_', '_', '-'],
       ),
     },
-    riser: { up: bars(hold('C4', 64)) },
+    riser: { up: bars(hold('C4', 64)), up2: bars(hold('C4', 32)) },
+    comet: { once: 'x' + '.'.repeat(31) },
   },
+  // 20 bars at 112 BPM = about 43 seconds (every song stays under 45 s)
   sections: [
-    { name: 'intro',     bars: 4, play: { kick: 'half', hat: 'quarter', pad: 'prog' } },
-    { name: 'groove',    bars: 8, play: { kick: 'four', snare: 'back', hat: 'eighth', bass: 'drive', pad: 'prog' } },
-    { name: 'build',     bars: 4, play: { kick: 'four', snare: 'ghost', hat: 'sixteen', bass: 'long', riser: 'up' } },
-    { name: 'drop',      bars: 8, play: { kick: 'drive', snare: 'back', hat: 'sixteen', bass: 'drive', pad: 'prog', lead: 'hook' } },
-    { name: 'breakdown', bars: 4, play: { kick: 'half', hat: 'quarter', pad: 'prog' }, dataBreak: true },
-    { name: 'final',     bars: 8, play: { kick: 'drive', snare: 'back', hat: 'sixteen', bass: 'drive', pad: 'prog', lead: 'answer' } },
-    { name: 'outro',     bars: 2, play: { kick: 'half', pad: 'prog' } },
+    { name: 'intro',     bars: 2, play: { kick: 'half', hat: 'quarter', pad: 'prog' } },
+    { name: 'groove',    bars: 4, play: { kick: 'four', snare: 'back', hat: 'eighth', bass: 'drive', pad: 'prog' } },
+    { name: 'build',     bars: 2, play: { kick: 'four', snare: 'ghost', hat: 'sixteen', bass: 'long', riser: 'up2', comet: 'once' } },
+    { name: 'drop',      bars: 4, play: { kick: 'four', snare: 'back', hat: 'sixteen', bass: 'drive', pad: 'prog', lead: 'hook' } },
+    { name: 'data break', bars: 3, play: { kick: 'half', hat: 'quarter', pad: 'prog' }, dataBreak: true },
+    { name: 'final',     bars: 4, play: { kick: 'four', snare: 'back', hat: 'sixteen', bass: 'drive', pad: 'prog', lead: 'answer' } },
+    { name: 'outro',     bars: 1, play: { kick: 'half', pad: 'prog' } },
   ],
   chart: {
     snare: { lane: 'R', from: 'easy' },
@@ -61,7 +68,9 @@ const song = {
     lead:  { lane: 'alt', from: 'normal', hold: true },
     bass:  { lane: 'alt', from: 'hard' },
   },
-  dataBreak: { startBar: 25, bars: 4, sample: 'marsquake', lanes: 'alt', note: 'Bars are 1-indexed. Phase 2: notes from marsquake peaks; backbone drops out.' },
+  // Bars are 1-indexed. Uses the InSight marsquake once it's downloaded; until then the
+  // Kepler star sound (the Numans' "voice"). Backbone drops out; notes sit on the peaks.
+  dataBreak: { startBar: 13, bars: 3, sample: 'marsquake', fallbackSample: 'kepler-star', gain: 0.9, lanes: 'alt' },
 };
 fs.writeFileSync(process.argv[2], JSON.stringify(song, null, 2) + '\n');
 console.log('wrote', process.argv[2]);

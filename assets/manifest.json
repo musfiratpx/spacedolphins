@@ -1,28 +1,252 @@
 {
-  "_readme": "Every model and sound the game uses. 'file' is the path the game loads. Fill in 'source' (the exact NASA page URL) and 'credit' (the credit line that page gives) when you download. The game shows a marked placeholder for anything missing and logs it in the browser console.",
+  "_readme": "Every model and sound the game uses. 'file' is the path the game loads. Fill in 'source' (the exact NASA page URL) and 'credit' (the credit line that page gives) when you download. The game shows a marked placeholder for anything missing and logs it in the browser console. Downloaded 2026-11-14 from NASA 3D Resources (GitHub) and nasa.gov/historical-sounds. Sounds point at raw MP3s until prep-audio.sh exists.",
   "models": {
-    "insight":       { "title": "InSight lander",            "file": "assets/models/insight.glb",       "catalogName": "InSight (landed configuration, not cruise stage)", "source": "", "credit": "NASA" },
-    "ingenuity":     { "title": "Ingenuity Mars Helicopter", "file": "assets/models/ingenuity.glb",     "catalogName": "Ingenuity", "source": "", "credit": "NASA" },
-    "opportunity":   { "title": "Opportunity rover (MER-B)", "file": "assets/models/opportunity.glb",   "catalogName": "Mars Exploration Rover Opportunity (MER-B)", "source": "", "credit": "NASA" },
-    "viking":        { "title": "Viking Lander",             "file": "assets/models/viking.glb",        "catalogName": "Viking Lander", "source": "", "credit": "NASA" },
-    "apollo-lm":     { "title": "Apollo Lunar Module",       "file": "assets/models/apollo-lm.glb",     "catalogName": "Apollo Lunar Module", "source": "", "credit": "NASA" },
-    "apollo17-site": { "title": "Apollo 17 Landing Site",    "file": "assets/models/apollo17-site.glb", "catalogName": "Apollo 17 Landing Site", "source": "", "credit": "NASA" },
-    "lro":           { "title": "Lunar Reconnaissance Orbiter", "file": "assets/models/lro.glb",        "catalogName": "Lunar Reconnaissance Orbiter", "source": "", "credit": "NASA" },
-    "voyager":       { "title": "Voyager",                   "file": "assets/models/voyager.glb",       "catalogName": "Voyager", "source": "", "credit": "NASA" },
-    "new-horizons":  { "title": "New Horizons",              "file": "assets/models/new-horizons.glb",  "catalogName": "New Horizons", "source": "", "credit": "NASA" },
-    "cassini":       { "title": "Cassini",                   "file": "assets/models/cassini.glb",       "catalogName": "Cassini", "source": "", "credit": "NASA" },
-    "blue-ghost":    { "title": "Blue Ghost (original model, no NASA model exists)", "file": "assets/models/blue-ghost.glb", "catalogName": "none: build an original Three.js model from NASA photos", "source": "", "credit": "Original model by our team" }
+    "insight": {
+      "title": "InSight lander",
+      "file": "assets/models/insight.glb",
+      "catalogName": "InSight (landed configuration, not cruise stage)",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/InSight%20Cruise%20Lander",
+      "credit": "NASA/JPL-Caltech (NASA 3D Resources: \"InSight Cruise Lander (arm deployed)\"). Check it shows the landed lander."
+    },
+    "ingenuity": {
+      "title": "Ingenuity Mars Helicopter",
+      "file": "assets/models/ingenuity.glb",
+      "catalogName": "Ingenuity",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Ingenuity%20Mars%20Helicopter",
+      "credit": "NASA/JPL-Caltech (NASA 3D Resources)"
+    },
+    "opportunity": {
+      "title": "Opportunity rover (MER-B)",
+      "file": "assets/models/opportunity.glb",
+      "catalogName": "Mars Exploration Rover Opportunity (MER-B)",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Mars%20Exploration%20Rover%20-%20Opportunity%20(MER-B)",
+      "credit": "NASA (NASA 3D Resources)"
+    },
+    "viking": {
+      "title": "Viking Lander",
+      "file": "assets/models/viking.glb",
+      "catalogName": "Viking Lander",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Viking%20Lander",
+      "credit": "NASA (NASA 3D Resources)"
+    },
+    "apollo-lm": {
+      "title": "Apollo Lunar Module",
+      "file": "assets/models/apollo-lm.glb",
+      "catalogName": "Apollo Lunar Module",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Apollo%20Lunar%20Module",
+      "credit": "NASA (NASA 3D Resources)"
+    },
+    "apollo17-site": {
+      "title": "Apollo 17 Landing Site",
+      "file": "assets/models/apollo17-site.glb",
+      "catalogName": "Apollo 17 Landing Site (NASA has only a 3D-printing file, no .glb: TODO)",
+      "source": "",
+      "credit": "NASA",
+      "note": "Not used: NASA only has a 26 MB 3D-printing terrain file. The rover card uses the original LRV model."
+    },
+    "lro": {
+      "title": "Lunar Reconnaissance Orbiter",
+      "file": "assets/models/lro.glb",
+      "catalogName": "Lunar Reconnaissance Orbiter",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Lunar%20Reconnaissance%20Orbiter%20(B)",
+      "credit": "NASA (NASA 3D Resources)"
+    },
+    "voyager": {
+      "title": "Voyager",
+      "file": "assets/models/voyager.glb",
+      "catalogName": "Voyager",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Voyager%20Probe%20(B)",
+      "credit": "NASA/JPL-Caltech (NASA 3D Resources)",
+      "fit": 0.42,
+      "fitNote": "Framed by hand: most of this file's vertices are in the long magnetometer boom."
+    },
+    "new-horizons": {
+      "title": "New Horizons",
+      "file": "assets/models/new-horizons.glb",
+      "catalogName": "New Horizons (printable parts)",
+      "source": "https://science.nasa.gov/3d-resources/new-horizons/",
+      "credit": "NASA (printable model parts); assembled per NASA's assembly sheet and colored by our team (scripts/convert-new-horizons.js)"
+    },
+    "cassini": {
+      "title": "Cassini",
+      "file": "assets/models/cassini.glb",
+      "catalogName": "Cassini",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Cassini-Huygens%20(A)",
+      "credit": "NASA/JPL-Caltech (NASA 3D Resources)"
+    },
+    "blue-ghost": {
+      "title": "Blue Ghost lander (original model)",
+      "file": null,
+      "catalogName": "none: build an original Three.js model from NASA photos",
+      "source": "",
+      "credit": "Original Three.js model by our team, shaped after NASA mission photos (src/three/originals.js). No company markings.",
+      "procedural": "blue-ghost"
+    },
+    "asteroid-bennu": {
+      "title": "Asteroid Bennu (1999 RQ36)",
+      "file": "assets/models/asteroid-bennu.glb",
+      "catalogName": "1999 RQ36 asteroid",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/1999%20RQ36%20asteroid",
+      "credit": "NASA (NASA 3D Resources)",
+      "use": "Background asteroid shape (visual only)"
+    },
+    "lrv": {
+      "title": "Lunar Roving Vehicle (original model)",
+      "procedural": "lrv",
+      "file": null,
+      "catalogName": "none: NASA has no 3D model of the LRV",
+      "source": "",
+      "credit": "Original Three.js model by our team, shaped after NASA Apollo photos (src/three/originals.js)"
+    }
   },
   "sounds": {
-    "marsquake":         { "title": "InSight marsquake sonification", "file": "assets/sounds/nasa/marsquake.ogg",         "raw": "assets/sounds/nasa/raw/", "kind": "sonification", "what": "TODO", "mission": "InSight", "source": "", "credit": "" },
-    "ingenuity-hum":     { "title": "Ingenuity in flight",            "file": "assets/sounds/nasa/ingenuity-hum.ogg",     "raw": "assets/sounds/nasa/raw/", "kind": "microphone",   "what": "TODO", "mission": "Mars 2020 / Ingenuity", "source": "", "credit": "" },
-    "mars-wind":         { "title": "Mars wind (Perseverance)",       "file": "assets/sounds/nasa/mars-wind.ogg",         "raw": "assets/sounds/nasa/raw/", "kind": "microphone",   "what": "TODO", "mission": "Mars 2020", "source": "", "credit": "" },
-    "atlas-launch":      { "title": "Atlas V: Launch",                "file": "assets/sounds/nasa/atlas-launch.ogg",      "raw": "assets/sounds/nasa/raw/", "kind": "microphone",   "what": "TODO", "mission": "Atlas V", "source": "", "credit": "" },
-    "voyager-plasma":    { "title": "Voyager: Interstellar Plasma Sounds", "file": "assets/sounds/nasa/voyager-plasma.ogg", "raw": "assets/sounds/nasa/raw/", "kind": "sonification", "what": "TODO", "mission": "Voyager 1", "source": "", "credit": "" },
-    "jupiter-lightning": { "title": "Voyager: Lightning on Jupiter",  "file": "assets/sounds/nasa/jupiter-lightning.ogg", "raw": "assets/sounds/nasa/raw/", "kind": "sonification", "what": "TODO", "mission": "Voyager", "source": "", "credit": "" },
-    "saturn-radio":      { "title": "Cassini Saturn radio emissions", "file": "assets/sounds/nasa/saturn-radio.ogg",      "raw": "assets/sounds/nasa/raw/", "kind": "sonification", "what": "TODO", "mission": "Cassini", "source": "", "credit": "" },
-    "kepler-star":       { "title": "Kepler star light-curve sound",  "file": "assets/sounds/nasa/kepler-star.ogg",       "raw": "assets/sounds/nasa/raw/", "kind": "sonification", "what": "TODO", "mission": "Kepler", "source": "", "credit": "" },
-    "lcross-moon":       { "title": "LCROSS: Water on the Moon Song", "file": "assets/sounds/nasa/lcross-moon.ogg",       "raw": "assets/sounds/nasa/raw/", "kind": "sonification", "what": "TODO", "mission": "LCROSS", "source": "", "credit": "" },
-    "beeps":             { "title": "Beeps and bytes",                "file": "assets/sounds/nasa/beeps.ogg",             "raw": "assets/sounds/nasa/raw/", "kind": "sonification", "what": "TODO", "mission": "Various", "source": "", "credit": "" }
+    "marsquake": {
+      "title": "InSight marsquake sonification",
+      "file": "assets/sounds/nasa/marsquake.ogg",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "sonification",
+      "what": "TODO: only inside NASA videos; a person must cut the clip (see TODOME)",
+      "mission": "InSight",
+      "source": "",
+      "credit": ""
+    },
+    "ingenuity-hum": {
+      "title": "Ingenuity in flight",
+      "file": "assets/sounds/nasa/ingenuity-hum.ogg",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "microphone",
+      "what": "TODO: only inside NASA videos; a person must cut the clip (see TODOME)",
+      "mission": "Mars 2020 / Ingenuity",
+      "source": "",
+      "credit": ""
+    },
+    "mars-wind": {
+      "title": "Mars wind (Perseverance)",
+      "file": "assets/sounds/nasa/mars-wind.ogg",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "microphone",
+      "what": "TODO: only inside NASA videos; a person must cut the clip (see TODOME)",
+      "mission": "Mars 2020",
+      "source": "",
+      "credit": ""
+    },
+    "atlas-launch": {
+      "title": "Atlas V: Launch",
+      "file": "assets/sounds/nasa/raw/atlas-launch.mp3",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "recording",
+      "what": "Sound of an Atlas V rocket launch (SDO launch). TODO_VERIFY wording",
+      "mission": "Atlas V",
+      "source": "https://www.nasa.gov/historical-sounds/",
+      "credit": "NASA"
+    },
+    "voyager-plasma": {
+      "title": "Voyager: Interstellar Plasma Sounds",
+      "file": "assets/sounds/nasa/voyager-plasma.ogg",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "sonification",
+      "what": "TODO: NASA's link (nasa.gov/externalflash/interstellar.mp3) is broken; find it on a NASA page",
+      "mission": "Voyager 1",
+      "source": "",
+      "credit": ""
+    },
+    "jupiter-lightning": {
+      "title": "Voyager: Lightning on Jupiter",
+      "file": "assets/sounds/nasa/raw/jupiter-lightning.mp3",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "sonification",
+      "what": "Radio signals from lightning on Jupiter, picked up by Voyager and turned into sound. TODO_VERIFY wording",
+      "mission": "Voyager",
+      "source": "https://www.nasa.gov/historical-sounds/",
+      "credit": "NASA"
+    },
+    "saturn-radio": {
+      "title": "Cassini: Saturn Radio Emissions #2",
+      "file": "assets/sounds/nasa/raw/saturn-radio.mp3",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "sonification",
+      "what": "Radio waves from Saturn recorded by Cassini, turned into sound. TODO_VERIFY wording",
+      "mission": "Cassini",
+      "source": "https://www.nasa.gov/historical-sounds/",
+      "credit": "NASA"
+    },
+    "kepler-star": {
+      "title": "Kepler: Star KIC12268220C Light Curve Waves to Sound",
+      "file": "assets/sounds/nasa/raw/kepler-star.mp3",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "sonification",
+      "what": "A star's brightness changes measured by Kepler, turned into sound. TODO_VERIFY wording",
+      "mission": "Kepler",
+      "source": "https://www.nasa.gov/historical-sounds/",
+      "credit": "NASA"
+    },
+    "lcross-moon": {
+      "title": "LCROSS: Water on the Moon Song",
+      "file": "assets/sounds/nasa/raw/lcross-moon.mp3",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "sonification",
+      "what": "NOT USED: appears to be a song by an outside artist (file name \"marmie\"); may contain vocals.",
+      "mission": "LCROSS",
+      "source": "https://www.nasa.gov/historical-sounds/",
+      "credit": "NASA"
+    },
+    "beeps": {
+      "title": "Quindar: Sound #1",
+      "file": "assets/sounds/nasa/raw/beeps.mp3",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "radio tone",
+      "what": "NOT USED: this NASA file includes radio voice transmissions around the tones (the game uses no vocals).",
+      "mission": "Various",
+      "source": "https://www.nasa.gov/historical-sounds/",
+      "credit": "NASA"
+    },
+    "stardust-comet": {
+      "title": "Stardust: Passing Comet Tempel 1",
+      "file": "assets/sounds/nasa/raw/stardust-comet.mp3",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "sonification",
+      "what": "TODO: check NASA's description before writing a pop-up",
+      "mission": "Stardust-NExT",
+      "source": "https://www.nasa.gov/historical-sounds/",
+      "credit": "NASA"
+    }
+  },
+  "textures": {
+    "earth": {
+      "title": "Blue Marble (2048 px)",
+      "file": "assets/textures/earth.jpg",
+      "source": "https://svs.gsfc.nasa.gov/2915/",
+      "credit": "NASA Goddard Space Flight Center Scientific Visualization Studio (Blue Marble)"
+    },
+    "mars": {
+      "title": "Mars",
+      "file": "assets/textures/mars.jpg",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/Images%20and%20Textures/Mars",
+      "credit": "NASA (NASA 3D Resources, Images and Textures)"
+    },
+    "moon": {
+      "title": "CGI Moon Kit: LRO color map (2k)",
+      "file": "assets/textures/moon.jpg",
+      "source": "https://svs.gsfc.nasa.gov/4720/",
+      "credit": "NASA's Scientific Visualization Studio (CGI Moon Kit; LRO/LROC data)"
+    },
+    "phobos": {
+      "title": "Mars - Phobos",
+      "file": "assets/textures/phobos.jpg",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/Images%20and%20Textures/Mars%20-%20Phobos",
+      "credit": "NASA (NASA 3D Resources, Images and Textures)"
+    },
+    "deimos": {
+      "title": "Mars - Deimos",
+      "file": "assets/textures/deimos.jpg",
+      "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/Images%20and%20Textures/Mars%20-%20Deimos",
+      "credit": "NASA (NASA 3D Resources, Images and Textures)"
+    },
+    "moon-bump": {
+      "title": "CGI Moon Kit: LOLA elevation (8-bit)",
+      "file": "assets/textures/moon-bump.jpg",
+      "source": "https://svs.gsfc.nasa.gov/4720/",
+      "credit": "NASA's Scientific Visualization Studio (CGI Moon Kit; LRO/LOLA data)"
+    }
   }
 }
