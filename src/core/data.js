@@ -48,3 +48,10 @@ export async function loadAsteroids() {
 }
 export function getAsteroids() { return asteroids?.asteroids || []; }
 export function getAsteroidSnapshot() { return asteroids; }
+
+// Radio script (story + real lines)
+let radio = null;
+export async function loadRadio() {
+  if (!radio) radio = await (await fetch('data/radio.json', { cache: 'no-store' })).json();
+  return radio;
+}

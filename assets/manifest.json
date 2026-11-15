@@ -101,34 +101,37 @@
   },
   "sounds": {
     "marsquake": {
-      "title": "InSight marsquake sonification",
-      "file": "assets/sounds/nasa/marsquake.ogg",
+      "title": "InSight: First Likely Marsquake",
+      "file": "assets/sounds/nasa/raw/marsquake.m4a",
       "raw": "assets/sounds/nasa/raw/",
       "kind": "sonification",
-      "what": "TODO: only inside NASA videos; a person must cut the clip (see TODOME)",
+      "what": "Ground shaking measured by InSight's seismometer, sped up 60 times so human ears can hear it (NASA video captions).",
       "mission": "InSight",
-      "source": "",
-      "credit": ""
+      "source": "https://images.nasa.gov/details/JPL-20190423-INSIGHf-0001-First%20Likely%20Marsquake%20Heard%20by%20NASAs%20InSight",
+      "credit": "NASA/JPL-Caltech",
+      "clip": "12.9\u201324.5 s of the video (the \"[Likely marsquake]\" segment)"
     },
     "ingenuity-hum": {
-      "title": "Ingenuity in flight",
-      "file": "assets/sounds/nasa/ingenuity-hum.ogg",
+      "title": "Ingenuity in flight, heard by Perseverance",
+      "file": "assets/sounds/nasa/raw/ingenuity-hum.m4a",
       "raw": "assets/sounds/nasa/raw/",
       "kind": "microphone",
-      "what": "TODO: only inside NASA videos; a person must cut the clip (see TODOME)",
+      "what": "Ingenuity's spinning blades during its fourth flight, recorded by Perseverance's microphone (NASA video captions).",
       "mission": "Mars 2020 / Ingenuity",
-      "source": "",
-      "credit": ""
+      "source": "https://images.nasa.gov/details/JPL-20210506-Listen%20to%20NASA%E2%80%99s%20Ingenuity%20Helicopter%20as%20it%20Flies%20on%20Mars-1080",
+      "credit": "NASA/JPL-Caltech",
+      "clip": "26\u201340 s of the video (steady 84.5 Hz blade hum, no narration)"
     },
     "mars-wind": {
-      "title": "Mars wind (Perseverance)",
-      "file": "assets/sounds/nasa/mars-wind.ogg",
+      "title": "Perseverance: First Sounds from Mars",
+      "file": "assets/sounds/nasa/raw/mars-wind.m4a",
       "raw": "assets/sounds/nasa/raw/",
       "kind": "microphone",
-      "what": "TODO: only inside NASA videos; a person must cut the clip (see TODOME)",
-      "mission": "Mars 2020",
-      "source": "",
-      "credit": ""
+      "what": "Wind on Mars recorded by Perseverance's microphone, with a faint whine from the rover itself (NASA video captions).",
+      "mission": "Mars 2020 Perseverance",
+      "source": "https://images.nasa.gov/details/JPL-20210222-M2020f-0003a-M2020_Audio_A_002",
+      "credit": "NASA/JPL-Caltech",
+      "clip": "4.0\u201317.5 s of the video"
     },
     "atlas-launch": {
       "title": "Atlas V: Launch",
@@ -145,7 +148,7 @@
       "file": "assets/sounds/nasa/voyager-plasma.ogg",
       "raw": "assets/sounds/nasa/raw/",
       "kind": "sonification",
-      "what": "TODO: NASA's link (nasa.gov/externalflash/interstellar.mp3) is broken; find it on a NASA page",
+      "what": "NOT AVAILABLE: NASA's link is broken and the NASA media library doesn't have it; only third-party mirrors (not allowed). Deep space uses Saturn radio instead.",
       "mission": "Voyager 1",
       "source": "",
       "credit": ""
@@ -207,6 +210,26 @@
       "kind": "sonification",
       "what": "TODO: check NASA's description before writing a pop-up",
       "mission": "Stardust-NExT",
+      "source": "https://www.nasa.gov/historical-sounds/",
+      "credit": "NASA"
+    },
+    "enceladus": {
+      "title": "Cassini: Enceladus Sound",
+      "file": "assets/sounds/nasa/raw/enceladus.mp3",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "sonification",
+      "mission": "Cassini",
+      "what": "Data from Cassini at Saturn's moon Enceladus, turned into sound. TODO_VERIFY wording",
+      "source": "https://www.nasa.gov/historical-sounds/",
+      "credit": "NASA"
+    },
+    "saturn-radio-1": {
+      "title": "Cassini: Saturn Radio Emissions #1",
+      "file": "assets/sounds/nasa/raw/saturn-radio-1.mp3",
+      "raw": "assets/sounds/nasa/raw/",
+      "kind": "sonification",
+      "mission": "Cassini",
+      "what": "Radio waves from Saturn recorded by Cassini, turned into sound. TODO_VERIFY wording",
       "source": "https://www.nasa.gov/historical-sounds/",
       "credit": "NASA"
     }

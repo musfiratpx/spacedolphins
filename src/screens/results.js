@@ -3,6 +3,9 @@ import { getMachine, machinesIn } from '../core/data.js';
 import { unlock, recordBest, state } from '../core/state.js';
 import { sfx } from '../audio/sfx.js';
 import { judging } from '../core/config.js';
+import { loadRadio } from '../core/data.js';
+import { save } from '../core/state.js';
+import { tag } from '../ui/dom.js';
 
 export default {
   mount(el, params, go) {
@@ -21,6 +24,7 @@ export default {
           <p class="eyebrow">${result.cleared ? 'Round cleared' : 'Not quite'}</p>
           <div class="grade grade-${result.grade}">${result.grade}</div>
           <p class="acc"><span class="acc-num" data-to="${pct}">0.0</span>% accuracy ${best.improved && best.prev ? '<span class="new-best">New best!</span>' : ''}</p>
+          ${result.score != null ? `<p class="score-line">${result.score.toLocaleString('en-US')} points${result.holds ? ` · ${result.holdsDone}/${result.holds} holds` : ''}</p>` : ''}
           <ul class="counts">
             <li><b>${result.counts.perfect}</b> Perfect</li>
             <li><b>${result.counts.great}</b> Great</li>
@@ -28,6 +32,9 @@ export default {
             <li><b>${result.counts.miss}</b> Miss</li>
             <li><b>${result.maxCombo}</b> Best combo</li>
           </ul>
+          ${result.shattered?.length ? `<p class="eyebrow" style="margin-top:12px">Asteroids shattered by Numan pulses ${tag('real')}</p>
+            <ul class="shattered">${result.shattered.map((a) => `<li><a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.name)}</a> · about ${Math.round(a.minM).toLocaleString('en-US')}–${Math.round(a.maxM).toLocaleString('en-US')} m wide · ${Math.round(a.kph).toLocaleString('en-US')} km/h</li>`).join('')}</ul>` : ''}
+          <p class="radio-strip" aria-live="polite"><span class="led"></span><span class="rs-who"></span> <span class="rs-text"></span></p>
           <p class="result-msg">${result.cleared
             ? (isNew ? `Signal locked. ${esc(machine.name)} is ready to scan.` : `${esc(machine.name)} is already in the Archive. Nice run!`)
             : `You need ${Math.round(judging.clear[result.difficulty] * 100)}% to scan. The machine isn't going anywhere. Try again!`}</p>
@@ -43,6 +50,21 @@ export default {
         </div>
       </section>`;
     if (result.cleared) setTimeout(() => sfx.unlock(), 150);
+    loadRadio().then((radio) => {
+      const kind = !result.cleared ? 'fail' : (result.grade === 'S' || result.grade === 'A') ? 'great' : 'ok';
+      const pool = radio.reactions?.[kind] || [];
+      if (!pool.length) return;
+      let idx = Math.floor(Math.random() * pool.length);
+      if (pool.length > 1 && state.lastReaction === `${kind}:${idx}`) idx = (idx + 1) % pool.length;
+      state.lastReaction = `${kind}:${idx}`; save();
+      const line = pool[idx];
+      const strip = el.querySelector('.radio-strip'); if (!strip) return;
+      strip.querySelector('.rs-who').innerHTML = `${line.who}: ${tag(line.tag)}`;
+      const t = strip.querySelector('.rs-text'); let c = 0;
+      strip.classList.add('on');
+      const step = () => { if (!t.isConnected) return; t.textContent = line.text.slice(0, ++c); if (c < line.text.length) setTimeout(step, 20); };
+      setTimeout(step, 500);
+    }).catch(() => {});
     // numbers count up instead of jumping
     const num = el.querySelector('.acc-num');
     const to = Number(num.dataset.to);

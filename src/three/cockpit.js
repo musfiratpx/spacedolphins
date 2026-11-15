@@ -6,8 +6,9 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { state } from '../core/state.js';
-import { getHardware } from '../core/data.js';
-import { on } from '../core/bus.js';
+import { getHardware, getAsteroids } from '../core/data.js';
+import { on, emit } from '../core/bus.js';
+import { foley } from '../audio/foley.js';
 
 const PALETTE = { teal: 0x2ec4b6, amber: 0xf2b134, rust: 0xd9622b, star: 0xe8ecf5 };
 
@@ -42,11 +43,38 @@ export class Cockpit {
     ].map(([c, i, p]) => { const l = new THREE.PointLight(c, 0, 1.4, 2); l.position.set(...p); l.userData.base = i; camera.add(l); return l; });
     this.plushies = {};      // region id -> mesh group
     this.aspect = 0;
+    this.pokeables = [];     // things you can click in the cockpit
+    this.tweens = [];        // short poke animations
     // redraw the best-grade sticky note after every round
     on('round:end', () => { setTimeout(() => {
       const map = this.note?.material.map; if (!map) return;
       const cv = map.image; this.drawNote(cv.getContext('2d'), cv.width, cv.height); map.needsUpdate = true;
     }, 50); });
+  }
+
+  /** Make an object clickable: fn runs when the player pokes it. */
+  pokeable(obj, fn) { obj.userData.poke = fn; this.pokeables.push(obj); return obj; }
+
+  /** Run fn(k) for k from 0 to 1 over dur ms (instant with reduced motion). */
+  tween(dur, fn) { this.tweens.push({ t0: performance.now(), dur, fn }); }
+
+  /** Called by the world when the player clicks the cockpit. */
+  poke(obj) { obj?.userData.poke?.(); }
+
+  /** A few steam wisps rising from the mug. */
+  steam(mug) {
+    const hh = this.hh;
+    this.steamTex ||= (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 64; const c = cv.getContext('2d'); const g = c.createRadialGradient(32, 32, 0, 32, 32, 32); g.addColorStop(0, 'rgba(255,255,255,.8)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(cv); })();
+    for (let i = 0; i < 3; i++) {
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: this.steamTex, transparent: true, depthWrite: false, opacity: 0 }));
+      sp.scale.setScalar(hh * 0.03); sp.position.set((i - 1) * hh * 0.008, hh * 0.05, 0); mug.add(sp);
+      const drift = (Math.random() - 0.5) * hh * 0.02;
+      setTimeout(() => this.tween(1400, (k) => {
+        sp.position.y = hh * (0.05 + k * 0.09); sp.position.x = (i - 1) * hh * 0.008 + drift * k;
+        sp.material.opacity = Math.sin(k * Math.PI) * 0.5; sp.scale.setScalar(hh * (0.03 + k * 0.03));
+        if (k >= 1) { mug.remove(sp); sp.material.dispose(); }
+      }), i * 180);
+    }
   }
 
   /** 0..1 how much the cockpit is showing (fades the interior lights). */
@@ -58,7 +86,7 @@ export class Cockpit {
     this.aspect = this.camera.aspect;
     const g = this.group;
     for (const c of [...g.children]) { g.remove(c); c.traverse((o) => o.geometry?.dispose()); }
-    this.screens = []; this.blinkers = []; this.levers = [];
+    this.screens = []; this.blinkers = []; this.levers = []; this.pokeables = []; this.tweens = [];
     const Z = -1;
     const hh = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
     const hw = hh * this.camera.aspect;
@@ -71,13 +99,16 @@ export class Cockpit {
 
     // ---- canopy frame ----
     const top = hh * 0.13;
-    add(box(hw * 2.6, top, 0.18), this.mat.hull, 0, hh - top * 0.35, Z + 0.05, 0.15);
+    this.topBar = add(box(hw * 2.6, top, 0.18), this.mat.hull, 0, hh - top * 0.35, Z + 0.05, 0.15);
+    this.topBarH = top;
+    this.pillars = {};
     add(box(hw * 2.6, 0.004, 0.004), this.mat.trim, 0, hh - top * 0.85, Z + 0.15);
     for (const s of [-1, 1]) {
       const len = hh * 2.4;
       const pillar = new THREE.Group();
       pillar.position.set(s * hw * 0.9, 0, Z); pillar.rotation.z = s * 0.2;
       g.add(pillar);
+      this.pillars[s] = pillar;
       add(box(hw * 0.09, len, 0.12), this.mat.hull, 0, 0, 0, 0, 0, 0, pillar);
       add(box(hw * 0.03, len, 0.02), this.mat.panel, -s * hw * 0.035, 0, 0.065, 0, 0, 0, pillar);
       add(box(0.003, len, 0.003), this.mat.trim, -s * hw * 0.05, 0, 0.075, 0, 0, 0, pillar);
@@ -125,6 +156,7 @@ export class Cockpit {
     dash.position.set(0, dashY, Z + 0.15);
     g.add(dash);
     const center = new THREE.Group(); center.rotation.x = -1.0; dash.add(center);
+    this.console = center; this.dashH = dashH;
     add(box(hw * 0.95, dashH, 0.06), this.mat.hull, 0, 0, 0, 0, 0, 0, center);
     add(box(hw * 0.95, 0.005, 0.005), this.mat.trim, 0, dashH / 2, 0.035, 0, 0, 0, center);
     const wings = [];
@@ -138,8 +170,9 @@ export class Cockpit {
       add(box(hw * 0.8, 0.005, 0.005), this.mat.trim, s * hw * 0.4, dashH / 2, 0.035, 0, 0, 0, wing);
       wings.push({ wing, s });
     }
-    // front lip / glare shield
+    // front lip / glare shield: also the shelf the mug, plant and plushies sit on
     add(box(hw * 2.4, hh * 0.03, 0.08), this.mat.rubber, 0, dashY + dashH * 0.45, Z + 0.08, -0.2);
+    this.shelf = { y: dashY + dashH * 0.45 + hh * 0.015 + 0.004, z: Z + 0.085 };
 
     // screens on the center console
     const screenW = hw * 0.26; const screenH = dashH * 0.62;
@@ -150,7 +183,9 @@ export class Cockpit {
       const cv = document.createElement('canvas'); cv.width = 256; cv.height = 160;
       const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
       const scr = add(new THREE.PlaneGeometry(screenW, screenH), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }), x, dashH * 0.04, 0.038, 0, 0, 0, center);
-      this.screens.push({ kind, cv, ctx: cv.getContext('2d'), tex, mesh: scr });
+      const screen = { kind, cv, ctx: cv.getContext('2d'), tex, mesh: scr, flashT: 0 };
+      this.screens.push(screen);
+      this.pokeable(scr, () => { (kind === 'radar' ? foley.ping : kind === 'wave' ? foley.chirp : foley.beep).call(foley); screen.flashT = performance.now(); });
     });
 
     // button banks and switches on the wings
@@ -165,7 +200,11 @@ export class Cockpit {
           const color = [PALETTE.teal, PALETTE.amber, PALETTE.rust, PALETTE.star][(r + c) % 4];
           const mat = lit ? new THREE.MeshBasicMaterial({ color, transparent: true }) : this.mat.panel;
           const b = add(btn, mat, x, y, 0.038, 0, 0, 0, wing);
-          if (lit) this.blinkers.push({ m: b, rate: 0.15 + Math.random() * 0.9, off: Math.random() * 9 });
+          if (lit) {
+            const bl = { m: b, rate: 0.15 + Math.random() * 0.9, off: Math.random() * 9, boostT: 0 };
+            this.blinkers.push(bl);
+            this.pokeable(b, () => { foley.beep(0.8 + Math.random() * 0.8); bl.boostT = performance.now(); });
+          }
         }
       }
       // toggle switches row
@@ -181,7 +220,9 @@ export class Cockpit {
           add(new THREE.SphereGeometry(hh * 0.018, 16, 12), k ? this.mat.amberTrim : this.mat.rubber, 0, 0, dashH * 0.5, 0, 0, 0, lever);
           lever.rotation.x = -0.4;
           wing.add(lever);
-          this.levers.push({ lever, off: k * 1.7 });
+          const lv = { lever, off: k * 1.7, push: 0 };
+          this.levers.push(lv);
+          this.pokeable(lever, () => { foley.whoosh(); this.tween(700, (q) => { lv.push = Math.sin(q * Math.PI) * 0.55; }); });
         }
       } else {
         for (let k = 0; k < 3; k++) {
@@ -197,10 +238,11 @@ export class Cockpit {
 
     // a small plant on the dash; it grows as the Archive fills
     this.plant = new THREE.Group();
-    this.plant.position.set(-hw * 0.62, dashY + dashH * 0.42, Z + 0.06);
+    this.plant.position.set(-hw * 0.7, this.shelf.y + hh * 0.02, this.shelf.z);
     g.add(this.plant);
     add(new THREE.CylinderGeometry(hh * 0.025, hh * 0.018, hh * 0.04, 16), this.mat.pot, 0, 0, 0, 0, 0, 0, this.plant);
     this.leaves = new THREE.Group(); this.plant.add(this.leaves);
+    this.pokeable(this.plant, () => { foley.rustle(); this.tween(800, (k) => { this.leaves.rotation.z = Math.sin(k * Math.PI * 5) * (1 - k) * 0.3; this.leaves.rotation.x = Math.sin(k * Math.PI * 4) * (1 - k) * 0.15; }); });
     this.growPlant();
 
     // Numan plushies, one per completed region, each displayed its own way:
@@ -208,9 +250,11 @@ export class Cockpit {
     // Deep space bounces on a spring like a bobblehead.
     this.plushies = {};
     this.plushSpots = {
-      mars: { style: 'sit', x: hw * 0.3, y: dashY + dashH * 0.46, z: Z + 0.07, s: 1.0 },
-      moon: { style: 'hang', x: -hw * 0.5, y: hh * 0.62, z: Z * 0.99, s: 0.85 },
-      deep: { style: 'spring', x: hw * 0.6, y: dashY + dashH * 0.46, z: Z + 0.07, s: 0.8 },
+      mars: { style: 'sit', x: hw * 0.2, y: this.shelf.y, z: this.shelf.z, s: 1.0 },
+      // hangs from a suction cup on the front of the left pillar (in front of it, so nothing cuts through)
+      // hangs from a suction cup at the top of the windshield, in the open middle of the window
+      moon: { style: 'hang', x: hw * 0.04, y: hh * 0.88, z: Z * 1.04, s: 0.9, len: hh * 0.42 },
+      deep: { style: 'spring', x: hw * 0.72, y: this.shelf.y, z: this.shelf.z, s: 0.8 },
     };
     this.dashTop = { hh };
     this.knownPlush = null;
@@ -261,10 +305,16 @@ export class Cockpit {
         cup.rotation.x = -Math.PI / 2; root.add(cup);
         const knob = new THREE.Mesh(new THREE.SphereGeometry(r * 0.09, 12, 8), cupMat); knob.position.z = r * 0.16; root.add(knob);
         const swing = new THREE.Group(); swing.position.z = r * 0.18; root.add(swing);
-        const len = r * 2.2;
+        const len = spot.len ? spot.len / spot.s : r * 2.2;
         const string = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.012, r * 0.012, len, 6), new THREE.MeshBasicMaterial({ color: 0xe8ecf5 }));
         string.position.y = -len / 2; swing.add(string);
-        body.position.y = -len - r * 2.3;    // hangs from the antenna tip
+        // a fabric hanging loop sewn on top of the head (like a real plush toy);
+        // the string ties to the top of the loop. Head top is ~1.85r above the feet.
+        const loopR = r * 0.12;
+        body.position.y = -len - loopR - r * 1.85;
+        const loop = new THREE.Mesh(new THREE.TorusGeometry(loopR, r * 0.028, 8, 16, Math.PI), new THREE.MeshStandardMaterial({ color: 0xe8ecf5, roughness: 0.9 }));
+        loop.position.y = r * 1.85;            // upper half-ring sits on the head, fully above it
+        body.add(loop);
         holder = swing;
         root.userData.swing = swing;
       } else if (spot.style === 'spring') {
@@ -278,9 +328,16 @@ export class Cockpit {
         root.userData.coil = coil; root.userData.top = top; root.userData.springH = h;
       }
       holder.add(body);
+      if (spot.pillar) root.rotation.z = -this.pillars[spot.pillar].rotation.z;   // string hangs straight down
       root.scale.setScalar(animate ? 0.001 : spot.s);
-      root.userData = { ...root.userData, body, style: spot.style, target: spot.s, born: animate ? performance.now() : 0, seed: Math.random() * 6, antenna: body.userData.antenna };
-      this.group.add(root);
+      root.userData = { ...root.userData, body, r, style: spot.style, target: spot.s, born: animate ? performance.now() : 0, seed: Math.random() * 6, antenna: body.userData.antenna, pokeT: 0 };
+      // squeeze it: each Numan squeaks in its own voice
+      this.pokeable(root, () => {
+        root.userData.pokeT = performance.now();
+        foley.squeak({ moon: 1.18, mars: 1, deep: 0.85 }[id] || 1);
+        if (spot.style === 'spring') setTimeout(() => foley.boing(), 120);
+      });
+      (spot.pillar ? this.pillars[spot.pillar] : this.group).add(root);
       this.plushies[id] = root;
     }
   }
@@ -306,12 +363,19 @@ export class Cockpit {
   /** @param t seconds, still = reduced motion, pulse = beat pulse 0..1, mouse = smoothed pointer */
   /** Stickers, notes, a mug, a lanyard and dust: the cockpit looks lived in. All original art. */
   addLivedIn({ hw, hh, Z, dashY, dashH, add }) {
-    const sticker = (draw, w, h, x, y, z, rot = 0, ry = 0, size = 256) => {
+    const sticker = (draw, w, h, x, y, z, rot = 0, ry = 0, size = 256, parent = this.group) => {
       const cv = document.createElement('canvas'); cv.width = size; cv.height = Math.round(size * (h / w));
       const c = cv.getContext('2d');
       draw(c, cv.width, cv.height);
       const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
-      const m = add(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.7, metalness: 0, envMap: this.env, envMapIntensity: 0.2 }), x, y, z, 0, ry, rot);
+      const m = add(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.7, metalness: 0, envMap: this.env, envMapIntensity: 0.2, polygonOffset: true, polygonOffsetFactor: -2 }), x, y, z, 0, ry, rot, parent);
+      m.userData.draw = draw; m.userData.aspect = h / w;
+      this.pokeable(m, () => {
+        foley.paper();
+        this.tween(650, (k) => { m.rotation.z = rot + Math.sin(k * Math.PI * 4) * (1 - k) * 0.14; });
+        const info = m.userData.info;
+        if (info) setTimeout(() => emit('paper:open', { draw, aspect: h / w, ...info }), 220);
+      });
       return m;
     };
     const S = hh * 0.07;   // base sticker size
@@ -323,22 +387,22 @@ export class Cockpit {
       c.fillStyle = '#7a2e12'; for (const [x, y, r] of [[.35, .3, .06], [.68, .62, .05], [.3, .7, .04]]) { c.beginPath(); c.arc(w * x, w * y, w * r, 0, 7); c.fill(); }
       c.fillStyle = '#1b1030'; c.beginPath(); c.arc(w * .4, w * .45, w * .04, 0, 7); c.arc(w * .6, w * .45, w * .04, 0, 7); c.fill();
       c.strokeStyle = '#1b1030'; c.lineWidth = w * .03; c.beginPath(); c.arc(w / 2, w * .52, w * .12, 0.2, Math.PI - 0.2); c.stroke();
-    }, S, S, -hw * 0.18, dashY + dashH * 0.42, Z + 0.17, 0.2, 0, 128);
+    }, S, S, -hw * 0.18, this.shelf.y - hh * 0.035, this.shelf.z + 0.11, 0.2, 0, 128);   // stuck on the left screen, a bit crooked
     // "4052 CREW" star badge
     sticker((c, w) => {
       c.translate(w / 2, w / 2); c.fillStyle = '#F2B134'; c.beginPath();
       for (let i = 0; i < 10; i++) { const r = i % 2 ? w * .2 : w * .46; const a = i * Math.PI / 5 - Math.PI / 2; c.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
       c.closePath(); c.fill(); c.lineWidth = w * .03; c.strokeStyle = '#fff'; c.stroke();
       c.fillStyle = '#0B1026'; c.font = `900 ${w * .14}px Nunito, sans-serif`; c.textAlign = 'center'; c.fillText('4052', 0, w * .02); c.font = `700 ${w * .08}px Nunito, sans-serif`; c.fillText('CREW', 0, w * .11);
-    }, S * 1.1, S * 1.1, hw * 0.83, -hh * 0.05, Z + 0.07, -0.25, -0.2, 128);
+    }, S * 1.1, S * 1.1, 0, hh * 0.12, 0.08, -0.1, 0, 128, this.pillars[1]);
     // rocket doodle
     sticker((c, w, h) => {
       c.fillStyle = '#e8ecf5'; c.fillRect(0, 0, w, h);
-      c.strokeStyle = '#2EC4B6'; c.lineWidth = 5; c.lineCap = 'round';
+      c.strokeStyle = '#2EC4B6'; c.lineWidth = w * 0.045; c.lineCap = 'round';
       c.beginPath(); c.moveTo(w * .5, h * .12); c.quadraticCurveTo(w * .75, h * .4, w * .62, h * .72); c.lineTo(w * .38, h * .72); c.quadraticCurveTo(w * .25, h * .4, w * .5, h * .12); c.stroke();
       c.beginPath(); c.arc(w * .5, h * .4, w * .07, 0, 7); c.stroke();
       c.strokeStyle = '#D9622B'; c.beginPath(); c.moveTo(w * .42, h * .78); c.lineTo(w * .46, h * .92); c.moveTo(w * .58, h * .78); c.lineTo(w * .54, h * .92); c.stroke();
-    }, S * 0.9, S * 1.1, -hw * 0.86, hh * 0.15, Z + 0.07, 0.15, 0.2, 128);
+    }, S * 1.4, S * 1.7, hw * 0.12, -hh * 0.34, Z * 1.06, 0.14, 0, 256).userData.info = { title: 'Rocket doodle', text: 'Every machine in the Archive began its trip on top of a rocket. Somebody on this ship really liked drawing them.' };
     // Numan face
     sticker((c, w) => {
       c.fillStyle = '#2EC4B6'; c.beginPath(); c.ellipse(w / 2, w * .55, w * .42, w * .38, 0, 0, 7); c.fill();
@@ -347,28 +411,37 @@ export class Cockpit {
       c.strokeStyle = '#0B1026'; c.lineWidth = w * .03; c.beginPath(); c.arc(w / 2, w * .66, w * .08, 0.3, Math.PI - 0.3); c.stroke();
       c.strokeStyle = '#2EC4B6'; c.lineWidth = w * .04; c.beginPath(); c.moveTo(w / 2, w * .18); c.lineTo(w / 2, w * .05); c.stroke();
       c.fillStyle = '#F2B134'; c.beginPath(); c.arc(w / 2, w * .05, w * .05, 0, 7); c.fill();
-    }, S, S, hw * 0.12, dashY + dashH * 0.42, Z + 0.17, -0.15, 0, 128);
+    }, S, S, hw * 0.12, this.shelf.y - hh * 0.03, this.shelf.z + 0.11, -0.15, 0, 128);   // and one on the middle screen
     // holographic star (iridescent)
     sticker((c, w) => {
       const g = c.createLinearGradient(0, 0, w, w); ['#ff9ad5', '#9ae7ff', '#c4ff9a', '#ffe59a', '#d59aff'].forEach((col, i) => g.addColorStop(i / 4, col));
       c.translate(w / 2, w / 2); c.fillStyle = g; c.beginPath();
       for (let i = 0; i < 8; i++) { const r = i % 2 ? w * .16 : w * .46; const a = i * Math.PI / 4; c.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
       c.closePath(); c.fill();
-    }, S * 0.7, S * 0.7, -hw * 0.7, hh * 0.84, Z + 0.25, 0.3, 0, 128);
+    }, S * 1.2, S * 1.2, hw * 0.25, hh * 0.75, Z * 1.06, 0.3, 0, 128);
     // "scan, don't recover" ribbon on the overhead edge
     sticker((c, w, h) => {
       c.fillStyle = '#D9622B'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = `900 ${h * .55}px Nunito, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('SCAN · DON\'T RECOVER', w / 2, h / 2 + 2);
-    }, S * 3, S * 0.45, hw * 0.4, hh * 0.86, Z + 0.24, -0.04, 0, 512);
+    }, S * 3, S * 0.45, hw * 0.35, -this.topBarH * 0.12, 0.092, -0.02, 0, 512, this.topBar).userData.info = { title: 'Scan, don\'t recover', text: 'The rule every recovery ship follows: scan a hologram copy for the Archive, and leave the real machine where it rests, as a monument.' };
+
+    // workplace-safety-style sign on the canopy bar (the crew's sense of humor)
+    sticker((c, w, h) => {
+      c.fillStyle = '#F2B134'; c.fillRect(0, 0, w, h); c.fillStyle = '#0B1026'; c.fillRect(w * .02, h * .08, w * .96, h * .84);
+      c.fillStyle = '#F2B134'; c.font = `800 ${h * .3}px Nunito, sans-serif`; c.textAlign = 'center';
+      c.fillText('DAYS SINCE LAST ASTEROID', w * .42, h * .58);
+      c.fillStyle = '#e8ecf5'; c.fillRect(w * .84, h * .18, w * .13, h * .64); c.fillStyle = '#D9622B'; c.font = `900 ${h * .55}px "Space Mono", monospace`; c.fillText('0', w * .905, h * .7);
+    }, S * 3.4, S * 0.5, -hw * 0.38, -this.topBarH * 0.12, 0.092, 0.01, 0, 512, this.topBar).userData.info = { title: 'Days since last asteroid: 0', text: 'The crew\'s favorite joke. The counter has never gone above zero. That is why the Numans\' songs matter.' };
 
     // sticky note with your real best grade
-    this.note = sticker((c, w, h) => this.drawNote(c, w, h), S * 1.4, S * 1.4, hw * 0.75, hh * 0.35, Z + 0.075, -0.06, -0.2, 256);
+    this.note = sticker((c, w, h) => this.drawNote(c, w, h), S * 1.9, S * 1.9, -hw * 0.44, hh * 0.79, Z * 1.06, -0.08, 0, 256);
+    this.note.userData.info = { title: 'Best run', text: 'Your best grade so far. Someone on the ship keeps updating this note every time you beat it.' };
     // taped checklist on the left pillar
     sticker((c, w, h) => {
       c.fillStyle = '#f7f3e8'; c.fillRect(0, 0, w, h);
       c.fillStyle = 'rgba(200,220,240,.5)'; c.fillRect(w * .35, 0, w * .3, h * .07);
       c.fillStyle = '#26324f'; c.font = `700 ${w * .085}px "Space Mono", monospace`;
       ['PRE-FLIGHT', '☑ Shield check', '☑ Calibrate lanes', '☑ Feed the Numans?', '☐ Call Earth'].forEach((l, i) => c.fillText(l, w * .08, h * (.2 + i * .16)));
-    }, S * 1.5, S * 1.9, -hw * 0.8, -hh * 0.18, Z + 0.075, 0.08, 0.2, 256);
+    }, S * 1.6, S * 2.05, hw * 0.49, -hh * 0.53, Z * 1.06, 0.06, 0, 256).userData.info = { title: 'Pre-flight checklist', text: 'Left by the traveler before you. Nobody knows who ticked "Feed the Numans?" or whether Numans even eat. "Call Earth" still is not done.' };
     // drawn Earth polaroid
     sticker((c, w, h) => {
       c.fillStyle = '#fbfbf7'; c.fillRect(0, 0, w, h);
@@ -377,16 +450,17 @@ export class Cockpit {
       c.fillStyle = g; c.beginPath(); c.arc(w / 2, w / 2, w * .3, 0, 7); c.fill();
       c.fillStyle = '#3fa34d'; c.beginPath(); c.ellipse(w * .44, w * .45, w * .1, w * .14, .4, 0, 7); c.fill(); c.beginPath(); c.ellipse(w * .6, w * .6, w * .07, w * .05, -.3, 0, 7); c.fill();
       c.fillStyle = '#26324f'; c.font = `700 ${w * .08}px "Space Mono", monospace`; c.textAlign = 'center'; c.fillText('home ♥', w / 2, h * .92);
-    }, S * 1.2, S * 1.45, hw * 0.55, hh * 0.62, Z + 0.06, 0.12, 0, 256);
+    }, S * 1.7, S * 2.05, hw * 0.44, hh * 0.76, Z * 1.06, 0.09, 0, 256).userData.info = { title: 'Home', text: 'A drawing of Earth from orbit, taped up by an earlier traveler. In 4052 it is still the only home people have, and it still needs its shield.' };
 
     // coffee mug on the dash
-    const mug = new THREE.Group(); mug.position.set(-hw * 0.45, dashY + dashH * 0.47, Z + 0.1);
+    const mug = new THREE.Group(); mug.position.set(-hw * 0.33, this.shelf.y, this.shelf.z);
     const mugMat = new THREE.MeshStandardMaterial({ color: 0xd9622b, roughness: 0.45, envMap: this.env, envMapIntensity: 0.4 });
     const cup = new THREE.Mesh(new THREE.CylinderGeometry(hh * 0.022, hh * 0.019, hh * 0.05, 20, 1, true), mugMat); cup.position.y = hh * 0.025; mug.add(cup);
     const bottom = new THREE.Mesh(new THREE.CircleGeometry(hh * 0.019, 20), mugMat); bottom.rotation.x = -Math.PI / 2; mug.add(bottom);
     const coffee = new THREE.Mesh(new THREE.CircleGeometry(hh * 0.021, 20), new THREE.MeshStandardMaterial({ color: 0x2a160c, roughness: 0.2 })); coffee.rotation.x = -Math.PI / 2; coffee.position.y = hh * 0.042; mug.add(coffee);
     const handle = new THREE.Mesh(new THREE.TorusGeometry(hh * 0.012, hh * 0.0035, 8, 16), mugMat); handle.position.set(hh * 0.024, hh * 0.026, 0); mug.add(handle);
     this.group.add(mug);
+    this.pokeable(mug, () => { foley.clink(); this.steam(mug); });
     // keycard lanyard hanging from the overhead panel (sways a little)
     this.lanyard = new THREE.Group(); this.lanyard.position.set(-hw * 0.22, hh * 0.86, Z + 0.32);
     const strap = new THREE.Mesh(new THREE.BoxGeometry(hh * 0.008, hh * 0.18, hh * 0.002), new THREE.MeshStandardMaterial({ color: 0x2ec4b6, roughness: 0.8 }));
@@ -399,6 +473,8 @@ export class Cockpit {
     }, hh * 0.05, hh * 0.07, 0, 0, 0, 0, 0, 128);
     this.group.remove(card); card.position.set(0, -hh * 0.2, 0.002); this.lanyard.add(card);
     this.group.add(this.lanyard);
+    this.lanyardKick = 0;
+    this.pokeable(this.lanyard, () => { foley.jingle(); this.lanyardKick = performance.now(); });
     // dust motes drifting in the cabin light
     const n = 90; const pos = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) pos.set([(Math.random() - 0.5) * hw * 1.8, (Math.random() - 0.5) * hh * 1.6, Z + 0.1 + Math.random() * 0.6], i * 3);
@@ -422,8 +498,18 @@ export class Cockpit {
   }
 
   update(t, still, pulse, mouse) {
+    const nowP = performance.now();
+    if (this.tweens.length) {
+      this.tweens = this.tweens.filter((tw) => {
+        const k = still ? 1 : Math.min(1, (nowP - tw.t0) / tw.dur);
+        tw.fn(k);
+        return k < 1;
+      });
+    }
     if (!still) {
-      if (this.lanyard) this.lanyard.rotation.z = Math.sin(t * 0.9) * 0.06 + mouse.x * 0.05;
+      const lk = (nowP - this.lanyardKick) / 1500;
+      const kick = lk < 1 ? Math.sin(lk * Math.PI * 4) * (1 - lk) * 0.5 : 0;
+      if (this.lanyard) this.lanyard.rotation.z = Math.sin(t * 0.9) * 0.06 + mouse.x * 0.05 + kick;
       if (this.dust) {
         const p = this.dust.geometry.attributes.position; const b = this.dustBase;
         for (let i = 0; i < p.count; i++) {
@@ -438,9 +524,9 @@ export class Cockpit {
       this.group.rotation.y = mouse.x * 0.02;
       this.group.rotation.x = mouse.y * 0.015;
     }
-    for (const b of this.blinkers) b.m.material.opacity = still ? 0.85 : 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * b.rate * 2 + b.off)) + pulse * 0.2;
+    for (const b of this.blinkers) b.m.material.opacity = nowP - b.boostT < 500 ? 1 : still ? 0.85 : 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * b.rate * 2 + b.off)) + pulse * 0.2;
     for (const l of this.levers) {
-      if (l.lever) l.lever.rotation.x = -0.4 + (still ? 0 : Math.sin(t * 0.3 + l.off) * 0.08);
+      if (l.lever) l.lever.rotation.x = -0.4 + (still ? 0 : Math.sin(t * 0.3 + l.off) * 0.08) + (l.push || 0);
       if (l.needle) l.needle.rotation.z = still ? 0.3 : Math.sin(t * 0.6 + l.off) * 0.9 + pulse * 0.2;
     }
     let got = 0;
@@ -458,7 +544,13 @@ export class Cockpit {
       }
       p.scale.setScalar(sc);
       const body = u.body;
+      // poked: a squishy bounce that settles
+      const pk = (nowP - u.pokeT) / 800;
+      const pe = pk < 1 ? Math.sin(pk * Math.PI * 3) * (1 - pk) : 0;
+      if (pk < 1 && u.style !== 'sit') body.scale.set(1 + pe * 0.22, 1 - pe * 0.22, 1 + pe * 0.22);
       if (still) continue;
+      if (pk < 1 && u.style === 'hang') u.swing.rotation.z += pe * 0.5;
+      if (u.style === 'sit') body.position.y = pk < 1 ? Math.abs(Math.sin(pk * Math.PI * 2)) * (1 - pk) * u.r * 0.9 : 0;
       u.antenna?.forEach((a, i) => { a.rotation.z = Math.sin(t * 3 + i + u.seed) * 0.25; });
       if (u.style === 'hang') {
         // pendulum swing, nudged by the beat
@@ -467,12 +559,12 @@ export class Cockpit {
         body.rotation.y = Math.sin(t * 0.5 + u.seed) * 0.5;
       } else if (u.style === 'spring') {
         // bobblehead: the spring compresses on the beat and boings back
-        const bob = Math.sin(t * 6 + u.seed) * 0.05 * (0.4 + pulse) + pulse * 0.12;
+        const bob = Math.sin(t * 6 + u.seed) * 0.05 * (0.4 + pulse) + pulse * 0.12 + pe * 0.35;
         u.coil.scale.y = 1 - bob; u.top.position.y = u.springH * (1 - bob);
         body.rotation.z = Math.sin(t * 2.2 + u.seed) * 0.12;
         body.rotation.y = Math.sin(t * 0.8 + u.seed) * 0.3;
       } else {
-        const squish = pulse * 0.08 + Math.sin(t * 2 + u.seed) * 0.02;
+        const squish = pulse * 0.08 + Math.sin(t * 2 + u.seed) * 0.02 + pe * 0.25;
         body.scale.set(1 + squish, 1 - squish, 1 + squish);
         body.rotation.y = Math.sin(t * 0.7 + u.seed) * 0.35;
       }
@@ -505,6 +597,13 @@ export class Cockpit {
         c.beginPath(); c.arc(cx + Math.cos(ba) * br, cy + Math.sin(ba) * br, 3, 0, Math.PI * 2); c.fill();
       }
       c.fillStyle = '#2EC4B6'; c.fillText('ROCK SCAN', 8, 16);
+      // a real near-Earth asteroid from this week's NASA NeoWs snapshot
+      const rocks = getAsteroids();
+      if (rocks.length) {
+        const a = rocks[Math.floor(t / 4) % rocks.length];
+        c.fillStyle = '#F2B134'; c.font = '700 11px "Space Mono", monospace';
+        c.fillText(a.name.replace(/^\d+ /, '').slice(0, 22), 8, H - 10);
+      }
     } else if (s.kind === 'wave') {
       c.fillText('NUMAN SIGNAL', 8, 16);
       c.strokeStyle = '#2EC4B6'; c.lineWidth = 2; c.beginPath();
@@ -535,6 +634,8 @@ export class Cockpit {
       c.fillStyle = '#2EC4B6'; c.fillRect(8, 120, (W - 16) * (got / Math.max(1, total)), 10);
       if (!still && Math.floor(t * 1.5) % 2) { c.fillStyle = '#F2B134'; c.fillText('SHIELD LOW', 8, 150); }
     }
+    const fk = (performance.now() - (s.flashT || 0)) / 600;
+    if (fk < 1) { c.fillStyle = `rgba(46,196,182,${(0.28 * (1 - fk)).toFixed(3)})`; c.fillRect(0, 0, W, H); }
     // scan lines
     c.fillStyle = 'rgba(0,0,0,0.18)';
     for (let y = 0; y < H; y += 3) c.fillRect(0, y, W, 1);
@@ -544,8 +645,8 @@ export class Cockpit {
 
 // ---- Numan plushies (original design, made in code) -----------------------
 // Soft, round light-beings in each region's color. Felt-like sheen material,
-// big glossy eyes, glowing antenna tips. Moon: crescent ears. Mars: one tall
-// antenna and freckles. Deep space: three eyes and a little star.
+// big glossy eyes, glowing antenna tips. Moon: the classic two antennae. Mars: one tall
+// antenna and freckles. Deep space: three eyes.
 const NUMAN_LOOK = {
   moon: { body: 0xc9c3e6, cheek: 0xf2a1c4, glow: 0xe8ecf5 },
   mars: { body: 0xe8804a, cheek: 0xffb08a, glow: 0x2ec4b6 },
@@ -593,17 +694,9 @@ export function makeNuman(kind, r) {
   }
   g.userData.antenna = antenna;
   // region details
-  if (kind === 'moon') {
-    for (const s of [-1, 1]) {
-      const ear = add(new THREE.TorusGeometry(r * 0.28, r * 0.08, 8, 20, Math.PI * 1.2), felt, s * r * 0.85, r * 1.55, 0);
-      ear.rotation.z = s > 0 ? -0.3 : Math.PI + 0.3;
-    }
-  } else if (kind === 'mars') {
+  if (kind === 'mars') {
     const freck = new THREE.MeshBasicMaterial({ color: 0x9c3b17 });
     for (const [fx, fy] of [[-0.55, 0.92], [-0.48, 0.85], [0.55, 0.92], [0.48, 0.85]]) add(new THREE.CircleGeometry(r * 0.035, 8), freck, fx * r, fy * r, r * 0.97);
-  } else {
-    const star = add(new THREE.OctahedronGeometry(r * 0.16, 0), glow, r * 0.75, r * 1.6, r * 0.2);
-    star.rotation.z = 0.4;
   }
   return g;
 }

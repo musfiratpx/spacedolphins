@@ -25,7 +25,7 @@ export function startHearingPopups() {
     if (!entry) return;
     box.innerHTML = `<p class="eyebrow">What you're hearing ${tag('real')}</p>
       <p class="hearing-title">${esc(entry.title || id)}</p>
-      <p class="hearing-sub">${esc(entry.mission ? `${entry.mission} · ` : '')}${esc(KIND[entry.kind] || 'A NASA sound.')}</p>`;
+      <p class="hearing-sub">${esc(entry.mission ? `${entry.mission} · ` : '')}${esc(entry.kind === 'microphone' && /Mars|Perseverance|Ingenuity/.test(entry.mission || '') ? 'Recorded by a real microphone on Mars.' : KIND[entry.kind] || 'A NASA sound.')}</p>`;
     box.classList.add('show');
     clearTimeout(timer);
     timer = setTimeout(() => box.classList.remove('show'), 5000);

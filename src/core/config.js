@@ -5,7 +5,7 @@ export const features = {
   realModels: true,        // loads .glb when present, placeholder otherwise
   nasaSamples: true,      // sampler.js + NASA layers in songs
   dataBreaks: true,
-  holdNotes: false,
+  holdNotes: true,
   scanUnlock: false,
   hotspots: false,
   machineLogs: false,      // log on card back with flip
@@ -20,7 +20,7 @@ export const features = {
   world3d: true,           // three/world.js: 3D space scene + cockpit behind every screen
   ui3d: true,              // hologram panels with 3D tilt (ui/tilt.js)
   asteroids: false,
-  numanMeter: false,
+  numanMeter: true,
   musicReactive: false,
   unlockCinematic: false,
   juice: false,            // fx.shake / flash / hitStop / burst do real work

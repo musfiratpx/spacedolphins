@@ -14,7 +14,8 @@ const defaults = {
   captions: true,
   quality: 'auto',       // auto | low | medium | high
   colorblind: false,
-  dyslexiaFont: false,
+  dyslexiaFont: false,   // 'easy-read' font: plain sans-serif with extra spacing
+  readAloud: false,      // speak radio lines with the browser's speech voice
 };
 
 function load() {

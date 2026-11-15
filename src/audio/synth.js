@@ -33,8 +33,36 @@ function env(gainNode, t, peak, attack, decay) {
 }
 
 const voices = {
-  kick(t, { velocity = 1 }, out) {
+  kick(t, { velocity = 1, tone }, out) {
     const ctx = getContext();
+    if (tone === 'soft' || tone === 'punch') {
+      const soft = tone === 'soft';
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(soft ? 110 : 200, t);
+      o.frequency.exponentialRampToValueAtTime(soft ? 38 : 48, t + (soft ? 0.16 : 0.07));
+      env(g, t, (soft ? 0.85 : 1.05) * velocity, soft ? 0.006 : 0.001, soft ? 0.42 : 0.26);
+      let chain = g;
+      if (!soft) {
+        // a little drive so it punches through the breakbeat
+        const ws = ctx.createWaveShaper(); ws.curve = driveCurve(); chain = ws; g.connect(ws);
+      }
+      o.connect(g); chain.connect(out);
+      o.start(t); o.stop(t + 0.5);
+      if (!soft) {
+        const c = noise(); const cg = ctx.createGain(); const hp = ctx.createBiquadFilter();
+        hp.type = 'highpass'; hp.frequency.value = 2500;
+        env(cg, t, 0.4 * velocity, 0.001, 0.012);
+        c.connect(hp).connect(cg).connect(out); c.start(t); c.stop(t + 0.03);
+      } else {
+        // muffled lo-fi thump: lowpassed noise body
+        const c = noise(); const cg = ctx.createGain(); const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass'; lp.frequency.value = 400;
+        env(cg, t, 0.25 * velocity, 0.002, 0.05);
+        c.connect(lp).connect(cg).connect(out); c.start(t); c.stop(t + 0.08);
+      }
+      return;
+    }
     const o = ctx.createOscillator();
     const g = ctx.createGain();
     o.type = 'sine';
@@ -53,6 +81,25 @@ const voices = {
 
   snare(t, { velocity = 1, tone }, out) {
     const ctx = getContext();
+    if (tone === 'gated' || tone === 'break') {
+      const gated = tone === 'gated';
+      const n = noise(); const f = ctx.createBiquadFilter(); const g = ctx.createGain();
+      f.type = gated ? 'bandpass' : 'highpass'; f.frequency.value = gated ? 1800 : 900; f.Q.value = gated ? 0.5 : 0.7;
+      if (gated) {
+        // 80s gated snare: loud burst held, then cut sharply
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.7 * velocity, t + 0.004);
+        g.gain.setValueAtTime(0.5 * velocity, t + 0.16);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+      } else env(g, t, 0.75 * velocity, 0.001, 0.12);
+      n.connect(f).connect(g).connect(out); n.start(t); n.stop(t + 0.3);
+      const o = ctx.createOscillator(); const og = ctx.createGain();
+      o.type = gated ? 'triangle' : 'square'; o.frequency.setValueAtTime(gated ? 190 : 240, t);
+      o.frequency.exponentialRampToValueAtTime(gated ? 140 : 170, t + 0.06);
+      env(og, t, (gated ? 0.4 : 0.22) * velocity, 0.001, gated ? 0.1 : 0.05);
+      o.connect(og).connect(out); o.start(t); o.stop(t + 0.15);
+      return;
+    }
     if (tone === 'rim') {
       // dry rimshot click for lo-fi beats
       const n = noise(); const bp = ctx.createBiquadFilter(); const g = ctx.createGain();
@@ -76,8 +123,26 @@ const voices = {
     o.start(t); o.stop(t + 0.15);
   },
 
-  hat(t, { velocity = 1, open = false }, out) {
+  hat(t, { velocity = 1, open = false, tone }, out) {
     const ctx = getContext();
+    if (tone === 'shaker') {
+      const n = noise(); const bp = ctx.createBiquadFilter(); const g = ctx.createGain();
+      bp.type = 'bandpass'; bp.frequency.value = 6200; bp.Q.value = 1.2;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.13 * velocity, t + 0.02);   // soft attack, like a shaker
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+      n.connect(bp).connect(g).connect(out); n.start(t); n.stop(t + 0.12);
+      return;
+    }
+    if (tone === 'metal') {
+      // 808-style metallic hat: six detuned squares through a high band
+      const g = ctx.createGain(); const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7000;
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 10000;
+      for (const f of [205, 304, 369, 522, 540, 800]) { const o = ctx.createOscillator(); o.type = 'square'; o.frequency.value = f * 2; o.connect(bp); o.start(t); o.stop(t + 0.08); }
+      bp.connect(hp).connect(g).connect(out);
+      env(g, t, 0.09 * velocity, 0.001, open ? 0.2 : 0.035);
+      return;
+    }
     const n = noise(); const hp = ctx.createBiquadFilter(); const g = ctx.createGain();
     hp.type = 'highpass'; hp.frequency.value = 7500;
     const pk = ctx.createBiquadFilter(); pk.type = 'peaking'; pk.frequency.value = 10500; pk.gain.value = 6; pk.Q.value = 1.2;
@@ -124,6 +189,21 @@ const voices = {
   lead(t, { note = 'C4', velocity = 1, duration = 0.2, tone }, out) {
     const ctx = getContext();
     const f = noteToFreq(note);
+    if (tone === 'acid') {
+      // squelchy acid line: square through a resonant filter that snaps shut every note
+      const o = ctx.createOscillator(); const lp = ctx.createBiquadFilter(); const g = ctx.createGain();
+      o.type = 'sawtooth'; o.frequency.value = f;
+      lp.type = 'lowpass'; lp.Q.value = 14;
+      lp.frequency.setValueAtTime(3800, t);
+      lp.frequency.exponentialRampToValueAtTime(320, t + Math.min(0.22, duration + 0.05));
+      const end = t + duration;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.1 * velocity, t + 0.004);
+      g.gain.setValueAtTime(0.1 * velocity, Math.max(t + 0.006, end - 0.02));
+      g.gain.exponentialRampToValueAtTime(0.0001, end + 0.05);
+      o.connect(lp).connect(g).connect(out); o.start(t); o.stop(end + 0.08);
+      return;
+    }
     if (tone === 'keys') {
       // soft electric-piano: sine + quiet triangle overtone, bell-like decay
       const o = ctx.createOscillator(); const o2 = ctx.createOscillator(); const g = ctx.createGain(); const g2 = ctx.createGain();
@@ -160,9 +240,36 @@ const voices = {
     for (const x of [o, o2, lfo]) { x.start(t); x.stop(end + 0.12); }
   },
 
-  pad(t, { note = 'C3', velocity = 1, duration = 2 }, out) {
+  pad(t, { note = 'C3', velocity = 1, duration = 2, tone }, out) {
     const ctx = getContext();
     const f = noteToFreq(note);
+    if (tone === 'warm' || tone === 'supersaw' || tone === 'dark') {
+      const g = ctx.createGain(); const lp = ctx.createBiquadFilter(); lp.type = 'lowpass';
+      const end = t + duration;
+      const level = { warm: 0.07, supersaw: 0.035, dark: 0.06 }[tone] * velocity;
+      const voicesSpec = {
+        warm: [[1, -4, 'triangle'], [1.5, 3, 'triangle'], [2, 0, 'sine'], [3, 2, 'sine']],          // with a soft major-ish color
+        supersaw: [[1, -18, 'sawtooth'], [1, -7, 'sawtooth'], [1, 0, 'sawtooth'], [1, 7, 'sawtooth'], [1, 18, 'sawtooth'], [2, 5, 'sawtooth'], [1.5, -5, 'sawtooth']],
+        dark: [[0.5, 0, 'square'], [1, -9, 'sawtooth'], [1, 9, 'sawtooth'], [1.5, 0, 'triangle']],
+      }[tone];
+      lp.frequency.setValueAtTime(tone === 'supersaw' ? 1800 : tone === 'dark' ? 380 : 900, t);
+      if (tone === 'supersaw') lp.frequency.linearRampToValueAtTime(3200, t + Math.min(1, duration * 0.4));
+      if (tone === 'dark') lp.frequency.linearRampToValueAtTime(700, t + duration * 0.8);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(level, t + Math.min(tone === 'supersaw' ? 0.05 : 0.5, duration / 3));
+      g.gain.setValueAtTime(level, Math.max(t + 0.06, end - 0.35));
+      g.gain.exponentialRampToValueAtTime(0.0001, end + 0.3);
+      lp.connect(g).connect(out);
+      // tape wobble for the lo-fi pad
+      let wob = null;
+      if (tone === 'warm') { wob = ctx.createOscillator(); wob.frequency.value = 0.6; const wg = ctx.createGain(); wg.gain.value = 9; wob.connect(wg); wob.start(t); wob.stop(end + 0.35); wob.wg = wg; }
+      for (const [mult, det, type] of voicesSpec) {
+        const o = ctx.createOscillator(); o.type = type; o.frequency.value = f * mult; o.detune.value = det;
+        if (wob) wob.wg.connect(o.detune);
+        o.connect(lp); o.start(t); o.stop(end + 0.35);
+      }
+      return;
+    }
     const g = ctx.createGain(); const lp = ctx.createBiquadFilter();
     lp.type = 'lowpass';
     lp.frequency.setValueAtTime(500, t);
@@ -217,6 +324,14 @@ const voices = {
     o.start(t); o.stop(t + 0.05);
   },
 };
+
+let _drive = null;
+function driveCurve() {
+  if (_drive) return _drive;
+  const n = 1024; _drive = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const x = (i / (n - 1)) * 2 - 1; _drive[i] = Math.tanh(x * 2.2); }
+  return _drive;
+}
 
 /** Play a synth voice. type is 'kick' | 'snare' | 'hat' | 'bass' | 'lead' | 'pad' | 'riser' | 'click'. */
 export function playSynth(type, time, params, out) {

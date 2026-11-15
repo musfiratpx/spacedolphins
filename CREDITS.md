@@ -43,7 +43,11 @@ NASA does not endorse this project. NASA's insignia and logotype are not used.
 - Voyager: Lightning on Jupiter
 - Cassini: Saturn Radio Emissions #2
 - LCROSS: Water on the Moon Song
-- Stardust: Passing Comet Tempel 1
+- Stardust: Passing Comet Tempel 1 (Mars song)
+- Cassini: Enceladus Sound (Moon song)
+- Cassini: Saturn Radio Emissions #1 (Deep space song)
+- InSight: First Likely Marsquake (sonification), Perseverance: First Sounds from Mars, and Ingenuity in flight heard by Perseverance: NASA/JPL-Caltech, clips cut from NASA videos on images.nasa.gov (Mars song)
+- Not used: Quindar: Sound #1 (contains radio voices) and LCROSS: Water on the Moon Song (may contain vocals; appears to be by an outside artist). The game uses no vocals.
 - Skipped: the Sputnik beep (not a NASA spacecraft) and the University of Iowa chorus clip (credited to a third party).
 
 ### Code

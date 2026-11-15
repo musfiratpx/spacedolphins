@@ -11,15 +11,16 @@ const moonProg = ['C2', 'A1', 'F1', 'G1'];
 const moon = {
   id: 'moon-calm', title: 'Nearest Neighbors', region: 'moon', bpm: 96, stepsPerBar: 16, swing: 0.18, key: 'C major', genre: 'lo-fi chillhop',
   instruments: {
-    kick:    { type: 'synth.kick',  gain: 0.8,  role: 'backbone', ducker: true },
+    kick:    { type: 'synth.kick',  gain: 0.85, role: 'backbone', tone: 'soft', ducker: true },
     snare:   { type: 'synth.snare', gain: 0.75, role: 'backbone', tone: 'rim', send: { reverb: 0.25 } },
-    hat:     { type: 'synth.hat',   gain: 0.32, role: 'backbone' },
+    hat:     { type: 'synth.hat',   gain: 0.5,  role: 'backbone', tone: 'shaker' },
     bass:    { type: 'synth.bass',  gain: 0.8,  role: 'backbone', tone: 'sub', duck: 0.35 },
-    pad:     { type: 'synth.pad',   gain: 0.7,  role: 'pad', duck: 0.4, send: { reverb: 0.6 } },
+    pad:     { type: 'synth.pad',   gain: 0.8,  role: 'pad', tone: 'warm', duck: 0.4, send: { reverb: 0.6 } },
     lead:    { type: 'synth.lead',  gain: 0.9,  role: 'lead', tone: 'keys', send: { reverb: 0.45, delay: 0.25 } },
     crackle: { type: 'synth.crackle', gain: 0.5, role: 'pad' },
     // NASA layer (no vocals): the Atlas V launch roar, low and far away, as a slow swell
     launch:  { type: 'sample.atlas-launch', gain: 0.22, role: 'riser', trim: true, durationSteps: 32, fadeSteps: 14, send: { reverb: 0.5 }, nasa: 'Atlas V: Launch' },
+    icy:     { type: 'sample.enceladus', gain: 0.3, role: 'pad', trim: true, durationSteps: 32, fadeSteps: 10, send: { reverb: 0.5, delay: 0.2 }, nasa: 'Cassini: Enceladus Sound' },
   },
   patterns: {
     kick:  { bap: 'o.....o...o.....', soft: 'o.......o.......' },
@@ -43,13 +44,14 @@ const moon = {
     },
     crackle: { on: 'x.x.x.x.x.x.x.x.' },
     launch: { swell: 'x' + '.'.repeat(31) },
+    icy: { once: 'x' + '.'.repeat(31) },
   },
   // 17 bars at 96 BPM = 42.5 s
   sections: [
     { name: 'intro',  bars: 2, play: { pad: 'prog', crackle: 'on', lead: 'sparse', launch: 'swell', kick: 'soft' } },
     { name: 'groove', bars: 4, play: { kick: 'bap', snare: 'rim', hat: 'lazy', bass: 'root', pad: 'prog', crackle: 'on' } },
     { name: 'keys',   bars: 6, play: { kick: 'bap', snare: 'rim', hat: 'lazy', bass: 'root', pad: 'prog', lead: 'keys', crackle: 'on' } },
-    { name: 'drift',  bars: 2, play: { kick: 'soft', pad: 'prog', crackle: 'on', launch: 'swell', lead: 'sparse' } },
+    { name: 'drift',  bars: 2, play: { kick: 'soft', pad: 'prog', crackle: 'on', icy: 'once', lead: 'sparse' } },
     { name: 'outro',  bars: 3, play: { kick: 'bap', snare: 'rim', hat: 'lazy', bass: 'root', pad: 'prog', lead: 'keys', crackle: 'on' } },
   ],
   chart: {
@@ -66,14 +68,15 @@ const deepProg = ['E2', 'C2', 'G1', 'D2'];
 const deep = {
   id: 'deep-signal', title: 'The Long Signal', region: 'deep', bpm: 140, stepsPerBar: 16, swing: 0, key: 'E minor', genre: 'breakbeat',
   instruments: {
-    kick:  { type: 'synth.kick',  gain: 1.0,  role: 'backbone', ducker: true },
-    snare: { type: 'synth.snare', gain: 0.85, role: 'backbone', send: { reverb: 0.25 } },
-    hat:   { type: 'synth.hat',   gain: 0.5,  role: 'backbone', send: { delay: 0.06 } },
+    kick:  { type: 'synth.kick',  gain: 0.95, role: 'backbone', tone: 'punch', ducker: true },
+    snare: { type: 'synth.snare', gain: 0.85, role: 'backbone', tone: 'break', send: { reverb: 0.18 } },
+    hat:   { type: 'synth.hat',   gain: 0.6,  role: 'backbone', tone: 'metal', send: { delay: 0.06 } },
     bass:  { type: 'synth.bass',  gain: 0.9,  role: 'backbone', tone: 'reese', duck: 0.55 },
-    pad:   { type: 'synth.pad',   gain: 0.6,  role: 'pad', duck: 0.6, send: { reverb: 0.55 } },
-    lead:  { type: 'synth.lead',  gain: 0.8,  role: 'lead', send: { reverb: 0.25, delay: 0.25 } },
+    pad:   { type: 'synth.pad',   gain: 0.7,  role: 'pad', tone: 'dark', duck: 0.6, send: { reverb: 0.55 } },
+    lead:  { type: 'synth.lead',  gain: 0.85, role: 'lead', tone: 'acid', send: { reverb: 0.15, delay: 0.3 } },
     riser: { type: 'synth.riser', gain: 0.6,  role: 'riser', send: { reverb: 0.3 } },
     // NASA layers
+    radio1:    { type: 'sample.saturn-radio-1', gain: 0.35, role: 'pad', trim: true, durationSteps: 32, fadeSteps: 8, send: { reverb: 0.4 }, nasa: 'Cassini: Saturn Radio Emissions #1' },
     lightning: { type: 'sample.jupiter-lightning', gain: 0.35, role: 'hats', trim: true, durationSteps: 6, fadeSteps: 2, send: { reverb: 0.3 }, nasa: 'Voyager: Lightning on Jupiter' },
   },
   patterns: {
@@ -98,11 +101,12 @@ const deep = {
       ),
     },
     riser: { up: bars(hold('C4', 32)) },
+ radio1: { once: 'x' + '.'.repeat(31) },
     lightning: { crack: '....o...........' + '............o...' },
   },
   // 26 bars at 140 BPM = 44.6 s
   sections: [
-    { name: 'intro',      bars: 2, play: { kick: 'half', hat: 'eighth', pad: 'prog' } },
+    { name: 'intro',      bars: 2, play: { kick: 'half', hat: 'eighth', pad: 'prog', radio1: 'once' } },
     { name: 'groove',     bars: 4, play: { kick: 'drive', snare: 'back', hat: 'eighth', bass: 'pulse', pad: 'prog' } },
     { name: 'build',      bars: 2, play: { kick: 'fill', snare: 'roll', hat: 'sixteen', bass: 'long', riser: 'up' } },
     { name: 'drop',       bars: 6, play: { kick: 'two', snare: 'back', hat: 'sixteen', bass: 'pulse', pad: 'prog', lead: 'hook', lightning: 'crack' } },

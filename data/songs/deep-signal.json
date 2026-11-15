@@ -10,22 +10,25 @@
   "instruments": {
     "kick": {
       "type": "synth.kick",
-      "gain": 1,
+      "gain": 0.95,
       "role": "backbone",
+      "tone": "punch",
       "ducker": true
     },
     "snare": {
       "type": "synth.snare",
       "gain": 0.85,
       "role": "backbone",
+      "tone": "break",
       "send": {
-        "reverb": 0.25
+        "reverb": 0.18
       }
     },
     "hat": {
       "type": "synth.hat",
-      "gain": 0.5,
+      "gain": 0.6,
       "role": "backbone",
+      "tone": "metal",
       "send": {
         "delay": 0.06
       }
@@ -39,8 +42,9 @@
     },
     "pad": {
       "type": "synth.pad",
-      "gain": 0.6,
+      "gain": 0.7,
       "role": "pad",
+      "tone": "dark",
       "duck": 0.6,
       "send": {
         "reverb": 0.55
@@ -48,11 +52,12 @@
     },
     "lead": {
       "type": "synth.lead",
-      "gain": 0.8,
+      "gain": 0.85,
       "role": "lead",
+      "tone": "acid",
       "send": {
-        "reverb": 0.25,
-        "delay": 0.25
+        "reverb": 0.15,
+        "delay": 0.3
       }
     },
     "riser": {
@@ -62,6 +67,18 @@
       "send": {
         "reverb": 0.3
       }
+    },
+    "radio1": {
+      "type": "sample.saturn-radio-1",
+      "gain": 0.35,
+      "role": "pad",
+      "trim": true,
+      "durationSteps": 32,
+      "fadeSteps": 8,
+      "send": {
+        "reverb": 0.4
+      },
+      "nasa": "Cassini: Saturn Radio Emissions #1"
     },
     "lightning": {
       "type": "sample.jupiter-lightning",
@@ -463,6 +480,9 @@
         "_"
       ]
     },
+    "radio1": {
+      "once": "x..............................."
+    },
     "lightning": {
       "crack": "....o.......................o..."
     }
@@ -474,7 +494,8 @@
       "play": {
         "kick": "half",
         "hat": "eighth",
-        "pad": "prog"
+        "pad": "prog",
+        "radio1": "once"
       }
     },
     {

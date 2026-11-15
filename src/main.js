@@ -6,6 +6,7 @@ import { startWorld, getWorld } from './three/world.js';
 import { startStars } from './ui/stars.js';
 import { startHearingPopups } from './ui/hearing.js';
 import { startAmbience } from './audio/ambience.js';
+import { startPaperViewer } from './ui/paper.js';
 import { debug } from './core/config.js';
 import { settings } from './core/settings.js';
 import { on } from './core/bus.js';
@@ -20,6 +21,7 @@ import card from './screens/card.js';
 import dex from './screens/dex.js';
 import credits from './screens/credits.js';
 import records from './screens/records.js';
+import radiolog from './screens/radiolog.js';
 
 // ---- Screen registry -------------------------------------------------------
 const screens = new Map();
@@ -51,6 +53,7 @@ async function swap(id, next, params) {
   app.style.setProperty('--enter-delay', `${flight > 1.8 && !settings.reducedMotion ? Math.round(flight * 420) : 0}ms`);
   app.classList.remove('fade-in');
   app.innerHTML = '';
+  app.scrollTop = 0;            // every screen opens at the top
   app.dataset.screen = id;
   current = { id, screen: next };
   await next.mount(app, params, go);
@@ -60,7 +63,9 @@ async function swap(id, next, params) {
   emit('screen:change', { id, params });
 }
 
-for (const [id, s] of Object.entries({ title, intro, hub, preround, round, results, card, dex, credits, records })) {
+window.__hhGo = (id, params) => go(id, params);   // handy in the browser console for debugging/testing
+
+for (const [id, s] of Object.entries({ title, intro, hub, preround, round, results, card, dex, credits, records, radiolog })) {
   registerScreen(id, s);
 }
 
@@ -68,16 +73,19 @@ for (const [id, s] of Object.entries({ title, intro, hub, preround, round, resul
 window.addEventListener('keydown', (e) => {
   if (e.key === 'F3') { e.preventDefault(); debug.hotspotCoords = !debug.hotspotCoords; }
   // Esc = back (rounds and the intro handle Esc themselves; inspect closes first)
-  if (e.key === 'Escape' && !['round', 'intro', 'title'].includes(current?.id) && !document.body.classList.contains('inspect-open') && !document.querySelector('dialog[open]')) {
+  if (e.key === 'Escape' && !['round', 'intro', 'title'].includes(current?.id) && !document.body.classList.contains('inspect-open') && !document.querySelector('dialog[open], .paper-view')) {
     const back = app.querySelector('.hub-head [data-go]');
     if (back) { e.preventDefault(); back.click(); }
   }
 });
 
 // CSS animations follow the in-game Reduced motion setting too
-const syncMotion = () => document.body.classList.toggle('reduce-motion', Boolean(settings.reducedMotion));
+const syncMotion = () => {
+  document.body.classList.toggle('reduce-motion', Boolean(settings.reducedMotion));
+  document.body.classList.toggle('easy-read', Boolean(settings.dyslexiaFont));
+};
 syncMotion();
-on('settings:change', ({ path }) => { if (path === 'reducedMotion') syncMotion(); });
+on('settings:change', ({ path }) => { if (path === 'reducedMotion' || path === 'dyslexiaFont') syncMotion(); });
 
 // ---- Boot -----------------------------------------------------------------
 (async function boot() {
@@ -88,6 +96,7 @@ on('settings:change', ({ path }) => { if (path === 'reducedMotion') syncMotion()
     if (!startWorld(sky)) startStars(sky);
     startHearingPopups();
     startAmbience();
+    startPaperViewer();
   } catch (err) {
     app.innerHTML = `<div class="screen center"><div class="panel"><h2>Couldn't load game data</h2>
       <p>Run the game from a web server (npm run dev), not by double-clicking index.html.</p>

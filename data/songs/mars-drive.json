@@ -19,6 +19,7 @@
       "type": "synth.snare",
       "gain": 0.8,
       "role": "backbone",
+      "tone": "gated",
       "send": {
         "reverb": 0.45
       }
@@ -42,6 +43,7 @@
       "type": "synth.pad",
       "gain": 0.75,
       "role": "pad",
+      "tone": "supersaw",
       "duck": 0.6,
       "send": {
         "reverb": 0.5
@@ -64,6 +66,27 @@
       "send": {
         "reverb": 0.3
       }
+    },
+    "wind": {
+      "type": "sample.mars-wind",
+      "gain": 0.4,
+      "role": "pad",
+      "trim": true,
+      "durationSteps": 32,
+      "fadeSteps": 10,
+      "send": {
+        "reverb": 0.25
+      },
+      "nasa": "Perseverance: First Sounds from Mars"
+    },
+    "rotor": {
+      "type": "sample.ingenuity-hum",
+      "gain": 0.22,
+      "role": "pad",
+      "trim": true,
+      "durationSteps": 64,
+      "fadeSteps": 12,
+      "nasa": "Ingenuity in flight"
     },
     "comet": {
       "type": "sample.stardust-comet",
@@ -535,6 +558,12 @@
     },
     "comet": {
       "once": "x..............................."
+    },
+    "wind": {
+      "once": "x..............................."
+    },
+    "rotor": {
+      "once": "x..............................................................."
     }
   },
   "sections": [
@@ -544,7 +573,8 @@
       "play": {
         "kick": "half",
         "hat": "quarter",
-        "pad": "prog"
+        "pad": "prog",
+        "wind": "once"
       }
     },
     {
@@ -579,7 +609,8 @@
         "hat": "sixteen",
         "bass": "drive",
         "pad": "prog",
-        "lead": "hook"
+        "lead": "hook",
+        "rotor": "once"
       }
     },
     {
@@ -609,7 +640,8 @@
       "bars": 1,
       "play": {
         "kick": "half",
-        "pad": "prog"
+        "pad": "prog",
+        "wind": "once"
       }
     }
   ],

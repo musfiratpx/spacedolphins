@@ -78,7 +78,11 @@
         "howItWorked": "real",
         "found": "real",
         "numanNote": "story"
-      }
+      },
+      "alive": false,
+      "quietSince": "November 1982",
+      "signal": "mars",
+      "short": "Viking 1"
     },
     {
       "id": "opportunity",
@@ -140,7 +144,11 @@
         "howItWorked": "real",
         "found": "real",
         "numanNote": "story"
-      }
+      },
+      "alive": false,
+      "quietSince": "June 10, 2018",
+      "signal": "mars",
+      "short": "Opportunity"
     },
     {
       "id": "insight",
@@ -202,7 +210,11 @@
         "howItWorked": "real",
         "found": "real",
         "numanNote": "story"
-      }
+      },
+      "alive": false,
+      "quietSince": "December 2022",
+      "signal": "mars",
+      "short": "InSight"
     },
     {
       "id": "ingenuity",
@@ -255,7 +267,11 @@
         "howItWorked": "real",
         "found": "real",
         "numanNote": "story"
-      }
+      },
+      "alive": false,
+      "quietSince": "January 2024",
+      "signal": "mars",
+      "short": "Ingenuity"
     },
     {
       "id": "apollo11-descent",
@@ -286,7 +302,12 @@
       "source": "https://www.nasa.gov/history/apollo-11-mission-overview/",
       "tags": {
         "numanNote": "story"
-      }
+      },
+      "alive": false,
+      "quietSince": "July 1969",
+      "monument": true,
+      "signal": "moon",
+      "short": "Apollo 11"
     },
     {
       "id": "apollo17-rover",
@@ -316,7 +337,12 @@
       "source": "https://www.nasa.gov/missions/apollo/apollo-17-mission-details/",
       "tags": {
         "numanNote": "story"
-      }
+      },
+      "alive": false,
+      "quietSince": "December 1972",
+      "monument": true,
+      "signal": "moon",
+      "short": "Apollo 17 rover"
     },
     {
       "id": "lro",
@@ -346,7 +372,10 @@
       "source": "https://science.nasa.gov/mission/lro/",
       "tags": {
         "numanNote": "story"
-      }
+      },
+      "alive": true,
+      "signal": "moon",
+      "short": "LRO"
     },
     {
       "id": "blue-ghost",
@@ -377,7 +406,11 @@
       "tags": {
         "numanNote": "story"
       },
-      "todo": "Landing date and end of mission not shown on the linked NASA page; arrived year 2025 from the team outline."
+      "todo": "Landing date and end of mission not shown on the linked NASA page; arrived year 2025 from the team outline.",
+      "alive": false,
+      "quietSince": null,
+      "signal": "moon",
+      "short": "Blue Ghost"
     },
     {
       "id": "voyager1",
@@ -408,7 +441,10 @@
       "source": "https://science.nasa.gov/mission/voyager/voyager-1/",
       "tags": {
         "numanNote": "story"
-      }
+      },
+      "alive": true,
+      "signal": "voyager1",
+      "short": "Voyager 1"
     },
     {
       "id": "voyager2",
@@ -439,7 +475,10 @@
       "source": "https://science.nasa.gov/mission/voyager/voyager-2/",
       "tags": {
         "numanNote": "story"
-      }
+      },
+      "alive": true,
+      "signal": null,
+      "short": "Voyager 2"
     },
     {
       "id": "new-horizons",
@@ -470,7 +509,10 @@
       "source": "https://science.nasa.gov/mission/new-horizons/",
       "tags": {
         "numanNote": "story"
-      }
+      },
+      "alive": true,
+      "signal": "new-horizons",
+      "short": "New Horizons"
     },
     {
       "id": "cassini",
@@ -501,7 +543,34 @@
       "source": "https://science.nasa.gov/mission/cassini/",
       "tags": {
         "numanNote": "story"
-      }
+      },
+      "alive": false,
+      "quietSince": "September 2017",
+      "signal": null,
+      "short": "Cassini"
     }
-  ]
+  ],
+  "signals": {
+    "_readme": "One-way light/radio travel time from Earth. Each is derived from the NASA figure in \"basis\".",
+    "moon": {
+      "text": "about 1.3 seconds",
+      "seconds": 1.28,
+      "basis": "Moon is an average of 384,400 km away (science.nasa.gov/moon/facts/); light covers 299,792 km per second."
+    },
+    "mars": {
+      "text": "about 4 to 21 minutes, depending on where the planets are",
+      "seconds": 750,
+      "basis": "Mars averages 1.5 AU from the Sun and Earth 1 AU (science.nasa.gov/mars/facts/), so 0.5–2.5 AU apart; light takes ~8.3 minutes per AU."
+    },
+    "voyager1": {
+      "text": "almost a full day",
+      "seconds": 86400,
+      "basis": "Voyager 1 is reaching one light-day from Earth (science.nasa.gov/mission/voyager/voyager-1/)."
+    },
+    "new-horizons": {
+      "text": "more than 8 hours",
+      "seconds": 30000,
+      "basis": "On Jan. 1, 2024 it was 60 times as far from the Sun as Earth (science.nasa.gov/mission/new-horizons/); ~8.3 light-minutes per AU."
+    }
+  }
 }

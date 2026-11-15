@@ -16,14 +16,16 @@ const song = {
   instruments: {
     // send = { reverb, delay } amounts; duck = dips under the kick so the beat stays clear
     kick:  { type: 'synth.kick',  gain: 1.0,  role: 'backbone', ducker: true, nasaLayer: 'marsquake (sub hit on downbeats, once downloaded)' },
-    snare: { type: 'synth.snare', gain: 0.8,  role: 'backbone', send: { reverb: 0.45 } },
+    snare: { type: 'synth.snare', gain: 0.8,  role: 'backbone', tone: 'gated', send: { reverb: 0.45 } },
     hat:   { type: 'synth.hat',   gain: 0.5,  role: 'backbone', send: { delay: 0.05 } },
     bass:  { type: 'synth.bass',  gain: 0.8,  role: 'backbone', duck: 0.5, nasaLayer: 'ingenuity-hum drone (once downloaded)' },
-    pad:   { type: 'synth.pad',   gain: 0.75, role: 'pad', duck: 0.6, send: { reverb: 0.5 }, nasaLayer: 'mars-wind (once downloaded)' },
+    pad:   { type: 'synth.pad',   gain: 0.75, role: 'pad', tone: 'supersaw', duck: 0.6, send: { reverb: 0.5 }, nasaLayer: 'mars-wind (once downloaded)' },
     lead:  { type: 'synth.lead',  gain: 0.8,  role: 'lead', send: { reverb: 0.25, delay: 0.22 } },
     riser: { type: 'synth.riser', gain: 0.6,  role: 'riser', send: { reverb: 0.3 } },
     // NASA layers (real recordings; they sit under the backbone, never mask it)
     // NASA layer (no vocals): Stardust's comet-flyby sonification as the whoosh into the drop
+    wind:  { type: 'sample.mars-wind', gain: 0.4, role: 'pad', trim: true, durationSteps: 32, fadeSteps: 10, send: { reverb: 0.25 }, nasa: 'Perseverance: First Sounds from Mars' },
+    rotor: { type: 'sample.ingenuity-hum', gain: 0.22, role: 'pad', trim: true, durationSteps: 64, fadeSteps: 12, nasa: 'Ingenuity in flight' },
     comet: { type: 'sample.stardust-comet', gain: 0.6, role: 'riser', trim: true, durationSteps: 32, fadeSteps: 6, send: { reverb: 0.3 }, nasa: 'Stardust: Passing Comet Tempel 1' },
   },
   patterns: {
@@ -51,16 +53,18 @@ const song = {
     },
     riser: { up: bars(hold('C4', 64)), up2: bars(hold('C4', 32)) },
     comet: { once: 'x' + '.'.repeat(31) },
+    wind: { once: 'x' + '.'.repeat(31) },
+    rotor: { once: 'x' + '.'.repeat(63) },
   },
   // 20 bars at 112 BPM = about 43 seconds (every song stays under 45 s)
   sections: [
-    { name: 'intro',     bars: 2, play: { kick: 'half', hat: 'quarter', pad: 'prog' } },
+    { name: 'intro',     bars: 2, play: { kick: 'half', hat: 'quarter', pad: 'prog', wind: 'once' } },
     { name: 'groove',    bars: 4, play: { kick: 'four', snare: 'back', hat: 'eighth', bass: 'drive', pad: 'prog' } },
     { name: 'build',     bars: 2, play: { kick: 'four', snare: 'ghost', hat: 'sixteen', bass: 'long', riser: 'up2', comet: 'once' } },
-    { name: 'drop',      bars: 4, play: { kick: 'four', snare: 'back', hat: 'sixteen', bass: 'drive', pad: 'prog', lead: 'hook' } },
+    { name: 'drop',      bars: 4, play: { kick: 'four', snare: 'back', hat: 'sixteen', bass: 'drive', pad: 'prog', lead: 'hook', rotor: 'once' } },
     { name: 'data break', bars: 3, play: { kick: 'half', hat: 'quarter', pad: 'prog' }, dataBreak: true },
     { name: 'final',     bars: 4, play: { kick: 'four', snare: 'back', hat: 'sixteen', bass: 'drive', pad: 'prog', lead: 'answer' } },
-    { name: 'outro',     bars: 1, play: { kick: 'half', pad: 'prog' } },
+    { name: 'outro',     bars: 1, play: { kick: 'half', pad: 'prog', wind: 'once' } },
   ],
   chart: {
     snare: { lane: 'R', from: 'easy' },

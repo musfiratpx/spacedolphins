@@ -6,6 +6,14 @@ import { emit } from '../core/bus.js';
 import { settings } from '../core/settings.js';
 import { esc, tag } from '../ui/dom.js';
 
+function speak(text) {
+  if (!settings.readAloud || !('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.95; u.volume = Math.min(1, settings.volumes.radio * settings.volumes.master * 1.1);
+  speechSynthesis.speak(u);
+}
+
 let cleanup = null;
 
 export default {
@@ -41,6 +49,7 @@ export default {
       full = line.text;
       text.textContent = '';
       emit('radio:line', line);
+      speak(line.text);
       let c = 0;
       const step = () => {
         if (c >= full.length) { typing = null; return; }
@@ -65,7 +74,7 @@ export default {
     el.querySelector('.skip').addEventListener('click', finish);
     el.querySelector('.intro-screen').addEventListener('pointerdown', advance);
     window.addEventListener('keydown', onKey);
-    cleanup = () => { clearTimeout(typing); window.removeEventListener('keydown', onKey); };
+    cleanup = () => { clearTimeout(typing); window.removeEventListener('keydown', onKey); try { speechSynthesis.cancel(); } catch { /* */ } };
     show(0);
   },
   unmount() { cleanup?.(); cleanup = null; },

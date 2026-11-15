@@ -3,7 +3,10 @@ import { wire, esc } from '../ui/dom.js';
 import { getRegion, machinesIn } from '../core/data.js';
 import { state } from '../core/state.js';
 import { judging } from '../core/config.js';
-import { HardwareViewer } from '../three/viewer.js';
+import { acquireViewer, releaseViewer } from '../three/viewer.js';
+import { loadRadio } from '../core/data.js';
+import { playRadio } from '../ui/radio.js';
+import { save } from '../core/state.js';
 
 let choice = { difficulty: 'normal' };
 let viewer = null;
@@ -71,9 +74,19 @@ export default {
     window.addEventListener('keydown', onEnter);
     holder = document.createElement('div');
     holder.className = 'target-view';
-    viewer = new HardwareViewer(holder, { interactive: false, spin: 0.008 });
+    viewer = acquireViewer(holder, { interactive: false, spin: 0.008 });
     shown = null;
     render();
+    // first time in a region: Mission Control and the Numans brief you
+    state.briefed ||= {};
+    if (!state.briefed[region.id]) {
+      loadRadio().then((radio) => {
+        const lines = radio.regions?.[region.id];
+        if (!lines || !viewer) return;
+        state.briefed[region.id] = true; save();
+        playRadio(lines, { title: `${region.name} briefing` });
+      }).catch(() => {});
+    }
   },
-  unmount() { viewer?.dispose(); viewer = null; holder = null; shown = null; window.removeEventListener('keydown', onEnter); },
+  unmount() { releaseViewer(); viewer = null; holder = null; shown = null; window.removeEventListener('keydown', onEnter); },
 };

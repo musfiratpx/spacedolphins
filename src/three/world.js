@@ -93,6 +93,26 @@ export class World {
     this.cockpitWant = 0;
 
     on('beat', () => { this.pulse = 1; });
+    // poke things in the cockpit (plushies, mug, screens...) when clicking open window, never UI
+    this.ray = new THREE.Raycaster(); this.ndc = new THREE.Vector2();
+    const UI = 'button, a, input, select, textarea, summary, label, dialog, .panel, .neo-strip, .reward, .radio-overlay, .hearing, .round';
+    const pick = (e) => {
+      if (this.cockpitShow < 0.9 || !this.cockpit.pokeables.length || e.target.closest?.(UI)) return null;
+      this.ndc.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+      this.ray.setFromCamera(this.ndc, this.cockpitCam);
+      for (const hit of this.ray.intersectObjects(this.cockpit.pokeables, true)) {
+        let o = hit.object; while (o && !o.userData.poke) o = o.parent;
+        if (o) return o;
+      }
+      return null;
+    };
+    window.addEventListener('pointerdown', (e) => { const o = pick(e); if (o) this.cockpit.poke(o); });
+    let hoverBusy = false;
+    window.addEventListener('pointermove', (e) => {
+      if (hoverBusy) return; hoverBusy = true;
+      setTimeout(() => { hoverBusy = false; }, 70);   // ~14 checks a second is plenty
+      document.body.classList.toggle('can-poke', Boolean(pick(e)));
+    }, { passive: true });
     window.addEventListener('pointermove', (e) => {
       this.mouse.set(e.clientX / window.innerWidth - 0.5, e.clientY / window.innerHeight - 0.5);
     });
@@ -264,7 +284,7 @@ export class World {
     const bump = this.tex('moon-bump', false);
     this.moon = new THREE.Mesh(
       new THREE.SphereGeometry(REGION_RADIUS.moon, 96, 64),
-      new THREE.MeshStandardMaterial({ map, bumpMap: bump, bumpScale: 3, color: map ? 0xffffff : 0xa7adba, roughness: 1 }),
+      new THREE.MeshStandardMaterial({ map, bumpMap: bump, bumpScale: 0.35, color: map ? 0xffffff : 0xa7adba, roughness: 1 }),
     );
     this.moon.position.copy(MOON);
     this.scene.add(this.moon);
@@ -563,6 +583,7 @@ const smooth = (a, b, x) => { const k = THREE.MathUtils.clamp((x - a) / (b - a),
 let world = null;
 export function startWorld(canvas) {
   try { world = new World(canvas); } catch (err) { console.warn('[world] WebGL unavailable', err); world = null; }
+  window.__hhWorld = world;   // handy in the browser console for debugging/testing
   return world;
 }
 export function getWorld() { return world; }

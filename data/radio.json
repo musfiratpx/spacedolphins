@@ -1,20 +1,80 @@
 {
-  "_readme": "Radio script. tag: 'story' for the 4052 fiction, 'real' for NASA facts. Keep lines short (ages 10-14).",
+  "_readme": "Radio script. tag: 'story' for the 4052 fiction, 'real' for NASA facts (each real line matches a fact on a card or in CLAUDE.md). Keep lines short (ages 10-14).",
   "intro": [
     { "who": "Mission Control", "tag": "story", "text": "Recovery Traveler, do you read me? This is Mission Control. The year is 4052." },
     { "who": "Mission Control", "tag": "story", "text": "Earth is still home, but it's weaker than it used to be. Its shield is failing, and asteroids keep coming." },
     { "who": "Mission Control", "tag": "story", "text": "Your job: find the machines humans sent into space between the 1960s and 2026, and scan them into the Archive." },
     { "who": "Mission Control", "tag": "story", "text": "We don't take them. We scan a hologram copy and leave each original where it rests, as a monument." },
+    { "who": "Mission Control", "tag": "story", "text": "Most of them went quiet long ago. Nobody visits them. That's why they need you: so they're not forgotten." },
     { "who": "Mission Control", "tag": "story", "text": "You won't be alone. The Numans, a life form we met not long ago, have offered to help. They're the reason people can live on Mars." },
     { "who": "The Numans", "tag": "story", "text": "We sing frequencies that shatter stone. But our songs need a human partner to keep time." },
     { "who": "Mission Control", "tag": "story", "text": "So here's the deal: play their rhythm games. Every song you clear protects Earth and unlocks a machine to scan." },
     { "who": "Mission Control", "tag": "story", "text": "Left lane is A or the left arrow. Right lane is D or the right arrow. You can tap the lanes too." },
-    { "who": "Mission Control", "tag": "story", "text": "First stop: Mars. Four machines are waiting. Good luck, Traveler." }
+    { "who": "Mission Control", "tag": "story", "text": "Start on the Moon to learn the rhythm, or jump straight to Mars. Good luck, Traveler." }
   ],
+  "regions": {
+    "moon": [
+      { "who": "Mission Control", "tag": "story", "text": "Moon approach. This is where people first walked on another world." },
+      { "who": "Mission Control", "tag": "real", "text": "Apollo 11 landed in the Sea of Tranquility on July 20, 1969. The bottom half of its lander is still sitting there." },
+      { "who": "Mission Control", "tag": "real", "text": "Apollo 17's rover is parked in the Taurus-Littrow valley. It drove 30.5 kilometers on batteries." },
+      { "who": "The Numans", "tag": "story", "text": "Your Moon is quiet. But it remembers every machine that touched it. We can hear them, very faintly." },
+      { "who": "Mission Control", "tag": "story", "text": "The Moon songs are gentle. Learn the rhythm here, Traveler." }
+    ],
+    "mars": [
+      { "who": "Mission Control", "tag": "real", "text": "Mars. In 1976, Viking 1 became the first US spacecraft to land here and send back pictures." },
+      { "who": "Mission Control", "tag": "real", "text": "Opportunity was built for 90 Martian days. It kept going for almost 15 years." },
+      { "who": "The Numans", "tag": "story", "text": "Mars is our home now too. We helped make it livable for your people. These machines were here first." },
+      { "who": "Mission Control", "tag": "story", "text": "Two rovers from your time, Curiosity and Perseverance, are on our friends list, not our scan list." },
+      { "who": "Mission Control", "tag": "story", "text": "Listen for the data break. When the beat drops out, you're hearing real mission data. Play its peaks." }
+    ],
+    "deep": [
+      { "who": "Mission Control", "tag": "story", "text": "Deep space. Out here, distance is everything." },
+      { "who": "Mission Control", "tag": "real", "text": "Voyager 1 launched in 1977. It's almost one light-day from Earth, so a message takes nearly a whole day to reach it." },
+      { "who": "Mission Control", "tag": "real", "text": "Cassini ended its mission on purpose, diving into Saturn to keep moons like Enceladus clean for future explorers." },
+      { "who": "The Numans", "tag": "story", "text": "These are the loneliest songs. Some of these machines are still listening. Play loud." },
+      { "who": "Mission Control", "tag": "story", "text": "Fast songs ahead, Traveler. Earth is counting on you." }
+    ]
+  },
   "reactions": {
-    "_hook": "Phase 2 (features.radioReactions): 3 variants each, picked at random without repeats.",
-    "great": [],
-    "ok": [],
-    "fail": []
-  }
+    "great": [
+      { "who": "Mission Control", "tag": "story", "text": "That's a clean scan! The Numans are humming along." },
+      { "who": "Mission Control", "tag": "story", "text": "Perfect timing. The shield lit up all the way across the sky." },
+      { "who": "The Numans", "tag": "story", "text": "You keep time like a star keeps light. We are impressed." }
+    ],
+    "ok": [
+      { "who": "Mission Control", "tag": "story", "text": "Signal locked. Not perfect, but the machine is safe in the Archive." },
+      { "who": "Mission Control", "tag": "story", "text": "Good enough to scan! The shield is holding." },
+      { "who": "The Numans", "tag": "story", "text": "A little wobbly. We liked it anyway." }
+    ],
+    "fail": [
+      { "who": "Mission Control", "tag": "story", "text": "We lost the signal. Shake it off and try again." },
+      { "who": "Mission Control", "tag": "story", "text": "So close! The machine isn't going anywhere. It has waited for decades." },
+      { "who": "The Numans", "tag": "story", "text": "Same song, again. Your timing is getting better. We can hear it." }
+    ]
+  },
+  "scanned": [
+    { "who": "Mission Control", "tag": "story", "text": "Archive confirms: {short} is scanned. The original stays at {place}, right where it was left." }
+  ],
+  "lore": [
+    { "id": "archive", "title": "The Archive", "lines": [
+      { "who": "Ship's log", "tag": "story", "text": "The Archive is a museum on Earth. Every machine you scan becomes a full-size hologram there." },
+      { "who": "Ship's log", "tag": "story", "text": "Kids walk under Voyager's dish and sit next to the Apollo rover. Nobody is allowed to touch the real ones." }
+    ] },
+    { "id": "shield", "title": "Earth's shield", "lines": [
+      { "who": "Ship's log", "tag": "story", "text": "The shield is a web of light around Earth that turns space rocks away. It is very old now." },
+      { "who": "Ship's log", "tag": "story", "text": "Every Numan song you finish patches a few holes. That's why the radar on your dash never stops beeping." }
+    ] },
+    { "id": "numans", "title": "The Numans", "lines": [
+      { "who": "Ship's log", "tag": "story", "text": "Nobody knows exactly where the Numans came from. They talk in frequencies and glow when they're happy." },
+      { "who": "Ship's log", "tag": "story", "text": "They think human music is the funniest thing in the universe. They also think it's beautiful. Both at once." }
+    ] },
+    { "id": "ship", "title": "Your ship", "lines": [
+      { "who": "Ship's log", "tag": "story", "text": "This recovery ship has carried twelve travelers before you. Someone left a coffee mug. Someone left a plant." },
+      { "who": "Ship's log", "tag": "story", "text": "Somebody wrote 'Feed the Numans?' on the checklist. Nobody knows if Numans eat." }
+    ] },
+    { "id": "monuments", "title": "Why we leave them", "lines": [
+      { "who": "Ship's log", "tag": "story", "text": "In 4052, every landing site is a protected place. We look. We scan. We don't touch." },
+      { "who": "Ship's log", "tag": "real", "text": "The machines are real, and so are their stories. Every fact on their cards comes from NASA." }
+    ] }
+  ]
 }

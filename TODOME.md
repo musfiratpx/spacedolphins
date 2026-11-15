@@ -54,8 +54,10 @@ The game itself needs no secrets. Only the asteroid snapshot script uses a key.
 ## ✅ Done by Claude on 2026-11-14 (please spot-check)
 - Downloaded 8 NASA models, Earth/Moon/Mars/Phobos/Deimos textures and 7 NASA sounds (see CREDITS.md).
 - Saved the NeoWs snapshot with the team API key (key lives only in `.env`).
-- **Still needs a person:** `marsquake`, `ingenuity-hum`, `mars-wind` (only inside NASA videos; cut a clip),
-  `voyager-plasma` (NASA's link `nasa.gov/externalflash/interstellar.mp3` is broken; find it on a NASA page),
+- Cut `marsquake`, `mars-wind` and `ingenuity-hum` from NASA videos on images.nasa.gov (segments chosen from NASA's
+  own captions; checked for no voices). **Please listen once** to confirm they sound right.
+- **Still needs a person:** `voyager-plasma` (NASA's link `nasa.gov/externalflash/interstellar.mp3` is broken and the
+  NASA media library doesn't have it; only third-party mirrors, which we don't use),
   and models for New Horizons and the Apollo 17 site (not in NASA's GitHub repo as .glb).
 - Check that `insight.glb` (NASA's "InSight Cruise Lander, arm deployed") looks like the landed lander.
 

@@ -61,9 +61,10 @@ export class HardwareViewer {
 
     this.dragging = false;
     this.autoRotate = !settings.reducedMotion;
-    if (this.opts.interactive) {
+    {
       // drag to rotate, scroll/pinch to zoom, right-drag (or two fingers) to pan
       const c = new OrbitControls(this.camera, this.renderer.domElement);
+      c.enabled = Boolean(this.opts.interactive);
       c.enableDamping = !settings.reducedMotion;
       c.dampingFactor = 0.08;
       c.minDistance = 0.6;
@@ -72,7 +73,7 @@ export class HardwareViewer {
       c.target.set(0, -0.15, 0);
       c.addEventListener('start', () => { this.dragging = true; this.autoRotate = false; });
       c.addEventListener('end', () => { this.dragging = false; });
-      this.renderer.domElement.style.touchAction = 'none';
+      this.renderer.domElement.style.touchAction = this.opts.interactive ? 'none' : 'auto';
       this.controls = c;
     }
     this.onResize = () => this.resize();
@@ -204,7 +205,7 @@ export class HardwareViewer {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     // narrow panels: back the camera off so the whole pedestal stays in view
-    if (!this.framed || !this.controls) this.frameHome();
+    if (!this.framed || !this.controls?.enabled) this.frameHome();
     this.camera.updateProjectionMatrix();
   }
 
@@ -234,7 +235,7 @@ export class HardwareViewer {
   }
 
   loop() {
-    if (this.disposed) return;
+    if (this.disposed || this.running === false) return;
     this.raf = requestAnimationFrame(this.loop);
     const t = this.clock.getElapsedTime();
     if (this.zoomTo) {
@@ -253,6 +254,30 @@ export class HardwareViewer {
       if (k >= 1) { this.scanning = false; this.scanRing.visible = false; this.clip.constant = 100; }
     }
     this.renderer.render(this.scene, this.camera);
+  }
+
+  /** Move this viewer into another container (reuses the WebGL context: no hitch). */
+  attach(container, opts = {}) {
+    this.opts = { ...this.opts, ...opts };
+    this.container = container;
+    container.appendChild(this.renderer.domElement);
+    this.ro.disconnect(); this.ro.observe(container);
+    this.controls.enabled = Boolean(this.opts.interactive);
+    this.renderer.domElement.style.touchAction = this.opts.interactive ? 'none' : 'auto';
+    this.setDetail(false);
+    this.framed = false; this.zoomTo = null;
+    this.autoRotate = !settings.reducedMotion;
+    this.resize();
+    if (!this.running) { this.running = true; this.raf = requestAnimationFrame(this.loop); }
+  }
+
+  /** Park the viewer: stop drawing and free the model, keep the context for next time. */
+  detach() {
+    this.running = false;
+    cancelAnimationFrame(this.raf);
+    this.token = (this.token || 0) + 1;      // cancel any model still loading
+    this.clear();
+    this.renderer.domElement.remove();
   }
 
   dispose() {
@@ -374,3 +399,14 @@ export function disposeObject(obj) {
     }
   });
 }
+
+// One shared viewer for the pre-round silhouette and the hardware card, so moving
+// between screens never creates a new WebGL context or re-bakes the lighting.
+let shared = null;
+export function acquireViewer(container, opts = {}) {
+  if (!shared || shared.disposed) shared = new HardwareViewer(container, opts);
+  else shared.attach(container, opts);
+  shared.running = true;
+  return shared;
+}
+export function releaseViewer() { shared?.detach(); }

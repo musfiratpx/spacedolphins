@@ -65,7 +65,7 @@ export default {
             <div class="side-grid">
               <button class="btn" data-go="dex">Hardwaredex</button>
               <button class="btn btn-ghost" data-go="records">Records</button>
-              <button class="btn btn-ghost" data-go="intro">Radio</button>
+              <button class="btn btn-ghost" data-go="radiolog">Radio log</button>
               <button class="btn btn-ghost" data-act="settings">⚙ Settings</button>
             </div>
             <button class="link-btn side-credits" data-go="credits">Credits</button>
@@ -86,6 +86,10 @@ export default {
                 </select></label>
               <label class="check"><input type="checkbox" ${settings.oneLane ? 'checked' : ''} data-set="oneLane"> One-lane mode (any key hits every note)</label>
               <label class="check"><input type="checkbox" ${settings.reducedMotion ? 'checked' : ''} data-set="reducedMotion"> Reduced motion</label>
+              <label class="check"><input type="checkbox" ${settings.dyslexiaFont ? 'checked' : ''} data-set="dyslexiaFont"> Easy-read font (extra spacing)</label>
+              <label class="check"><input type="checkbox" ${settings.readAloud ? 'checked' : ''} data-set="readAloud"> Read radio lines aloud</label>
+              <label>Tester code <span class="hint">For playtesting: unlocks every region, machine and song</span>
+                <span class="tester-row"><input type="text" class="tester-code" autocomplete="off" spellcheck="false" aria-label="Tester code"><button type="button" class="btn btn-small" data-act="tester">Unlock</button></span></label>
               <button type="button" class="btn btn-ghost btn-small danger" data-act="reset">Reset progress…</button>
               </form>
             </dialog>
@@ -125,6 +129,18 @@ export default {
     dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });   // click outside closes
     wire(el, go, {
       settings: () => dlg.showModal(),
+      tester: () => {
+        const code = el.querySelector('.tester-code').value.trim().toLowerCase();
+        if (code !== 'nasa') { toast('That code didn\'t work'); return; }
+        // playtest unlock: every machine scanned, every song in the record library, every region open
+        const today = new Date().toLocaleDateString('en-CA');
+        for (const m of machines) if (!state.unlocked[m.id]) state.unlocked[m.id] = { date: today, grade: '—', accuracy: 0 };
+        for (const r of regions) state.best[`${r.song}:normal`] ||= { grade: '—', accuracy: 0 };
+        state.tester = true; save();
+        dlg.close();
+        toast('Tester mode: everything unlocked', 3000);
+        go('hub');
+      },
       reset: () => {
         if (!confirm('Erase all scanned machines and scores? Settings are kept.')) return;
         resetProgress();

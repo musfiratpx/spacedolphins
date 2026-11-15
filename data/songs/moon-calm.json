@@ -10,8 +10,9 @@
   "instruments": {
     "kick": {
       "type": "synth.kick",
-      "gain": 0.8,
+      "gain": 0.85,
       "role": "backbone",
+      "tone": "soft",
       "ducker": true
     },
     "snare": {
@@ -25,8 +26,9 @@
     },
     "hat": {
       "type": "synth.hat",
-      "gain": 0.32,
-      "role": "backbone"
+      "gain": 0.5,
+      "role": "backbone",
+      "tone": "shaker"
     },
     "bass": {
       "type": "synth.bass",
@@ -37,8 +39,9 @@
     },
     "pad": {
       "type": "synth.pad",
-      "gain": 0.7,
+      "gain": 0.8,
       "role": "pad",
+      "tone": "warm",
       "duck": 0.4,
       "send": {
         "reverb": 0.6
@@ -70,6 +73,19 @@
         "reverb": 0.5
       },
       "nasa": "Atlas V: Launch"
+    },
+    "icy": {
+      "type": "sample.enceladus",
+      "gain": 0.3,
+      "role": "pad",
+      "trim": true,
+      "durationSteps": 32,
+      "fadeSteps": 10,
+      "send": {
+        "reverb": 0.5,
+        "delay": 0.2
+      },
+      "nasa": "Cassini: Enceladus Sound"
     }
   },
   "patterns": {
@@ -358,6 +374,9 @@
     },
     "launch": {
       "swell": "x..............................."
+    },
+    "icy": {
+      "once": "x..............................."
     }
   },
   "sections": [
@@ -404,7 +423,7 @@
         "kick": "soft",
         "pad": "prog",
         "crackle": "on",
-        "launch": "swell",
+        "icy": "once",
         "lead": "sparse"
       }
     },
