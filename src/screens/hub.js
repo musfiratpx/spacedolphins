@@ -32,9 +32,17 @@ export default {
             <p class="eyebrow">Recovery ship · Year 4052</p>
             <h1>Ship hub</h1>
           </div>
-          <div class="archive-meter" aria-label="Archive ${got} of ${total} machines">
-            <span class="eyebrow">Archive</span>
-            <span class="big">${got}/${total}</span>
+          <div class="head-meters">
+            <div class="meter shield-meter ${(state.shield ?? 50) < 30 ? 'low' : ''}" aria-label="Earth's shield ${state.shield ?? 50} percent">
+              <span class="eyebrow">Earth's shield ${tag('story')}</span>
+              <span class="big">${state.shield ?? 50}%</span>
+              <span class="sm-bar"><i style="width:${state.shield ?? 50}%"></i></span>
+            </div>
+            <div class="meter archive-meter" aria-label="Archive ${got} of ${total} machines">
+              <span class="eyebrow">Archive</span>
+              <span class="big">${got}/${total}</span>
+              <span class="sm-bar"><i style="width:${Math.round((got / total) * 100)}%"></i></span>
+            </div>
           </div>
         </header>
         <div class="neo-strip" aria-live="polite">
@@ -64,6 +72,7 @@ export default {
             <h2>Ship systems</h2>
             <div class="side-grid">
               <button class="btn" data-go="dex">Hardwaredex</button>
+              <button class="btn btn-ghost" data-go="map">Map</button>
               <button class="btn btn-ghost" data-go="records">Records</button>
               <button class="btn btn-ghost" data-go="radiolog">Radio log</button>
               <button class="btn btn-ghost" data-act="settings">⚙ Settings</button>
@@ -94,6 +103,8 @@ export default {
               </form>
             </dialog>
       </section>`;
+
+    window.__hhWorld?.setShield(state.shield ?? 50);
 
     // Real asteroids from NASA's NeoWs snapshot, one at a time
     const rocks = getAsteroids();

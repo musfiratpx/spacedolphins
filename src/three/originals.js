@@ -71,6 +71,7 @@ export function buildLRV() {
   for (const zs of [-1, 1]) {
     for (const xs of [-1, 1]) {
       const wheel = lrvWheel(mats);
+      wheel.name = 'lrv-wheel';
       wheel.position.set(xs * Wd / 2, 0.41, zs * L * 0.37);
       rover.add(wheel);
       rover.add(tube(new THREE.Vector3(xs * Wd * 0.33, H - 0.05, zs * L * 0.3), new THREE.Vector3(xs * (Wd / 2 - 0.12), 0.41, zs * L * 0.37), 0.02, mats.alu));
@@ -83,7 +84,7 @@ export function buildLRV() {
   }
   // two seats with webbing and footrests
   for (const xs of [-1, 1]) {
-    const seat = new THREE.Group(); seat.position.set(xs * 0.33, H, -0.1);
+    const seat = new THREE.Group(); seat.name = 'lrv-seat'; seat.position.set(xs * 0.33, H, -0.1);
     seat.add(at(new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.05, 0.42), mats.seat), 0, 0.08, 0));
     const back = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.5, 0.05), mats.seat); back.position.set(0, 0.34, -0.22); back.rotation.x = -0.15; seat.add(back);
     for (const s of [-1, 1]) {
@@ -180,6 +181,7 @@ export function buildBlueGhost() {
     const strut = new THREE.Vector3(Math.cos(a) * 0.95, deckY - bodyH + 0.05, Math.sin(a) * 0.95);
     g.add(tube(strut, foot.clone().lerp(top, 0.25), 0.025, mats.alu));
     const pad = new THREE.Mesh(new THREE.CylinderGeometry(fifth ? 0.14 : 0.2, fifth ? 0.16 : 0.22, 0.06, 20), fifth ? mats.radiator : mats.alu);
+    if (fifth) pad.name = 'bg-eds';
     pad.position.copy(foot).setY(0.04); g.add(pad);
   });
   return g;

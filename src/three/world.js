@@ -274,6 +274,8 @@ export class World {
       new THREE.LineBasicMaterial({ color: 0x2ec4b6, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false }),
     );
     this.earth.add(this.shield);
+    this.shieldSegments = this.shield.geometry.attributes.position.count;
+    this.shieldLevel = 0.5;
     this.earth.add(this.atmosphere(1.2, 0x2ec4b6, 3, 0.35));
     this.earth.position.copy(EARTH);
     this.scene.add(this.earth);
@@ -407,6 +409,16 @@ export class World {
     };
   }
 
+  /** Earth's shield strength 0-100: weak shields go amber and lose panels. */
+  setShield(pct) {
+    const k = Math.max(0, Math.min(1, pct / 100));
+    this.shieldLevel = k;
+    this.shield.material.color.lerpColors(new THREE.Color(0xf2b134), new THREE.Color(0x2ec4b6), Math.min(1, k * 1.6));
+    // missing panels where the shield is damaged (whole line segments, so it reads as holes)
+    const keep = Math.floor((0.45 + 0.55 * k) * this.shieldSegments / 2) * 2;
+    this.shield.geometry.setDrawRange(0, keep);
+  }
+
   // ---- shots ---------------------------------------------------------------
   setShot(id, params = {}, instant = false) {
     const s = shotFor(id, params);
@@ -521,7 +533,7 @@ export class World {
       m.position.set(Math.cos(m.userData.a) * m.userData.dist, Math.sin(m.userData.a) * m.userData.dist * 0.15, Math.sin(m.userData.a) * m.userData.dist);
       m.rotation.y = m.userData.a;
     }
-    this.shield.material.opacity = 0.16 + 0.06 * Math.sin(t * 1.3) + this.pulse * 0.05;
+    this.shield.material.opacity = (0.1 + 0.12 * this.shieldLevel) + 0.06 * Math.sin(t * 1.3) + this.pulse * 0.05;
     if (!still) this.shield.rotation.y = t * 0.02;
 
     if (this.asteroidField) {

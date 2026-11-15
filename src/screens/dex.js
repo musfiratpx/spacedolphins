@@ -36,7 +36,7 @@ export default {
       <section class="screen dex-screen">
         <header class="hub-head">
           <div><p class="eyebrow">Hardwaredex</p><h1>${Math.round((got / machines.length) * 100)}% complete</h1></div>
-          <button class="btn" data-go="hub">← Hub</button>
+          <div class="stack row"><button class="btn btn-ghost" data-go="map">🗺 Where are they now?</button><button class="btn" data-go="hub">← Hub</button></div>
         </header>
         ${timeline(regions, machines)}
         ${regions.map((r) => `

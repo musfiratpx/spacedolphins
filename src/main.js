@@ -9,6 +9,7 @@ import { startAmbience } from './audio/ambience.js';
 import { startPaperViewer } from './ui/paper.js';
 import { debug } from './core/config.js';
 import { settings } from './core/settings.js';
+import { state } from './core/state.js';
 import { on } from './core/bus.js';
 
 import title from './screens/title.js';
@@ -22,6 +23,7 @@ import dex from './screens/dex.js';
 import credits from './screens/credits.js';
 import records from './screens/records.js';
 import radiolog from './screens/radiolog.js';
+import map from './screens/map.js';
 
 // ---- Screen registry -------------------------------------------------------
 const screens = new Map();
@@ -65,7 +67,7 @@ async function swap(id, next, params) {
 
 window.__hhGo = (id, params) => go(id, params);   // handy in the browser console for debugging/testing
 
-for (const [id, s] of Object.entries({ title, intro, hub, preround, round, results, card, dex, credits, records, radiolog })) {
+for (const [id, s] of Object.entries({ title, intro, hub, preround, round, results, card, dex, credits, records, radiolog, map })) {
   registerScreen(id, s);
 }
 
@@ -94,6 +96,7 @@ on('settings:change', ({ path }) => { if (path === 'reducedMotion' || path === '
     await Promise.all([loadManifest(), loadHardware(), loadAsteroids()]);
     // 3D world behind every screen; falls back to the 2D starfield without WebGL
     if (!startWorld(sky)) startStars(sky);
+    getWorld()?.setShield(state.shield ?? 50);
     startHearingPopups();
     startAmbience();
     startPaperViewer();

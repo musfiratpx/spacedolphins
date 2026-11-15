@@ -55,21 +55,21 @@
       "hotspots": [
         {
           "part": "Robot arm",
-          "position": [
-            0,
-            0,
-            0
+          "at": [
+            0.93,
+            0.42,
+            0.5
           ],
-          "label": "Scooped soil for the biology labs. TODO_VERIFY position"
+          "label": "It scooped Martian soil into small labs that tested for signs of life."
         },
         {
           "part": "Camera",
-          "position": [
-            0,
-            0,
-            0
+          "at": [
+            0.36,
+            0.92,
+            0.5
           ],
-          "label": "Took the first US photos from the Martian surface. TODO_VERIFY position"
+          "label": "Viking 1 took the first US pictures from the surface of Mars."
         }
       ],
       "source": "https://science.nasa.gov/mission/viking-1/",
@@ -112,30 +112,21 @@
       "hotspots": [
         {
           "part": "Solar panels",
-          "position": [
-            0,
-            0,
-            0
+          "at": [
+            0.55,
+            0.62,
+            0.45
           ],
-          "label": "Turned sunlight into power. Dust storms blocked it. TODO_VERIFY position"
-        },
-        {
-          "part": "Robot arm",
-          "position": [
-            0,
-            0,
-            0
-          ],
-          "label": "Held tools to study rocks up close. TODO_VERIFY position"
+          "label": "Sunlight powered it. A planet-wide dust storm in 2018 blocked the Sun."
         },
         {
           "part": "Wheels",
-          "position": [
-            0,
-            0,
-            0
+          "at": [
+            0.86,
+            0.1,
+            0.55
           ],
-          "label": "Six wheels carried it about 28 miles. TODO_VERIFY position"
+          "label": "Built for 90 Martian days, it drove about 45 kilometers over almost 15 years."
         }
       ],
       "source": "https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/",
@@ -177,31 +168,24 @@
       "sound": "marsquake",
       "hotspots": [
         {
-          "part": "Seismometer dome",
-          "position": [
-            0,
-            0,
-            0
-          ],
-          "label": "Covered the seismometer to block wind and heat. TODO_VERIFY position"
+          "part": "Seismometer (SEIS)",
+          "mesh": "^SEIS",
+          "label": "It sat on the ground and felt more than 1,300 marsquakes. The biggest was about magnitude 5."
+        },
+        {
+          "part": "Wind and heat shield",
+          "mesh": "^WTS",
+          "label": "This dome covered the seismometer to block wind and heat, so it could feel tiny shakes."
+        },
+        {
+          "part": "Robotic arm",
+          "mesh": "^arm",
+          "label": "The arm set the seismometer and its dome down on the ground."
         },
         {
           "part": "Solar panels",
-          "position": [
-            0,
-            0,
-            0
-          ],
-          "label": "Round panels made power until dust covered them. TODO_VERIFY position"
-        },
-        {
-          "part": "Robot arm",
-          "position": [
-            0,
-            0,
-            0
-          ],
-          "label": "Placed instruments on the ground. TODO_VERIFY position"
+          "mesh": "^panel_l(_\\d+)?$",
+          "label": "Dust slowly covered these panels. With less power, the mission ended in December 2022."
         }
       ],
       "source": "https://science.nasa.gov/mission/insight/",
@@ -244,21 +228,8 @@
       "hotspots": [
         {
           "part": "Rotors",
-          "position": [
-            0,
-            0,
-            0
-          ],
-          "label": "Two rotors spun opposite ways to grip thin air. TODO_VERIFY position"
-        },
-        {
-          "part": "Solar panel",
-          "position": [
-            0,
-            0,
-            0
-          ],
-          "label": "Charged its batteries between flights. TODO_VERIFY position"
+          "mesh": "^rotors",
+          "label": "Two rotors spin in opposite directions, very fast, to grip Mars's thin air."
         }
       ],
       "source": "https://science.nasa.gov/mission/mars-2020-perseverance/ingenuity-mars-helicopter/",
@@ -298,7 +269,17 @@
       "power": "launch-pad",
       "model": "apollo-lm",
       "sound": "beeps",
-      "hotspots": [],
+      "hotspots": [
+        {
+          "part": "Descent stage",
+          "at": [
+            0.5,
+            0.3,
+            0.5
+          ],
+          "label": "The bottom half of the lander. It stayed behind as a launch pad when the top half lifted off."
+        }
+      ],
       "source": "https://www.nasa.gov/history/apollo-11-mission-overview/",
       "tags": {
         "numanNote": "story"
@@ -333,7 +314,18 @@
       "power": "long-haul",
       "model": "lrv",
       "sound": "beeps",
-      "hotspots": [],
+      "hotspots": [
+        {
+          "part": "Wheels",
+          "mesh": "^lrv-wheel",
+          "label": "Battery power drove the rover 30.5 kilometers across the Taurus-Littrow valley."
+        },
+        {
+          "part": "Seats",
+          "mesh": "^lrv-seat",
+          "label": "Two astronauts sat side by side and drove it across the Moon."
+        }
+      ],
       "source": "https://www.nasa.gov/missions/apollo/apollo-17-mission-details/",
       "tags": {
         "numanNote": "story"
@@ -401,7 +393,13 @@
       "power": "dust-shield",
       "model": "blue-ghost",
       "sound": "beeps",
-      "hotspots": [],
+      "hotspots": [
+        {
+          "part": "Dust shield leg",
+          "mesh": "^bg-eds",
+          "label": "A fifth leg set the Electrodynamic Dust Shield on the ground. It used electric fields to push dust away."
+        }
+      ],
       "source": "https://science.nasa.gov/lunar-science/clps-deliveries/to19d-firefly/",
       "tags": {
         "numanNote": "story"
@@ -505,7 +503,13 @@
       "power": "hibernate",
       "model": "new-horizons",
       "sound": "kepler-star",
-      "hotspots": [],
+      "hotspots": [
+        {
+          "part": "Nuclear power (RTG)",
+          "mesh": "^RTG",
+          "label": "A spare from the Cassini mission. It made about 250 watts of power at launch."
+        }
+      ],
       "source": "https://science.nasa.gov/mission/new-horizons/",
       "tags": {
         "numanNote": "story"

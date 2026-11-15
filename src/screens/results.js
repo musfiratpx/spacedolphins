@@ -17,6 +17,10 @@ export default {
     if (result.cleared) isNew = unlock(machine.id, result);
 
     const pct = (result.accuracy * 100).toFixed(1);
+    // Earth's shield (Story): cleared +5, each Numan pulse +2, failed -10. Never game over.
+    const shieldBefore = state.shield ?? 50;
+    const shieldDelta = (result.cleared ? 5 : -10) + 2 * (result.shattered?.length || 0);
+    state.shield = Math.max(0, Math.min(100, shieldBefore + shieldDelta)); save();
     const nextTarget = machinesIn(machine.region).find((m) => !state.unlocked[m.id] && m.id !== machine.id);
     el.innerHTML = `
       <section class="screen center results-screen">
@@ -34,6 +38,12 @@ export default {
           </ul>
           ${result.shattered?.length ? `<p class="eyebrow" style="margin-top:12px">Asteroids shattered by Numan pulses ${tag('real')}</p>
             <ul class="shattered">${result.shattered.map((a) => `<li><a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.name)}</a> · about ${Math.round(a.minM).toLocaleString('en-US')}–${Math.round(a.maxM).toLocaleString('en-US')} m wide · ${Math.round(a.kph).toLocaleString('en-US')} km/h</li>`).join('')}</ul>` : ''}
+          <div class="shield-change">
+            <span class="sc-label">Earth's shield ${tag('story')}</span>
+            <span class="sc-bar"><i style="width:${shieldBefore}%" data-to="${state.shield}"></i></span>
+            <span class="sc-num ${shieldDelta >= 0 ? 'up' : 'down'}">${state.shield}% (${shieldDelta >= 0 ? '+' : ''}${shieldDelta})</span>
+          </div>
+          ${state.shield === 0 ? '<p class="hint">Shield critical! Mission Control says: any cleared round patches it. The game never ends.</p>' : ''}
           <p class="radio-strip" aria-live="polite"><span class="led"></span><span class="rs-who"></span> <span class="rs-text"></span></p>
           <p class="result-msg">${result.cleared
             ? (isNew ? `Signal locked. ${esc(machine.name)} is ready to scan.` : `${esc(machine.name)} is already in the Archive. Nice run!`)
@@ -75,6 +85,9 @@ export default {
       if (k < 1 && num.isConnected) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
+    // shield bar slides to its new value
+    setTimeout(() => { const bar = el.querySelector('.sc-bar i'); if (bar) bar.style.width = `${bar.dataset.to}%`; }, 500);
+    window.__hhWorld?.setShield(state.shield);
     wire(el, go);
   },
 };

@@ -9,6 +9,8 @@ import { acquireViewer, releaseViewer } from '../three/viewer.js';
 import { getModel } from '../core/manifest.js';
 import { sfx } from '../audio/sfx.js';
 import { loadRadio } from '../core/data.js';
+import { drawPatch } from '../ui/patches.js';
+import { getRegion } from '../core/data.js';
 
 let viewer = null;
 let onKey = null;
@@ -50,7 +52,8 @@ export default {
     el.innerHTML = `
       <section class="screen card-screen">
         <header class="hub-head">
-          <div><p class="eyebrow">${params.fresh ? 'New in the Archive' : 'Hardwaredex'}</p><h1>${esc(m.name)}</h1>${statusLine(m)}</div>
+          <div class="card-title"><canvas class="patch-badge" width="160" height="160" role="img" aria-label="Mission patch for ${esc(m.name)}"></canvas>
+            <div><p class="eyebrow">${params.fresh ? 'New in the Archive' : 'Hardwaredex'}</p><h1>${esc(m.name)}</h1>${statusLine(m)}</div></div>
           <div class="stack row">
             <button class="btn btn-ghost" data-go="dex">Hardwaredex</button>
             <button class="btn" data-go="hub">Hub</button>
@@ -66,6 +69,8 @@ export default {
               <button class="tool" data-act="reset" aria-label="Reset view">⟲</button>
               <button class="tool tool-wide" data-act="inspect" aria-pressed="false">⤢ Inspect</button>
             </div>
+            ${m.hotspots?.length ? `<div class="parts-row" role="group" aria-label="Parts you can explore"><span class="parts-title">Explore the parts:</span>${m.hotspots.map((h, i) => `<button class="chip part-chip" data-act="part" data-i="${i}">◉ ${esc(h.part)}</button>`).join('')}</div>` : ''}
+            <div class="hotspot-label hidden" role="status" aria-live="polite"><button class="tool hs-close" data-act="partClose" aria-label="Close">✕</button><p class="hs-part"></p><p class="hs-text"></p></div>
             <p class="viewer-note hidden">Model placeholder: download <code>${esc(entry?.file || m.model)}</code> from NASA 3D Resources.</p>
             <p class="hint">Drag to rotate · scroll or pinch to zoom · right-drag to move</p>
           </div>
@@ -108,6 +113,9 @@ export default {
           </article>
         </div>
       </section>`;
+
+    const pc = el.querySelector('.patch-badge');
+    drawPatch(pc.getContext('2d'), 80, 80, 156, m, getRegion(m.region)?.color || '#2EC4B6', true);
 
     // ---- machine log: typed out line by line (instant with reduced motion) ----
     const lines = [...el.querySelectorAll('.log-lines li')];
@@ -192,11 +200,21 @@ export default {
         else b.textContent = 'Not supported here';
       },
       hello: sendHello,
+      part: (b) => viewer?.focusHotspot(Number(b.dataset.i)),
+      partClose: () => { el.querySelector('.hotspot-label').classList.add('hidden'); el.querySelectorAll('.part-chip').forEach((c) => c.classList.remove('on')); viewer?.reset(); },
     });
     onKey = (e) => { if (e.key === 'Escape' && wrap.classList.contains('inspecting')) setInspect(false); };
     window.addEventListener('keydown', onKey);
     viewer = acquireViewer(el.querySelector('.viewer'), { interactive: true, spin: 0.004 });
-    const { placeholder } = await viewer.show(m.model, { scan: true });
+    const showPart = (h, i) => {
+      const box = el.querySelector('.hotspot-label');
+      box.querySelector('.hs-part').innerHTML = `${esc(h.part)} ${tag('real')}`;
+      box.querySelector('.hs-text').textContent = h.label;
+      box.classList.remove('hidden');
+      el.querySelectorAll('.part-chip').forEach((c) => c.classList.toggle('on', Number(c.dataset.i) === i));
+      try { sfx.click(); } catch { /* */ }
+    };
+    const { placeholder } = await viewer.show(m.model, { scan: true, hotspots: m.hotspots, onHotspot: showPart });
     if (placeholder) el.querySelector('.viewer-note')?.classList.remove('hidden');
   },
   unmount() {

@@ -144,7 +144,9 @@ export class HardwareViewer {
       if (this.disposed || token !== this.token) { disposeObject(gltf.scene); return { placeholder: false }; }
       logModel(modelId, gltf.scene, performance.now() - t0);
       if (opts.silhouette) applySilhouette(gltf.scene); else polish(gltf.scene);
-      this.pivot.add(this.fit(gltf.scene));
+      this.model = this.fit(gltf.scene);
+      this.pivot.add(this.model);
+      if (opts.hotspots?.length) this.addHotspots(opts.hotspots, opts.onHotspot);
       if (opts.scan && !settings.reducedMotion) this.startScan(gltf.scene);
       return { placeholder: false };
     } catch (err) {
@@ -192,7 +194,72 @@ export class HardwareViewer {
     this.pivot.add(group);
   }
 
+  /** Pulsing dots on real parts. Found by mesh/node name, or by a spot inside the model's box. */
+  addHotspots(list, onPick) {
+    this.hotspots = [];
+    this.onHotspot = onPick;
+    this.pivot.updateMatrixWorld(true);
+    const inv = this.pivot.matrixWorld.clone().invert();
+    const cv = document.createElement('canvas'); cv.width = cv.height = 64;
+    const c = cv.getContext('2d');
+    c.fillStyle = 'rgba(46,196,182,.25)'; c.beginPath(); c.arc(32, 32, 30, 0, 7); c.fill();
+    c.strokeStyle = '#E8ECF5'; c.lineWidth = 5; c.beginPath(); c.arc(32, 32, 18, 0, 7); c.stroke();
+    c.fillStyle = '#2EC4B6'; c.beginPath(); c.arc(32, 32, 9, 0, 7); c.fill();
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+    const whole = new THREE.Box3().setFromObject(this.model);
+    list.forEach((h, i) => {
+      let point = null;
+      if (h.mesh) {
+        // repeated parts (4 wheels, 2 panels): put the dot on the FIRST one, not the average
+        const re = new RegExp(h.mesh, 'i'); let found = null;
+        this.model.traverse((o) => { if (!found && o.name && re.test(o.name)) found = o; });
+        if (found) { const box = new THREE.Box3().setFromObject(found); if (!box.isEmpty()) point = box.getCenter(new THREE.Vector3()); }
+      } else if (h.at) {
+        const size = whole.getSize(new THREE.Vector3());
+        point = whole.min.clone().add(new THREE.Vector3(h.at[0] * size.x, h.at[1] * size.y, h.at[2] * size.z));
+      }
+      if (!point) { console.warn(`[viewer] hotspot "${h.part}" not found`); return; }
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false }));
+      sp.renderOrder = 10;
+      sp.position.copy(point.applyMatrix4(inv));
+      sp.scale.setScalar(0.2);
+      sp.userData.hotspot = i;
+      this.pivot.add(sp);
+      this.hotspots.push({ sprite: sp, data: h, index: i });
+    });
+    if (!this.hotspotClick) {
+      // a click (not a drag) on a dot picks it
+      const el = this.renderer.domElement; let down = null;
+      el.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY]; });
+      el.addEventListener('pointerup', (e) => {
+        if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6 || !this.hotspots?.length) return;
+        const r = el.getBoundingClientRect();
+        const ndc = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+        const ray = new THREE.Raycaster(); ray.setFromCamera(ndc, this.camera);
+        const hit = ray.intersectObjects(this.hotspots.map((h) => h.sprite))[0];
+        if (hit) this.focusHotspot(hit.object.userData.hotspot);
+      });
+      this.hotspotClick = true;
+    }
+    return this.hotspots.map((h) => h.data);
+  }
+
+  /** Fly the camera to a part and tell the card which one. */
+  focusHotspot(i) {
+    const h = this.hotspots?.find((x) => x.index === i);
+    if (!h || !this.controls) return;
+    this.autoRotate = false;
+    const p = h.sprite.getWorldPosition(new THREE.Vector3());
+    const dir = this.camera.position.clone().sub(this.controls.target).normalize();
+    this.flyTo = { target: p, cam: p.clone().add(dir.multiplyScalar(1.7)) };
+    this.zoomTo = null;
+    this.hotspots.forEach((x) => { x.sprite.material.opacity = x.index === i ? 1 : 0.55; });
+    this.onHotspot?.(h.data, i);
+  }
+
   clear() {
+    this.hotspots = [];
+    this.flyTo = null;
     for (const child of [...this.pivot.children]) { this.pivot.remove(child); disposeObject(child); }
     this.pivot.rotation.set(0, 0, 0);
     this.scanning = false;
@@ -226,7 +293,7 @@ export class HardwareViewer {
     this.zoomTo = c.target.clone().add(off.setLength(len));
   }
 
-  reset() { this.autoRotate = !settings.reducedMotion; this.pivot.rotation.set(0, 0, 0); this.frameHome(); this.zoomTo = null; }
+  reset() { this.autoRotate = !settings.reducedMotion; this.pivot.rotation.set(0, 0, 0); this.frameHome(); this.zoomTo = null; this.flyTo = null; this.hotspots?.forEach((x) => { x.sprite.material.opacity = 1; }); }
 
   /** Higher resolution while inspecting full screen. */
   setDetail(high) {
@@ -238,6 +305,16 @@ export class HardwareViewer {
     if (this.disposed || this.running === false) return;
     this.raf = requestAnimationFrame(this.loop);
     const t = this.clock.getElapsedTime();
+    if (this.flyTo && this.controls) {
+      const k = settings.reducedMotion ? 1 : 0.1;
+      this.controls.target.lerp(this.flyTo.target, k);
+      this.camera.position.lerp(this.flyTo.cam, k);
+      if (this.camera.position.distanceTo(this.flyTo.cam) < 0.003) this.flyTo = null;
+    }
+    if (this.hotspots?.length && !settings.reducedMotion) {
+      const s = 0.19 + Math.sin(t * 4) * 0.03;
+      for (const h of this.hotspots) h.sprite.scale.setScalar(s);
+    }
     if (this.zoomTo) {
       this.camera.position.lerp(this.zoomTo, 0.18);
       if (this.camera.position.distanceTo(this.zoomTo) < 0.005) this.zoomTo = null;

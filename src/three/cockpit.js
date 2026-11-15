@@ -9,6 +9,7 @@ import { state } from '../core/state.js';
 import { getHardware, getAsteroids } from '../core/data.js';
 import { on, emit } from '../core/bus.js';
 import { foley } from '../audio/foley.js';
+import { drawPatchBoard } from '../ui/patches.js';
 
 const PALETTE = { teal: 0x2ec4b6, amber: 0xf2b134, rust: 0xd9622b, star: 0xe8ecf5 };
 
@@ -394,7 +395,15 @@ export class Cockpit {
       for (let i = 0; i < 10; i++) { const r = i % 2 ? w * .2 : w * .46; const a = i * Math.PI / 5 - Math.PI / 2; c.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
       c.closePath(); c.fill(); c.lineWidth = w * .03; c.strokeStyle = '#fff'; c.stroke();
       c.fillStyle = '#0B1026'; c.font = `900 ${w * .14}px Nunito, sans-serif`; c.textAlign = 'center'; c.fillText('4052', 0, w * .02); c.font = `700 ${w * .08}px Nunito, sans-serif`; c.fillText('CREW', 0, w * .11);
-    }, S * 1.1, S * 1.1, 0, hh * 0.12, 0.08, -0.1, 0, 128, this.pillars[1]);
+    }, S * 1.1, S * 1.1, 0, hh * 0.42, 0.08, -0.1, 0, 128, this.pillars[1]);
+    // mission patch board: a patch for every machine you've scanned
+    const bw = hw * 0.075;
+    this.patchBoard = sticker((c, w, h) => drawPatchBoard(c, w, h), bw, bw * 3, 0, -hh * 0.12, 0.08, 0, 0, 256, this.pillars[1]);
+    this.patchBoard.userData.info = {
+      title: 'Mission patches', kind: 'story',
+      text: 'You earn a patch for every machine you scan. The real machines stay where they are; the patches stay with you.',
+      draw: (c, w, h) => drawPatchBoard(c, w, h, { cols: 4 }), aspect: 0.75,
+    };
     // rocket doodle
     sticker((c, w, h) => {
       c.fillStyle = '#e8ecf5'; c.fillRect(0, 0, w, h);
@@ -450,7 +459,7 @@ export class Cockpit {
       c.fillStyle = g; c.beginPath(); c.arc(w / 2, w / 2, w * .3, 0, 7); c.fill();
       c.fillStyle = '#3fa34d'; c.beginPath(); c.ellipse(w * .44, w * .45, w * .1, w * .14, .4, 0, 7); c.fill(); c.beginPath(); c.ellipse(w * .6, w * .6, w * .07, w * .05, -.3, 0, 7); c.fill();
       c.fillStyle = '#26324f'; c.font = `700 ${w * .08}px "Space Mono", monospace`; c.textAlign = 'center'; c.fillText('home ♥', w / 2, h * .92);
-    }, S * 1.7, S * 2.05, hw * 0.44, hh * 0.76, Z * 1.06, 0.09, 0, 256).userData.info = { title: 'Home', text: 'A drawing of Earth from orbit, taped up by an earlier traveler. In 4052 it is still the only home people have, and it still needs its shield.' };
+    }, S * 1.25, S * 1.5, -hw * 0.52, this.shelf.y + S * 0.75, this.shelf.z, 0.05, 0.12, 256).userData.info = { title: 'Home', text: 'A drawing of Earth from orbit, taped up by an earlier traveler. In 4052 it is still the only home people have, and it still needs its shield.' };
 
     // coffee mug on the dash
     const mug = new THREE.Group(); mug.position.set(-hw * 0.33, this.shelf.y, this.shelf.z);
@@ -531,7 +540,11 @@ export class Cockpit {
     }
     let got = 0;
     try { got = Object.keys(state.unlocked).length; } catch { /* */ }
-    if (got !== this.plantKey) { this.growPlant(); this.syncPlushies(true); }
+    if (got !== this.plantKey) {
+      this.growPlant(); this.syncPlushies(true);
+      const map = this.patchBoard?.material.map;
+      if (map) { const cv = map.image; drawPatchBoard(cv.getContext('2d'), cv.width, cv.height); map.needsUpdate = true; }
+    }
     // plushies: springy pop-in, then a gentle squish on the beat
     const now = performance.now();
     for (const p of Object.values(this.plushies)) {
