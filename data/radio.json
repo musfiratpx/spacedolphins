@@ -1,0 +1,20 @@
+{
+  "_readme": "Radio script. tag: 'story' for the 4052 fiction, 'real' for NASA facts. Keep lines short (ages 10-14).",
+  "intro": [
+    { "who": "Mission Control", "tag": "story", "text": "Recovery Traveler, do you read me? This is Mission Control. The year is 4052." },
+    { "who": "Mission Control", "tag": "story", "text": "Earth is still home, but it's weaker than it used to be. Its shield is failing, and asteroids keep coming." },
+    { "who": "Mission Control", "tag": "story", "text": "Your job: find the machines humans sent into space between the 1960s and 2026, and scan them into the Archive." },
+    { "who": "Mission Control", "tag": "story", "text": "We don't take them. We scan a hologram copy and leave each original where it rests, as a monument." },
+    { "who": "Mission Control", "tag": "story", "text": "You won't be alone. The Numans, a life form we met not long ago, have offered to help. They're the reason people can live on Mars." },
+    { "who": "The Numans", "tag": "story", "text": "We sing frequencies that shatter stone. But our songs need a human partner to keep time." },
+    { "who": "Mission Control", "tag": "story", "text": "So here's the deal: play their rhythm games. Every song you clear protects Earth and unlocks a machine to scan." },
+    { "who": "Mission Control", "tag": "story", "text": "Left lane is A or the left arrow. Right lane is D or the right arrow. You can tap the lanes too." },
+    { "who": "Mission Control", "tag": "story", "text": "First stop: Mars. Four machines are waiting. Good luck, Traveler." }
+  ],
+  "reactions": {
+    "_hook": "Phase 2 (features.radioReactions): 3 variants each, picked at random without repeats.",
+    "great": [],
+    "ok": [],
+    "fail": []
+  }
+}

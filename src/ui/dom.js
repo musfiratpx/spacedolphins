@@ -1,0 +1,34 @@
+// Small DOM helpers shared by screens.
+import { sfx } from '../audio/sfx.js';
+import { unlockAudio } from '../audio/clock.js';
+
+export function html(strings, ...values) {
+  return strings.reduce((out, s, i) => out + s + (i < values.length ? values[i] : ''), '');
+}
+
+export function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+}
+
+/** Wire up every [data-go] button in el, plus hover/click sounds. */
+export function wire(el, go, handlers = {}) {
+  // Listen on the screen's own root (replaced on every render), never on #app itself,
+  // or listeners pile up and one click fires several times.
+  const root = el.id === 'app' ? el.firstElementChild : el;
+  root.querySelectorAll('button, [data-go]').forEach((b) => {
+    b.addEventListener('pointerenter', () => { try { sfx.hover(); } catch { /* audio not started yet */ } });
+  });
+  let busy = false;
+  root.addEventListener('click', async (e) => {
+    if (busy) return;
+    const btn = e.target.closest('[data-go], [data-act]');
+    if (!btn || btn.disabled) return;
+    await unlockAudio();
+    if (btn.dataset.go) { busy = true; sfx.click(); go(btn.dataset.go, btn.dataset.params ? JSON.parse(btn.dataset.params) : {}); }
+    else if (handlers[btn.dataset.act]) { sfx.click(); handlers[btn.dataset.act](btn, e); }
+  });
+}
+
+export function tag(kind) {
+  return `<span class="tag tag-${kind}" title="${kind === 'real' ? 'A real fact from NASA' : 'Part of the game story'}">${kind === 'real' ? 'Real' : 'Story'}</span>`;
+}

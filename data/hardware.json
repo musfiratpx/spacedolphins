@@ -1,0 +1,171 @@
+{
+  "_readme": "Card fields: max ~25 words each. Facts only from CLAUDE.md 'Facts' or the linked NASA page. Unknown = TODO_VERIFY. coordsVerified=false means lat/lon still need a teammate check.",
+  "regions": [
+    {
+      "id": "moon",
+      "name": "The Moon: Nearest Neighbors",
+      "color": "#A7ADBA",
+      "song": "moon-calm",
+      "songTitle": "TODO (Phase 2)",
+      "bpm": 100,
+      "lockedText": "Coming in Phase 2"
+    },
+    {
+      "id": "mars",
+      "name": "Mars: The Red Archive",
+      "color": "#D9622B",
+      "song": "mars-drive",
+      "songTitle": "The Red Archive",
+      "bpm": 112
+    },
+    {
+      "id": "deep",
+      "name": "Deep Space: The Long Signal",
+      "color": "#7B6CF6",
+      "song": "deep-signal",
+      "songTitle": "TODO (Phase 2)",
+      "bpm": 140,
+      "lockedText": "Coming in Phase 2"
+    }
+  ],
+  "machines": [
+    {
+      "id": "viking",
+      "name": "Viking 1 Lander",
+      "region": "mars",
+      "place": "Chryse Planitia, Mars",
+      "lat": 22.27,
+      "lon": -47.95,
+      "coordsVerified": false,
+      "arrived": 1976,
+      "why": "To photograph Mars up close and test its soil for signs of life.",
+      "howItWorked": "A small robot arm scooped soil into onboard labs that looked for signs of living things.",
+      "found": "The first US pictures from the surface of Mars. Its life tests were not taken as proof of life.",
+      "status": "Mission ended in November 1982. The lander is still at Chryse Planitia.",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "Chryse Planitia. I touched down on July 20, 1976.",
+        "I took the first US pictures from the ground on Mars.",
+        "My arm scooped red soil into my little labs. Was anything alive in it?",
+        "I worked until November 1982."
+      ],
+      "numanNote": "The Numans call this one 'the first to knock on the door.'",
+      "teaser": "This lander searched the soil for life.",
+      "power": "life-detector",
+      "model": "viking",
+      "sound": "beeps",
+      "hotspots": [
+        { "part": "Robot arm", "position": [0, 0, 0], "label": "Scooped soil for the biology labs. TODO_VERIFY position" },
+        { "part": "Camera", "position": [0, 0, 0], "label": "Took the first US photos from the Martian surface. TODO_VERIFY position" }
+      ],
+      "source": "https://science.nasa.gov/mission/viking-1/",
+      "tags": { "why": "real", "howItWorked": "real", "found": "real", "numanNote": "story" }
+    },
+    {
+      "id": "opportunity",
+      "name": "Opportunity rover",
+      "region": "mars",
+      "place": "Meridiani Planum, Mars",
+      "lat": -1.95,
+      "lon": 354.47,
+      "coordsVerified": false,
+      "arrived": 2004,
+      "why": "To look for rocks and soil that show whether Mars once had water.",
+      "howItWorked": "Six wheels, solar panels for power, and a robot arm with tools to study rocks up close.",
+      "found": "Evidence that Mars was once wet, including small round hematite grains called 'blueberries'.",
+      "status": "Last heard from June 10, 2018, during a dust storm. Mission declared over in February 2019.",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "Meridiani Planum. They planned for 90 days.",
+        "I drove about 28 miles over almost 15 years.",
+        "I found signs that Mars was once wet.",
+        "In 2018 a dust storm covered the Sun, and I never woke up."
+      ],
+      "numanNote": "The Numans say dust storms still sing its name.",
+      "teaser": "Built for 90 days. Lasted almost 15 years.",
+      "power": "endurance",
+      "model": "opportunity",
+      "sound": "mars-wind",
+      "hotspots": [
+        { "part": "Solar panels", "position": [0, 0, 0], "label": "Turned sunlight into power. Dust storms blocked it. TODO_VERIFY position" },
+        { "part": "Robot arm", "position": [0, 0, 0], "label": "Held tools to study rocks up close. TODO_VERIFY position" },
+        { "part": "Wheels", "position": [0, 0, 0], "label": "Six wheels carried it about 28 miles. TODO_VERIFY position" }
+      ],
+      "source": "https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/",
+      "tags": { "why": "real", "howItWorked": "real", "found": "real", "numanNote": "story" }
+    },
+    {
+      "id": "insight",
+      "name": "InSight lander",
+      "region": "mars",
+      "place": "Elysium Planitia, Mars",
+      "lat": 4.5,
+      "lon": 135.6,
+      "coordsVerified": false,
+      "arrived": 2018,
+      "why": "To study the deep inside of Mars.",
+      "howItWorked": "A seismometer sat on the ground under a dome that blocked wind and heat, listening for shaking.",
+      "found": "More than 1,300 marsquakes. The biggest was about magnitude 5 in May 2022.",
+      "status": "Dust covered its solar panels. NASA ended the mission in December 2022.",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "Elysium Planitia. I landed in November 2018.",
+        "I set my seismometer on the ground under a dome. Then I listened.",
+        "Mars rumbled more than 1,300 times.",
+        "Dust slowly covered my solar panels, and in December 2022 I went quiet."
+      ],
+      "numanNote": "The Numans tune their songs to the rhythm of marsquakes.",
+      "teaser": "This lander heard Mars shake.",
+      "power": "quake-sense",
+      "model": "insight",
+      "sound": "marsquake",
+      "hotspots": [
+        { "part": "Seismometer dome", "position": [0, 0, 0], "label": "Covered the seismometer to block wind and heat. TODO_VERIFY position" },
+        { "part": "Solar panels", "position": [0, 0, 0], "label": "Round panels made power until dust covered them. TODO_VERIFY position" },
+        { "part": "Robot arm", "position": [0, 0, 0], "label": "Placed instruments on the ground. TODO_VERIFY position" }
+      ],
+      "source": "https://science.nasa.gov/mission/insight/",
+      "tags": { "why": "real", "howItWorked": "real", "found": "real", "numanNote": "story" }
+    },
+    {
+      "id": "ingenuity",
+      "name": "Ingenuity helicopter",
+      "region": "mars",
+      "place": "Jezero Crater, Mars",
+      "lat": 18.4,
+      "lon": 77.5,
+      "coordsVerified": false,
+      "arrived": 2021,
+      "why": "To test whether a helicopter could fly in the thin air of Mars.",
+      "howItWorked": "Two rotors spin in opposite directions, very fast, to grip the thin Martian air.",
+      "found": "The first powered, controlled flight on another planet, on April 19, 2021. It flew 72 times.",
+      "status": "Rotor damage ended its mission in January 2024. It still rests in Jezero Crater.",
+      "statusAsOf": "2026-11-14",
+      "log": [
+        "Jezero Crater. I rode to Mars under Perseverance.",
+        "On April 19, 2021, I lifted off. No one had flown on another planet before.",
+        "I flew 72 times.",
+        "I carry a tiny piece of fabric from the Wright brothers' 1903 Flyer."
+      ],
+      "numanNote": "The Numans had never seen a machine dance in the air before.",
+      "teaser": "The first aircraft to fly on another planet.",
+      "power": "lift",
+      "model": "ingenuity",
+      "sound": "ingenuity-hum",
+      "hotspots": [
+        { "part": "Rotors", "position": [0, 0, 0], "label": "Two rotors spun opposite ways to grip thin air. TODO_VERIFY position" },
+        { "part": "Solar panel", "position": [0, 0, 0], "label": "Charged its batteries between flights. TODO_VERIFY position" }
+      ],
+      "source": "https://science.nasa.gov/mission/mars-2020-perseverance/ingenuity-mars-helicopter/",
+      "tags": { "why": "real", "howItWorked": "real", "found": "real", "numanNote": "story" }
+    },
+    { "id": "apollo11-descent", "name": "Apollo 11 descent stage", "region": "moon", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 1969, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "It was a launch pad for the trip home.", "power": "launch-pad", "model": "apollo-lm", "sound": "atlas-launch", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
+    { "id": "apollo17-rover", "name": "Apollo 17 rover", "region": "moon", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 1972, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "A car that drove on the Moon.", "power": "long-haul", "model": "apollo17-site", "sound": "beeps", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
+    { "id": "lro", "name": "Lunar Reconnaissance Orbiter", "region": "moon", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 2009, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "It maps the whole Moon from orbit.", "power": "map-ahead", "model": "lro", "sound": "lcross-moon", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
+    { "id": "blue-ghost", "name": "Blue Ghost Mission 1", "region": "moon", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 2025, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "It tested ways to clear dust off surfaces.", "power": "dust-shield", "model": "blue-ghost", "sound": "beeps", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
+    { "id": "voyager1", "name": "Voyager 1", "region": "deep", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 1977, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "Its signal takes almost a day to reach Earth.", "power": "long-range", "model": "voyager", "sound": "voyager-plasma", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
+    { "id": "voyager2", "name": "Voyager 2", "region": "deep", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 1977, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "Still sending signals from interstellar space.", "power": "long-range", "model": "voyager", "sound": "jupiter-lightning", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
+    { "id": "new-horizons", "name": "New Horizons", "region": "deep", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 2006, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "It hibernates to save power on long trips.", "power": "hibernate", "model": "new-horizons", "sound": "kepler-star", "hotspots": [], "source": "TODO_VERIFY", "tags": {} },
+    { "id": "cassini", "name": "Cassini", "region": "deep", "place": "TODO_VERIFY", "lat": null, "lon": null, "coordsVerified": false, "arrived": 1997, "why": "TODO_VERIFY", "howItWorked": "TODO_VERIFY", "found": "TODO_VERIFY", "status": "TODO_VERIFY", "statusAsOf": null, "log": [], "numanNote": null, "teaser": "Its ending was planned to protect Saturn's moons.", "power": "guardian", "model": "cassini", "sound": "saturn-radio", "hotspots": [], "source": "TODO_VERIFY", "tags": {} }
+  ]
+}
