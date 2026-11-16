@@ -31,7 +31,7 @@ export class Cockpit {
       chrome: std(0x9db7c2, 0.25, 0.9),
       pot: std(0x8a4a2a, 0.8, 0.0),
       leaf: std(0x3fa34d, 0.7, 0.0),
-      trim: new THREE.MeshBasicMaterial({ color: PALETTE.teal, transparent: true, opacity: 0.7 }),
+      trim: new THREE.MeshBasicMaterial({ color: PALETTE.teal, transparent: true, opacity: 0.4 }),
       amberTrim: new THREE.MeshBasicMaterial({ color: PALETTE.amber, transparent: true, opacity: 0.6 }),
     };
     this.screens = [];
@@ -41,7 +41,7 @@ export class Cockpit {
     // Interior lights live on the camera and never get removed or hidden: changing
     // the number of lights forces every shader to recompile (a visible hitch).
     this.lights = [
-      [PALETTE.teal, 1.6, [0, -0.3, -0.65]], [PALETTE.amber, 0.9, [0, 0.39, -0.6]], [0xa66cff, 0.8, [0, 0, -0.7]],
+      [PALETTE.teal, 0.55, [0, -0.3, -0.65]], [PALETTE.amber, 0.7, [0, 0.39, -0.6]], [0xa66cff, 0.45, [0, 0, -0.7]],
     ].map(([c, i, p]) => { const l = new THREE.PointLight(c, 0, 1.4, 2); l.position.set(...p); l.userData.base = i; camera.add(l); return l; });
     this.plushies = {};      // region id -> mesh group
     this.aspect = 0;
@@ -182,7 +182,7 @@ export class Cockpit {
     kinds.forEach((kind, i) => {
       const x = (i - 1) * screenW * 1.12;
       add(box(screenW * 1.06, screenH * 1.1, 0.01), this.mat.rubber, x, dashH * 0.04, 0.032, 0, 0, 0, center);
-      const cv = document.createElement('canvas'); cv.width = 256; cv.height = 160;
+      const cv = document.createElement('canvas'); cv.width = 512; cv.height = 320;   // drawn at 2x so text stays sharp
       const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
       const scr = add(new THREE.PlaneGeometry(screenW, screenH), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }), x, dashH * 0.04, 0.038, 0, 0, 0, center);
       const screen = { kind, cv, ctx: cv.getContext('2d'), tex, mesh: scr, flashT: 0 };
@@ -273,7 +273,7 @@ export class Cockpit {
     gr.addColorStop(0.6, 'rgba(180,230,255,0.04)'); gr.addColorStop(0.64, 'rgba(255,255,255,0)');
     c2.fillStyle = gr; c2.fillRect(0, 0, 256, 256);
     const vg = c2.createRadialGradient(128, 128, 60, 128, 128, 180);
-    vg.addColorStop(0, 'rgba(194,221,228,0)'); vg.addColorStop(1, 'rgba(194,221,228,0.10)');
+    vg.addColorStop(0, 'rgba(194,221,228,0)'); vg.addColorStop(1, 'rgba(194,221,228,0.05)');
     c2.fillStyle = vg; c2.fillRect(0, 0, 256, 256);
     add(new THREE.PlaneGeometry(hw * 2.2, hh * 2.1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(gc), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }), 0, 0, Z * 1.1);
   }
@@ -389,7 +389,7 @@ export class Cockpit {
       c.fillStyle = '#7a2e12'; for (const [x, y, r] of [[.35, .3, .06], [.68, .62, .05], [.3, .7, .04]]) { c.beginPath(); c.arc(w * x, w * y, w * r, 0, 7); c.fill(); }
       c.fillStyle = '#1b1030'; c.beginPath(); c.arc(w * .4, w * .45, w * .04, 0, 7); c.arc(w * .6, w * .45, w * .04, 0, 7); c.fill();
       c.strokeStyle = '#1b1030'; c.lineWidth = w * .03; c.beginPath(); c.arc(w / 2, w * .52, w * .12, 0.2, Math.PI - 0.2); c.stroke();
-    }, S, S, -hw * 0.18, this.shelf.y - hh * 0.035, this.shelf.z + 0.11, 0.2, 0, 128);   // stuck on the left screen, a bit crooked
+    }, S * 1.1, S * 1.1, 0, hh * 0.42, 0.08, 0.15, 0, 128, this.pillars[-1]);   // on the left pillar, a bit crooked
     // "4052 CREW" star badge
     sticker((c, w) => {
       c.translate(w / 2, w / 2); c.fillStyle = '#C9374C'; c.beginPath();
@@ -407,21 +407,22 @@ export class Cockpit {
     };
     // rocket doodle
     sticker((c, w, h) => {
-      c.fillStyle = '#c2dde4'; c.fillRect(0, 0, w, h);
-      c.strokeStyle = '#C2DDE4'; c.lineWidth = w * 0.045; c.lineCap = 'round';
+      c.fillStyle = '#f7f3e8'; c.fillRect(0, 0, w, h);
+      c.fillStyle = 'rgba(200,220,240,.5)'; c.fillRect(w * .35, 0, w * .3, h * .07);   // tape
+      c.strokeStyle = '#133769'; c.lineWidth = w * 0.045; c.lineCap = 'round';
       c.beginPath(); c.moveTo(w * .5, h * .12); c.quadraticCurveTo(w * .75, h * .4, w * .62, h * .72); c.lineTo(w * .38, h * .72); c.quadraticCurveTo(w * .25, h * .4, w * .5, h * .12); c.stroke();
       c.beginPath(); c.arc(w * .5, h * .4, w * .07, 0, 7); c.stroke();
       c.strokeStyle = '#C9374C'; c.beginPath(); c.moveTo(w * .42, h * .78); c.lineTo(w * .46, h * .92); c.moveTo(w * .58, h * .78); c.lineTo(w * .54, h * .92); c.stroke();
-    }, S * 1.4, S * 1.7, hw * 0.12, -hh * 0.34, Z * 1.06, 0.14, 0, 256).userData.info = { title: 'Rocket doodle', text: 'Every machine in the Archive began its trip on top of a rocket. Somebody on this ship really liked drawing them.' };
+    }, S * 1.4, S * 1.7, -hw * 0.3, -hh * 0.54, Z * 1.06, 0.14, 0, 256).userData.info = { title: 'Rocket doodle', text: 'Every machine in the Archive began its trip on top of a rocket. Somebody on this ship really liked drawing them.' };
     // Numan face
     sticker((c, w) => {
-      c.fillStyle = '#C2DDE4'; c.beginPath(); c.ellipse(w / 2, w * .55, w * .42, w * .38, 0, 0, 7); c.fill();
+      c.fillStyle = '#A66CFF'; c.beginPath(); c.ellipse(w / 2, w * .55, w * .42, w * .38, 0, 0, 7); c.fill();
       c.fillStyle = '#fff'; c.beginPath(); c.arc(w * .36, w * .5, w * .1, 0, 7); c.arc(w * .64, w * .5, w * .1, 0, 7); c.fill();
       c.fillStyle = '#0B1F3A'; c.beginPath(); c.arc(w * .37, w * .52, w * .06, 0, 7); c.arc(w * .65, w * .52, w * .06, 0, 7); c.fill();
       c.strokeStyle = '#0B1F3A'; c.lineWidth = w * .03; c.beginPath(); c.arc(w / 2, w * .66, w * .08, 0.3, Math.PI - 0.3); c.stroke();
-      c.strokeStyle = '#C2DDE4'; c.lineWidth = w * .04; c.beginPath(); c.moveTo(w / 2, w * .18); c.lineTo(w / 2, w * .05); c.stroke();
+      c.strokeStyle = '#A66CFF'; c.lineWidth = w * .04; c.beginPath(); c.moveTo(w / 2, w * .18); c.lineTo(w / 2, w * .05); c.stroke();
       c.fillStyle = '#C9374C'; c.beginPath(); c.arc(w / 2, w * .05, w * .05, 0, 7); c.fill();
-    }, S, S, hw * 0.12, this.shelf.y - hh * 0.03, this.shelf.z + 0.11, -0.15, 0, 128);   // and one on the middle screen
+    }, S * 1.1, S * 1.1, 0, hh * 0.2, 0.08, -0.15, 0, 128, this.pillars[-1]);   // and one just below it
     // holographic star (iridescent)
     sticker((c, w) => {
       const g = c.createLinearGradient(0, 0, w, w); ['#ff9ad5', '#9ae7ff', '#c4ff9a', '#ffe59a', '#d59aff'].forEach((col, i) => g.addColorStop(i / 4, col));
@@ -488,14 +489,14 @@ export class Cockpit {
     // keycard lanyard hanging from the overhead panel (sways a little)
     this.lanyard = new THREE.Group(); this.lanyard.position.set(-hw * 0.22, hh * 0.86, Z + 0.32);
     const strap = new THREE.Mesh(new THREE.BoxGeometry(hh * 0.008, hh * 0.18, hh * 0.002), new THREE.MeshStandardMaterial({ color: 0xc2dde4, roughness: 0.8 }));
-    strap.position.y = -hh * 0.09; this.lanyard.add(strap);
+    strap.scale.y = 1.35; strap.position.y = -hh * 0.12; this.lanyard.add(strap);
     const card = sticker((c, w, h) => {
-      c.fillStyle = '#c2dde4'; c.fillRect(0, 0, w, h); c.fillStyle = '#C2DDE4'; c.fillRect(0, 0, w, h * .25);
-      c.fillStyle = '#0B1F3A'; c.font = `900 ${w * .12}px Nunito, sans-serif`; c.fillText('RECOVERY', w * .08, h * .17);
+      c.fillStyle = '#c2dde4'; c.fillRect(0, 0, w, h); c.fillStyle = '#133769'; c.fillRect(0, 0, w, h * .25);
+      c.fillStyle = '#c2dde4'; c.font = `900 ${w * .12}px Nunito, sans-serif`; c.fillText('RECOVERY', w * .08, h * .17);
       c.fillStyle = '#9DB7C2'; c.fillRect(w * .08, h * .35, w * .35, h * .4);
       c.fillStyle = '#133769'; c.font = `700 ${w * .09}px "Space Mono", monospace`; c.fillText('TRAVELER', w * .5, h * .5); c.fillText('ID 4052', w * .5, h * .66);
     }, hh * 0.05, hh * 0.07, 0, 0, 0, 0, 0, 128);
-    this.group.remove(card); card.position.set(0, -hh * 0.2, 0.002); this.lanyard.add(card);
+    this.group.remove(card); card.position.set(0, -hh * 0.26, 0.002); this.lanyard.add(card);
     this.group.add(this.lanyard);
     this.lanyardKick = 0;
     this.pokeable(this.lanyard, () => { foley.jingle(); this.lanyardKick = performance.now(); });
@@ -602,7 +603,8 @@ export class Cockpit {
   }
 
   draw(s, t, still, pulse) {
-    const { ctx: c, cv } = s; const W = cv.width; const H = cv.height;
+    const { ctx: c, cv } = s; const W = cv.width / 2; const H = cv.height / 2;
+    c.setTransform(2, 0, 0, 2, 0, 0);
     c.fillStyle = '#06122a'; c.fillRect(0, 0, W, H);
     c.strokeStyle = 'rgba(194,221,228,0.12)'; c.lineWidth = 1;
     for (let x = 0; x < W; x += 16) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke(); }
