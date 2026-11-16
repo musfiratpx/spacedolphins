@@ -117,19 +117,18 @@ plays all the music and sound.
 
 ### Real vs Story
 
-| Real (from NASA) | Story (our fiction) |
+| Real | Story |
 |---|---|
 | Every machine, place, date, discovery and status on a card | The year 4052, Earth's shield, the asteroid threat |
 | NASA 3D models, planet textures, sounds and photos | The Numans and their songs |
 | Asteroid names, sizes and speeds from NeoWs | Sound in space (space is silent!) |
 
-Every piece of text in the game is tagged **Real** or **Story**. Card facts come only from the
-NASA page linked on each card. Anything not yet checked is marked `TODO_VERIFY` in the data and
+Facts come only from the NASA page linked on each card. Anything not yet checked is marked `TODO_VERIFY` in the data and
 left out of the game.
 
 ### Performance
 
-- A loading screen (with fun facts) shows real progress while textures and models load, and
+- A loading screen shows real progress while textures and models load, and
   warms up the graphics so the first camera move doesn't stutter.
 - The background world redraws at half rate on menus and a third during rounds, so the note
   lanes get the frame budget.
@@ -187,20 +186,9 @@ calibration and full keyboard play.
 - [CLAUDE.md](CLAUDE.md): the project's rules, data formats and verified facts
 
 ## Team
-
-| Role | Owner |
-|---|---|
-| Game lead | TBD |
-| 3D and design | TBD |
-| Content and accuracy | TBD |
-| Audio and charts | TBD |
-| Data | TBD |
-| Demo and submission | TBD |
+Jaicee Cofresi, Moses Ezekiel, Musfirat Rahman
 
 ## Credits and licenses
 
 See [CREDITS.md](CREDITS.md) for every NASA model, texture, sound and photo, with its source
-and credit line. NASA media is generally not copyrighted but is credited anyway. NASA's insignia
-and logotype are not used, and NASA does not endorse this project. All music is original (written
-as code). Three.js and Vite are MIT-licensed; Nunito and Space Mono are under the SIL Open Font
-License.
+and credit line. NASA does not endorse this project. All music is from code. 
