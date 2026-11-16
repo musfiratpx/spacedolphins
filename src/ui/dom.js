@@ -11,15 +11,13 @@ export function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 }
 
-/** Wire up every [data-go] button in el, plus hover/click sounds. */
+/** Wire up every [data-go] button in el, plus click sounds. */
 export function wire(el, go, handlers = {}) {
   // Listen on the screen's own root (replaced on every render), never on #app itself,
   // or listeners pile up and one click fires several times.
   const root = el.id === 'app' ? el.firstElementChild : el;
   applyTilt(root);
-  root.querySelectorAll('button, [data-go]').forEach((b) => {
-    b.addEventListener('pointerenter', () => { try { sfx.hover(); } catch { /* audio not started yet */ } });
-  });
+  // sounds play on click only (no hover sounds)
   let busy = false;
   root.addEventListener('click', async (e) => {
     if (busy) return;

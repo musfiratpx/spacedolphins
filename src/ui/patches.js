@@ -41,27 +41,27 @@ export function drawPatch(c, x, y, d, m, color, earned = true) {
   const r = d / 2;
   c.save();
   if (!earned) {
-    c.setLineDash([d * 0.05, d * 0.05]); c.strokeStyle = 'rgba(232,236,245,.35)'; c.lineWidth = d * 0.03;
+    c.setLineDash([d * 0.05, d * 0.05]); c.strokeStyle = 'rgba(194,221,228,.35)'; c.lineWidth = d * 0.03;
     c.beginPath(); c.arc(x, y, r * 0.92, 0, 7); c.stroke();
-    c.fillStyle = 'rgba(232,236,245,.35)'; c.font = `900 ${d * 0.3}px Nunito, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('?', x, y);
+    c.fillStyle = 'rgba(194,221,228,.35)'; c.font = `900 ${d * 0.3}px Nunito, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('?', x, y);
     c.restore(); return;
   }
   // embroidered border, twill field, stitched inner ring
   c.fillStyle = color; c.beginPath(); c.arc(x, y, r, 0, 7); c.fill();
   const g = c.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r * 0.86);
-  g.addColorStop(0, '#1d2756'); g.addColorStop(1, '#0B1026');
+  g.addColorStop(0, '#1d2756'); g.addColorStop(1, '#0B1F3A');
   c.fillStyle = g; c.beginPath(); c.arc(x, y, r * 0.84, 0, 7); c.fill();
   c.setLineDash([d * 0.025, d * 0.02]); c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = d * 0.012;
   c.beginPath(); c.arc(x, y, r * 0.92, 0, 7); c.stroke(); c.setLineDash([]);
   // stars
-  c.fillStyle = 'rgba(232,236,245,.7)';
+  c.fillStyle = 'rgba(194,221,228,.7)';
   for (const [sx, sy] of [[-0.5, -0.35], [0.45, -0.45], [0.55, 0.05], [-0.6, 0.1]]) c.fillRect(x + sx * r, y + sy * r, d * 0.018, d * 0.018);
-  icon(c, KIND[m.id] || 'probe', x, y - r * 0.12, d * 0.5, '#E8ECF5');
+  icon(c, KIND[m.id] || 'probe', x, y - r * 0.12, d * 0.5, '#C2DDE4');
   // name banner + year
   c.fillStyle = color; c.fillRect(x - r * 0.78, y + r * 0.36, r * 1.56, r * 0.32);
-  c.fillStyle = '#0B1026'; c.font = `900 ${d * 0.1}px Nunito, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillStyle = '#0B1F3A'; c.font = `900 ${d * 0.1}px Nunito, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
   c.fillText((m.short || m.name).toUpperCase(), x, y + r * 0.52, r * 1.5);
-  c.fillStyle = '#F2B134'; c.font = `700 ${d * 0.085}px "Space Mono", monospace`; c.fillText(String(m.arrived), x, y - r * 0.66);
+  c.fillStyle = '#C9374C'; c.font = `700 ${d * 0.085}px "Space Mono", monospace`; c.fillText(String(m.arrived), x, y - r * 0.66);
   c.restore();
 }
 

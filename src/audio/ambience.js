@@ -2,6 +2,7 @@
 // Fades in on menus, out during rounds and record playback so it never fights the music.
 import { getContext, getBus } from './clock.js';
 import { on } from '../core/bus.js';
+import { settings } from '../core/settings.js';
 
 let nodes = null;
 let want = 0;
@@ -38,13 +39,14 @@ function apply() {
   const ctx = getContext();
   if (ctx.state !== 'running') return;
   if (!nodes) nodes = build();
-  nodes.out.gain.setTargetAtTime(want, ctx.currentTime, 0.6);
+  nodes.out.gain.setTargetAtTime(settings.bgMusic === false ? 0 : want, ctx.currentTime, 0.6);
 }
 
 export function startAmbience() {
   on('screen:change', ({ id }) => { want = id === 'round' ? 0 : 0.05; apply(); });
   on('round:start', () => { want = 0; apply(); });
   on('records:play', (playing) => { want = playing ? 0 : 0.05; apply(); });
+  on('settings:change', ({ path }) => { if (path === 'bgMusic') apply(); });
   // the AudioContext only starts after a click; pick up the hum then
   window.addEventListener('pointerdown', () => setTimeout(apply, 50), { passive: true });
 }

@@ -68,6 +68,26 @@ export function getOutputLatency() {
   return (ctx.outputLatency || 0) + (ctx.baseLatency || 0);
 }
 
+/**
+ * The song time reaching the player's ears right now, in seconds on the audio clock.
+ * ctx.currentTime only moves in chunks (10-40 ms depending on browser), which made
+ * presses feel late. getOutputTimestamp() tells us which audio-clock time was at the
+ * speaker at a known moment, so we extrapolate from that sample. Still the audio clock
+ * (rule 5): it only fills in between its updates. Falls back where unsupported.
+ */
+export function getHeardTime() {
+  if (!ctx) return 0;
+  const fallback = ctx.currentTime - getOutputLatency();
+  if (ctx.state === 'running' && ctx.getOutputTimestamp) {
+    const ts = ctx.getOutputTimestamp();
+    if (ts.performanceTime > 0 && ts.contextTime > 0) {
+      const t = ts.contextTime + (performance.now() - ts.performanceTime) / 1000;
+      if (Math.abs(t - fallback) < 0.25) return t;
+    }
+  }
+  return fallback;
+}
+
 export function getAnalyser() {
   getContext();
   return analyser;

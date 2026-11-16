@@ -33,6 +33,22 @@ NASA does not endorse this project. NASA's insignia and logotype are not used.
 - Mars, Phobos, Deimos: NASA 3D Resources `Images and Textures`
 - Deep space ringed planet: original art painted in code (not a NASA image)
 
+### Photos taken by the machines (NASA Image and Video Library, downloaded 2026-11-15)
+Shown in the Hardwaredex gallery, on hardware cards and as the dashboard polaroid. Only NASA/JPL(-Caltech) credited images are used.
+- The first photo from the surface of Mars (PIA00381), taken by Viking Lander 1, camera 2, July 20, 1976. NASA/JPL. https://images.nasa.gov/details/PIA00381
+- Morning on Chryse Planitia (PIA03163), taken by Viking Lander 1, camera 1. NASA/JPL. https://images.nasa.gov/details/PIA03163
+- Opportunity's shadow (PIA06739), taken by Opportunity, front hazard-avoidance camera, 2004. NASA/JPL. https://images.nasa.gov/details/PIA06739
+- A long shadow at Endeavour Crater (PIA16120), taken by Opportunity, Aug. 23, 2012. NASA/JPL-Caltech. https://images.nasa.gov/details/PIA16120
+- InSight's first selfie (PIA22876), taken by InSight, Instrument Deployment Camera on its robotic arm, December 2018. NASA/JPL-Caltech. https://images.nasa.gov/details/PIA22876
+- Sunset on Mars (PIA23202), taken by InSight, Instrument Deployment Camera, April 25, 2019. NASA/JPL-Caltech. https://images.nasa.gov/details/PIA23202
+- InSight's final selfie (PIA25287), taken by InSight, Instrument Deployment Camera, April 24, 2022. NASA/JPL-Caltech. https://images.nasa.gov/details/PIA25287
+- Ingenuity's shadow on its first flight (PIA24584), taken by Ingenuity, black-and-white navigation camera, April 19, 2021. NASA/JPL-Caltech. https://images.nasa.gov/details/PIA24584
+- The first color photo of Mars from the air (PIA24593), taken by Ingenuity, color camera, April 22, 2021. NASA/JPL-Caltech. https://images.nasa.gov/details/PIA24593
+- Earth and Moon together (PIA00013), taken by Voyager 1, Sept. 18, 1977. NASA/JPL. https://images.nasa.gov/details/PIA00013
+- The Pale Blue Dot (PIA00452), taken by Voyager 1, narrow-angle camera. NASA/JPL. https://images.nasa.gov/details/PIA00452
+- Uranus (PIA18182), taken by Voyager 2, 1986. NASA/JPL-Caltech. https://images.nasa.gov/details/PIA18182
+- Neptune (PIA02210), taken by Voyager 2, Aug. 14, 1989. NASA/JPL. https://images.nasa.gov/details/PIA02210
+
 ### Asteroid data
 - NeoWs snapshot (`data/asteroids.json`), NASA/JPL, via https://api.nasa.gov/. Each asteroid links to its JPL Small-Body Database record.
 

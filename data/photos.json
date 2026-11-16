@@ -1,0 +1,150 @@
+{
+  "_readme": "Real photos TAKEN BY the machines in the game (not photos of them). Each caption comes from the NASA description at `source`; keep captions <= 25 words. Only NASA/JPL(-Caltech) credits are used: images co-credited to universities or companies (Cassini/SSI, New Horizons/JHUAPL/SwRI, LRO/ASU, Blue Ghost/Firefly) are skipped per CLAUDE.md rule 4 until the team decides. Apollo photos are skipped (taken by astronauts, not the hardware). Files live in assets/photos/ and are also listed in assets/manifest.json.",
+  "dashboard": "voyager1-earth-moon",
+  "photos": [
+    {
+      "id": "viking1-first",
+      "machine": "viking",
+      "file": "assets/photos/PIA00381.jpg",
+      "title": "The first photo from the surface of Mars",
+      "caption": "The first photograph ever taken on the surface of Mars, minutes after Viking 1 landed. Rocks, sand and dust.",
+      "taken": "July 20, 1976",
+      "camera": "Viking Lander 1, camera 2",
+      "credit": "NASA/JPL",
+      "source": "https://images.nasa.gov/details/PIA00381"
+    },
+    {
+      "id": "viking1-morning",
+      "machine": "viking",
+      "file": "assets/photos/PIA03163.jpg",
+      "title": "Morning on Chryse Planitia",
+      "caption": "A wide view of Chryse Planitia in the morning, stitched together from Viking Lander 1's camera 1.",
+      "taken": "",
+      "camera": "Viking Lander 1, camera 1",
+      "credit": "NASA/JPL",
+      "source": "https://images.nasa.gov/details/PIA03163"
+    },
+    {
+      "id": "opportunity-shadow-endurance",
+      "machine": "opportunity",
+      "file": "assets/photos/PIA06739.jpg",
+      "title": "Opportunity's shadow",
+      "caption": "Opportunity caught its own shadow with its front hazard-avoidance camera while driving into Endurance Crater.",
+      "taken": "2004",
+      "camera": "Opportunity, front hazard-avoidance camera",
+      "credit": "NASA/JPL",
+      "source": "https://images.nasa.gov/details/PIA06739"
+    },
+    {
+      "id": "opportunity-shadow-endeavour",
+      "machine": "opportunity",
+      "file": "assets/photos/PIA16120.jpg",
+      "title": "A long shadow at Endeavour Crater",
+      "caption": "Opportunity's afternoon shadow stretching into Endeavour Crater, on its 3,051st day on Mars.",
+      "taken": "Aug. 23, 2012",
+      "camera": "Opportunity",
+      "credit": "NASA/JPL-Caltech",
+      "source": "https://images.nasa.gov/details/PIA16120"
+    },
+    {
+      "id": "insight-first-selfie",
+      "machine": "insight",
+      "file": "assets/photos/PIA22876.jpg",
+      "title": "InSight's first selfie",
+      "caption": "InSight's first selfie on Mars: its solar panels and deck, with its science instruments on top.",
+      "taken": "December 2018",
+      "camera": "InSight, Instrument Deployment Camera on its robotic arm",
+      "credit": "NASA/JPL-Caltech",
+      "source": "https://images.nasa.gov/details/PIA22876"
+    },
+    {
+      "id": "insight-sunset",
+      "machine": "insight",
+      "file": "assets/photos/PIA23202.jpg",
+      "title": "Sunset on Mars",
+      "caption": "A sunset on Mars, taken with the camera on the end of InSight's robotic arm.",
+      "taken": "April 25, 2019",
+      "camera": "InSight, Instrument Deployment Camera",
+      "credit": "NASA/JPL-Caltech",
+      "source": "https://images.nasa.gov/details/PIA23202"
+    },
+    {
+      "id": "insight-final-selfie",
+      "machine": "insight",
+      "file": "assets/photos/PIA25287.jpg",
+      "title": "InSight's final selfie",
+      "caption": "InSight's last selfie. Its solar panels are covered with far more dust than in its first one.",
+      "taken": "April 24, 2022",
+      "camera": "InSight, Instrument Deployment Camera",
+      "credit": "NASA/JPL-Caltech",
+      "source": "https://images.nasa.gov/details/PIA25287"
+    },
+    {
+      "id": "ingenuity-first-flight",
+      "machine": "ingenuity",
+      "file": "assets/photos/PIA24584.jpg",
+      "title": "Ingenuity's shadow on its first flight",
+      "caption": "Ingenuity photographed its own shadow while hovering, during the first powered, controlled flight on another planet.",
+      "taken": "April 19, 2021",
+      "camera": "Ingenuity, black-and-white navigation camera",
+      "credit": "NASA/JPL-Caltech",
+      "source": "https://images.nasa.gov/details/PIA24584"
+    },
+    {
+      "id": "ingenuity-first-color",
+      "machine": "ingenuity",
+      "file": "assets/photos/PIA24593.jpg",
+      "title": "The first color photo of Mars from the air",
+      "caption": "The first color image of Mars taken by an aircraft while flying, during Ingenuity's second flight.",
+      "taken": "April 22, 2021",
+      "camera": "Ingenuity, color camera",
+      "credit": "NASA/JPL-Caltech",
+      "source": "https://images.nasa.gov/details/PIA24593"
+    },
+    {
+      "id": "voyager1-earth-moon",
+      "machine": "voyager1",
+      "file": "assets/photos/PIA00013.jpg",
+      "fit": "contain",
+      "title": "Earth and Moon together",
+      "caption": "A crescent Earth and Moon in one picture, the first of its kind taken by a spacecraft. Voyager 1 was 7.25 million miles away.",
+      "taken": "Sept. 18, 1977",
+      "camera": "Voyager 1",
+      "credit": "NASA/JPL",
+      "source": "https://images.nasa.gov/details/PIA00013"
+    },
+    {
+      "id": "voyager1-pale-blue-dot",
+      "machine": "voyager1",
+      "file": "assets/photos/PIA00452.jpg",
+      "title": "The Pale Blue Dot",
+      "caption": "Earth as a tiny point of light, seen from more than 4 billion miles away. Part of the first portrait of the solar system.",
+      "taken": "",
+      "camera": "Voyager 1, narrow-angle camera",
+      "credit": "NASA/JPL",
+      "source": "https://images.nasa.gov/details/PIA00452"
+    },
+    {
+      "id": "voyager2-uranus",
+      "machine": "voyager2",
+      "file": "assets/photos/PIA18182.jpg",
+      "title": "Uranus",
+      "caption": "The planet Uranus, photographed by Voyager 2 as it flew past.",
+      "taken": "1986",
+      "camera": "Voyager 2",
+      "credit": "NASA/JPL-Caltech",
+      "source": "https://images.nasa.gov/details/PIA18182"
+    },
+    {
+      "id": "voyager2-neptune",
+      "machine": "voyager2",
+      "file": "assets/photos/PIA02210.jpg",
+      "title": "Neptune",
+      "caption": "Neptune in enhanced color, taken as Voyager 2 closed in on the planet.",
+      "taken": "Aug. 14, 1989",
+      "camera": "Voyager 2",
+      "credit": "NASA/JPL",
+      "source": "https://images.nasa.gov/details/PIA02210"
+    }
+  ]
+}

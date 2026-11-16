@@ -217,6 +217,9 @@ Source: https://science.nasa.gov/mission/mars-2020-perseverance/ingenuity-mars-h
 Coordinates are approximate and marked TODO_VERIFY in data until checked.
 
 ## Palette and type
-Navy `#0B1026` background, Starlight `#E8ECF5` text, Moon gray `#A7ADBA`, Mars rust
-`#D9622B`, Numan teal `#2EC4B6`, warning amber `#F2B134`. Nunito for UI, Space Mono for
-radio captions (OFL). Fall back to system fonts if offline.
+Team palette (changed 2026-11-15): Navy `#0b1f3a` background, Blue `#133769` panels,
+Light blue `#c2dde4` text and main accent, Red `#c9374c` Mars / warnings / fills,
+Wine `#76101e` deep accents and Story tags, bright Purple `#A66CFF` for Deep Space,
+data breaks and the cockpit glow. Small red text on dark uses the tint `#E37B8B`
+for readability; muted text uses `#9DB7C2`. Nunito for UI, Space Mono for radio captions
+(OFL). Fall back to system fonts if offline.

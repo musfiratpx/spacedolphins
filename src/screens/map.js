@@ -9,7 +9,7 @@ let view = null;
 let tab = 'moon';
 
 function statusText(m) {
-  if (m.alive) return '<span class="status-chip alive"><span class="pulse"></span> Still talking to Earth</span>';
+  if (m.alive) return '<span class="status-chip alive"><span class="pulse"></span> Still active as of 2026</span>';
   if (m.monument) return `<span class="status-chip monument">🗿 Monument since ${esc(m.quietSince)}</span>`;
   if (m.quietSince) return `<span class="status-chip quiet">💤 Quiet since ${esc(m.quietSince)}</span>`;
   return '<span class="status-chip quiet">Status being checked</span>';
@@ -51,7 +51,7 @@ export default {
             </div>
             <div class="panel map-side">
               <h2>${esc(region.name)}</h2>
-              <p class="map-legend"><span><span class="mi-dot alive"></span> still talking</span><span><span class="mi-dot quiet"></span> quiet</span><span><span class="mi-dot monument"></span> monument</span></p>
+              <p class="map-legend"><span><span class="mi-dot alive"></span> Green, glowing = still active as of 2026</span><span><span class="mi-dot quiet"></span> Gray = quiet (mission over)</span><span><span class="mi-dot monument"></span> Red = monument (left in place)</span></p>
               <ul class="map-list">${list}</ul>
               <div class="map-info" aria-live="polite"><p class="hint">Pick a machine to see where it is now.</p></div>
             </div>

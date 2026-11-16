@@ -1,5 +1,5 @@
 // Hardware card: the machine's story. 3D model + fact fields, a status line
-// (still talking / quiet since / monument), the machine's own log typed out
+// (still active / quiet since / monument), the machine's own log typed out
 // (with read-aloud), and "Send a hello": a signal with the real light-travel time.
 import { wire, esc, tag } from '../ui/dom.js';
 import { getMachine, getHardware } from '../core/data.js';
@@ -11,21 +11,32 @@ import { sfx } from '../audio/sfx.js';
 import { loadRadio } from '../core/data.js';
 import { drawPatch } from '../ui/patches.js';
 import { getRegion } from '../core/data.js';
+import { photosFor, photoTile, wirePhotos } from '../ui/photos.js';
 
 let viewer = null;
 let onKey = null;
 let timers = [];
 
-function field(label, value, kind = 'real') {
-  if (value == null || value === '') return '';
-  const todo = String(value).includes('TODO_VERIFY');
-  // unverified facts stay marked, but kids see a friendly line instead of a code word
-  const shown = todo ? 'Still being fact-checked by our team.' : value;
-  return `<div class="field ${todo ? 'todo' : ''}" ${todo ? 'data-todo="TODO_VERIFY"' : ''}><dt>${label} ${tag(kind)}</dt><dd>${esc(shown)}</dd></div>`;
+const ok = (v) => v != null && v !== '' && !String(v).includes('TODO_VERIFY');   // unverified facts are left out
+const lower1 = (t) => t.charAt(0).toLowerCase() + t.slice(1);
+
+/** The machine's story as a few plain paragraphs (no labelled mini-sections). */
+function storyParagraphs(m) {
+  const tags = m.tags || {};
+  const para = (parts) => {
+    const real = parts.filter(([, v]) => ok(v));
+    if (!real.length) return '';
+    const kind = real.some(([k]) => tags[k] === 'story') ? 'story' : 'real';
+    const text = real.map(([k, v]) => (k === 'why' && /^to /i.test(v) ? `It was sent ${lower1(v)}` : v)).join(' ');
+    return `<p>${esc(text)} ${tag(kind)}</p>`;
+  };
+  return para([['why', m.why], ['howItWorked', m.howItWorked]])
+    + para([['found', m.found]])
+    + para([['status', m.status]]);
 }
 
 function statusLine(m) {
-  if (m.alive) return `<p class="status-chip alive"><span class="pulse" aria-hidden="true"></span> Still talking to Earth</p>`;
+  if (m.alive) return `<p class="status-chip alive"><span class="pulse" aria-hidden="true"></span> Still active as of 2026</p>`;
   if (m.monument) return `<p class="status-chip monument">🗿 Left in place as a monument since ${esc(m.quietSince)}</p>`;
   if (m.quietSince) return `<p class="status-chip quiet">💤 Quiet since ${esc(m.quietSince)}</p>`;
   return '';
@@ -45,10 +56,10 @@ export default {
   async mount(el, params, go) {
     const m = getMachine(params.id);
     const u = state.unlocked[m.id];
-    const tags = m.tags || {};
     const { entry } = getModel(m.model);
     const sig = m.signal ? getHardware().signals?.[m.signal] : null;
     const hellos = state.hellos?.[m.id] || 0;
+    const photos = photosFor(m.id);
     el.innerHTML = `
       <section class="screen card-screen">
         <header class="hub-head">
@@ -75,18 +86,21 @@ export default {
             <p class="hint">Drag to rotate · scroll or pinch to zoom · right-drag to move</p>
           </div>
           <div class="panel card-fields">
-            <dl>
-              ${field('Where it is', `${m.place}${m.lat != null ? ` (${m.lat}°, ${m.lon}°)` : ''}`, 'real')}
-              ${field('Arrived', m.arrived, 'real')}
-              ${field('Why it was sent', m.why, tags.why || 'real')}
-              ${field('How it worked · the engineering', m.howItWorked, tags.howItWorked || 'real')}
-              ${field('What it found · the science', m.found, tags.found || 'real')}
-              ${field(`Status today${m.statusAsOf ? ` (as of ${m.statusAsOf})` : ''}`, m.status, 'real')}
-              ${m.numanNote ? field('Numan note', m.numanNote, 'story') : ''}
-            </dl>
+            <p class="card-facts">
+              ${ok(m.place) ? `<span><b>Where</b> ${esc(m.place)}</span>` : ''}
+              ${ok(m.arrived) ? `<span><b>Arrived</b> ${esc(m.arrived)}</span>` : ''}
+              ${tag('real')}
+            </p>
+            <div class="card-story">${storyParagraphs(m)}</div>
+            ${ok(m.numanNote) ? `<p class="numan-note">${esc(m.numanNote)} ${tag('story')}</p>` : ''}
             <p class="source"><a href="${esc(m.source)}" target="_blank" rel="noopener">NASA record ↗</a>${u ? ` <span class="muted">· Scanned ${esc(u.date)}</span>` : ''}</p>
           </div>
         </div>
+        ${photos.length ? `
+        <section class="panel card-photos" aria-label="Photos taken by ${esc(m.short || m.name)}">
+          <h2>📷 Photos taken by ${esc(m.short || m.name)} ${tag('real')}</h2>
+          <div class="photo-row">${photos.map((p) => photoTile(p)).join('')}</div>
+        </section>` : ''}
 
         <div class="story-grid">
           ${m.log?.length ? `
@@ -114,8 +128,9 @@ export default {
         </div>
       </section>`;
 
+    wirePhotos(el);
     const pc = el.querySelector('.patch-badge');
-    drawPatch(pc.getContext('2d'), 80, 80, 156, m, getRegion(m.region)?.color || '#2EC4B6', true);
+    drawPatch(pc.getContext('2d'), 80, 80, 156, m, getRegion(m.region)?.color || '#C2DDE4', true);
 
     // ---- machine log: typed out line by line (instant with reduced motion) ----
     const lines = [...el.querySelectorAll('.log-lines li')];

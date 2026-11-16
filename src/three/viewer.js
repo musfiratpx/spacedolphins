@@ -38,10 +38,10 @@ export class HardwareViewer {
     const key = new THREE.DirectionalLight(0xffffff, 2.0);
     key.position.set(3, 4, 5);
     this.scene.add(key);
-    const rim = new THREE.DirectionalLight(0x2ec4b6, 2.4);
+    const rim = new THREE.DirectionalLight(0xc2dde4, 2.4);
     rim.position.set(-4, 2, -4);
     this.scene.add(rim);
-    const warm = new THREE.DirectionalLight(0xd9622b, 0.8);
+    const warm = new THREE.DirectionalLight(0xc9374c, 0.8);
     warm.position.set(4, -1, -3);
     this.scene.add(warm);
 
@@ -53,7 +53,7 @@ export class HardwareViewer {
     this.clip = new THREE.Plane(new THREE.Vector3(0, -1, 0), 10);
     this.scanRing = new THREE.Mesh(
       new THREE.RingGeometry(1.0, 1.25, 64),
-      new THREE.MeshBasicMaterial({ color: 0x2ec4b6, transparent: true, opacity: 0.8, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }),
+      new THREE.MeshBasicMaterial({ color: 0xc2dde4, transparent: true, opacity: 0.8, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }),
     );
     this.scanRing.rotation.x = -Math.PI / 2;
     this.scanRing.visible = false;
@@ -88,7 +88,7 @@ export class HardwareViewer {
 
   addPedestal() {
     const g = new THREE.Group();
-    const ringMat = (o) => new THREE.MeshBasicMaterial({ color: 0x2ec4b6, transparent: true, opacity: o, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false });
+    const ringMat = (o) => new THREE.MeshBasicMaterial({ color: 0xc2dde4, transparent: true, opacity: o, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false });
     for (const [r1, r2, o] of [[1.15, 1.2, 0.7], [1.32, 1.34, 0.35], [0.5, 1.15, 0.06]]) {
       const m = new THREE.Mesh(new THREE.RingGeometry(r1, r2, 96), ringMat(o));
       m.rotation.x = -Math.PI / 2;
@@ -116,7 +116,7 @@ export class HardwareViewer {
       return m;
     };
     const shadow = disc(0.0, 0.7, 0x000000, 0.55, THREE.NormalBlending); shadow.position.y = 0.002; g.add(shadow);
-    const glowDisc = disc(0.5, 1.0, 0x2ec4b6, 0.18, THREE.AdditiveBlending); glowDisc.position.y = 0.001; g.add(glowDisc);
+    const glowDisc = disc(0.5, 1.0, 0xc2dde4, 0.18, THREE.AdditiveBlending); glowDisc.position.y = 0.001; g.add(glowDisc);
     g.position.y = -1.05;
     this.ticks = ticks;
     this.pedestal = g;
@@ -179,9 +179,9 @@ export class HardwareViewer {
   addPlaceholder() {
     // Clearly marked stand-in: teal wireframe "probe" shape.
     const group = new THREE.Group();
-    const mat = new THREE.MeshBasicMaterial({ color: 0x2ec4b6, wireframe: true, transparent: true, opacity: 0.8 });
+    const mat = new THREE.MeshBasicMaterial({ color: 0xc2dde4, wireframe: true, transparent: true, opacity: 0.8 });
     group.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.7, 1), mat));
-    const legMat = new THREE.MeshBasicMaterial({ color: 0xa7adba, wireframe: true });
+    const legMat = new THREE.MeshBasicMaterial({ color: 0x9db7c2, wireframe: true });
     for (let i = 0; i < 3; i++) {
       const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.1, 6), legMat);
       const a = (i / 3) * Math.PI * 2;
@@ -202,9 +202,9 @@ export class HardwareViewer {
     const inv = this.pivot.matrixWorld.clone().invert();
     const cv = document.createElement('canvas'); cv.width = cv.height = 64;
     const c = cv.getContext('2d');
-    c.fillStyle = 'rgba(46,196,182,.25)'; c.beginPath(); c.arc(32, 32, 30, 0, 7); c.fill();
-    c.strokeStyle = '#E8ECF5'; c.lineWidth = 5; c.beginPath(); c.arc(32, 32, 18, 0, 7); c.stroke();
-    c.fillStyle = '#2EC4B6'; c.beginPath(); c.arc(32, 32, 9, 0, 7); c.fill();
+    c.fillStyle = 'rgba(194,221,228,.25)'; c.beginPath(); c.arc(32, 32, 30, 0, 7); c.fill();
+    c.strokeStyle = '#C2DDE4'; c.lineWidth = 5; c.beginPath(); c.arc(32, 32, 18, 0, 7); c.stroke();
+    c.fillStyle = '#C2DDE4'; c.beginPath(); c.arc(32, 32, 9, 0, 7); c.fill();
     const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
     const whole = new THREE.Box3().setFromObject(this.model);
     list.forEach((h, i) => {
@@ -443,7 +443,7 @@ export function polish(obj) {
 /** Replace every material with a dark body + teal rim: the "unscanned" look. */
 export function applySilhouette(obj) {
   const mat = new THREE.ShaderMaterial({
-    uniforms: { uRim: { value: new THREE.Color(0x2ec4b6) } },
+    uniforms: { uRim: { value: new THREE.Color(0xc2dde4) } },
     vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix*vec4(position,1.); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }',
     fragmentShader: 'uniform vec3 uRim; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1. - abs(dot(normalize(vN), vV)), 2.5); gl_FragColor = vec4(mix(vec3(0.03,0.05,0.12), uRim, f), 1.); }',
     side: THREE.DoubleSide,

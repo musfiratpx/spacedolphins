@@ -4,7 +4,7 @@
     {
       "id": "moon",
       "name": "The Moon: Nearest Neighbors",
-      "color": "#A7ADBA",
+      "color": "#9DB7C2",
       "song": "moon-calm",
       "songTitle": "Nearest Neighbors",
       "bpm": 100
@@ -12,7 +12,7 @@
     {
       "id": "mars",
       "name": "Mars: The Red Archive",
-      "color": "#D9622B",
+      "color": "#C9374C",
       "song": "mars-drive",
       "songTitle": "The Red Archive",
       "bpm": 112
@@ -20,7 +20,7 @@
     {
       "id": "deep",
       "name": "Deep Space: The Long Signal",
-      "color": "#7B6CF6",
+      "color": "#A66CFF",
       "song": "deep-signal",
       "songTitle": "The Long Signal",
       "bpm": 140
@@ -428,7 +428,7 @@
         "I launched in 1977 and flew past Jupiter and Saturn.",
         "In August 2012 I left the Sun's bubble and entered interstellar space.",
         "Engineers turn my instruments off one by one to save power.",
-        "I am still talking to Earth."
+        "I am still active as of 2026."
       ],
       "numanNote": "The Numans can hear it humming far away.",
       "teaser": "Its signal takes almost a day to reach Earth.",

@@ -10,8 +10,9 @@ import { getHardware, getAsteroids } from '../core/data.js';
 import { on, emit } from '../core/bus.js';
 import { foley } from '../audio/foley.js';
 import { drawPatchBoard } from '../ui/patches.js';
+import { dashboardPhoto } from '../ui/photos.js';
 
-const PALETTE = { teal: 0x2ec4b6, amber: 0xf2b134, rust: 0xd9622b, star: 0xe8ecf5 };
+const PALETTE = { teal: 0xc2dde4, amber: 0xc9374c, rust: 0xc9374c, star: 0xc2dde4 };
 
 export class Cockpit {
   constructor(renderer, camera) {
@@ -27,7 +28,7 @@ export class Cockpit {
       panel: std(0x262f5e, 0.6, 0.4),
       dark: std(0x0c1129, 0.7, 0.3),
       rubber: std(0x070a18, 0.9, 0.0),
-      chrome: std(0xa7adba, 0.25, 0.9),
+      chrome: std(0x9db7c2, 0.25, 0.9),
       pot: std(0x8a4a2a, 0.8, 0.0),
       leaf: std(0x3fa34d, 0.7, 0.0),
       trim: new THREE.MeshBasicMaterial({ color: PALETTE.teal, transparent: true, opacity: 0.7 }),
@@ -40,7 +41,7 @@ export class Cockpit {
     // Interior lights live on the camera and never get removed or hidden: changing
     // the number of lights forces every shader to recompile (a visible hitch).
     this.lights = [
-      [PALETTE.teal, 1.6, [0, -0.3, -0.65]], [PALETTE.amber, 0.9, [0, 0.39, -0.6]], [0x7b6cf6, 0.7, [0, 0, -0.7]],
+      [PALETTE.teal, 1.6, [0, -0.3, -0.65]], [PALETTE.amber, 0.9, [0, 0.39, -0.6]], [0xa66cff, 0.8, [0, 0, -0.7]],
     ].map(([c, i, p]) => { const l = new THREE.PointLight(c, 0, 1.4, 2); l.position.set(...p); l.userData.base = i; camera.add(l); return l; });
     this.plushies = {};      // region id -> mesh group
     this.aspect = 0;
@@ -272,7 +273,7 @@ export class Cockpit {
     gr.addColorStop(0.6, 'rgba(180,230,255,0.04)'); gr.addColorStop(0.64, 'rgba(255,255,255,0)');
     c2.fillStyle = gr; c2.fillRect(0, 0, 256, 256);
     const vg = c2.createRadialGradient(128, 128, 60, 128, 128, 180);
-    vg.addColorStop(0, 'rgba(46,196,182,0)'); vg.addColorStop(1, 'rgba(46,196,182,0.10)');
+    vg.addColorStop(0, 'rgba(194,221,228,0)'); vg.addColorStop(1, 'rgba(194,221,228,0.10)');
     c2.fillStyle = vg; c2.fillRect(0, 0, 256, 256);
     add(new THREE.PlaneGeometry(hw * 2.2, hh * 2.1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(gc), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }), 0, 0, Z * 1.1);
   }
@@ -307,13 +308,13 @@ export class Cockpit {
         const knob = new THREE.Mesh(new THREE.SphereGeometry(r * 0.09, 12, 8), cupMat); knob.position.z = r * 0.16; root.add(knob);
         const swing = new THREE.Group(); swing.position.z = r * 0.18; root.add(swing);
         const len = spot.len ? spot.len / spot.s : r * 2.2;
-        const string = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.012, r * 0.012, len, 6), new THREE.MeshBasicMaterial({ color: 0xe8ecf5 }));
+        const string = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.012, r * 0.012, len, 6), new THREE.MeshBasicMaterial({ color: 0xc2dde4 }));
         string.position.y = -len / 2; swing.add(string);
         // a fabric hanging loop sewn on top of the head (like a real plush toy);
         // the string ties to the top of the loop. Head top is ~1.85r above the feet.
         const loopR = r * 0.12;
         body.position.y = -len - loopR - r * 1.85;
-        const loop = new THREE.Mesh(new THREE.TorusGeometry(loopR, r * 0.028, 8, 16, Math.PI), new THREE.MeshStandardMaterial({ color: 0xe8ecf5, roughness: 0.9 }));
+        const loop = new THREE.Mesh(new THREE.TorusGeometry(loopR, r * 0.028, 8, 16, Math.PI), new THREE.MeshStandardMaterial({ color: 0xc2dde4, roughness: 0.9 }));
         loop.position.y = r * 1.85;            // upper half-ring sits on the head, fully above it
         body.add(loop);
         holder = swing;
@@ -383,7 +384,7 @@ export class Cockpit {
     // smiling Mars
     sticker((c, w) => {
       c.fillStyle = '#fff'; c.beginPath(); c.arc(w / 2, w / 2, w * 0.48, 0, 7); c.fill();
-      const g = c.createRadialGradient(w * 0.4, w * 0.4, 5, w / 2, w / 2, w * 0.44); g.addColorStop(0, '#f08a4b'); g.addColorStop(1, '#b8471d');
+      const g = c.createRadialGradient(w * 0.4, w * 0.4, 5, w / 2, w / 2, w * 0.44); g.addColorStop(0, '#f08a4b'); g.addColorStop(1, '#76101e');
       c.fillStyle = g; c.beginPath(); c.arc(w / 2, w / 2, w * 0.44, 0, 7); c.fill();
       c.fillStyle = '#7a2e12'; for (const [x, y, r] of [[.35, .3, .06], [.68, .62, .05], [.3, .7, .04]]) { c.beginPath(); c.arc(w * x, w * y, w * r, 0, 7); c.fill(); }
       c.fillStyle = '#1b1030'; c.beginPath(); c.arc(w * .4, w * .45, w * .04, 0, 7); c.arc(w * .6, w * .45, w * .04, 0, 7); c.fill();
@@ -391,10 +392,10 @@ export class Cockpit {
     }, S, S, -hw * 0.18, this.shelf.y - hh * 0.035, this.shelf.z + 0.11, 0.2, 0, 128);   // stuck on the left screen, a bit crooked
     // "4052 CREW" star badge
     sticker((c, w) => {
-      c.translate(w / 2, w / 2); c.fillStyle = '#F2B134'; c.beginPath();
+      c.translate(w / 2, w / 2); c.fillStyle = '#C9374C'; c.beginPath();
       for (let i = 0; i < 10; i++) { const r = i % 2 ? w * .2 : w * .46; const a = i * Math.PI / 5 - Math.PI / 2; c.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
       c.closePath(); c.fill(); c.lineWidth = w * .03; c.strokeStyle = '#fff'; c.stroke();
-      c.fillStyle = '#0B1026'; c.font = `900 ${w * .14}px Nunito, sans-serif`; c.textAlign = 'center'; c.fillText('4052', 0, w * .02); c.font = `700 ${w * .08}px Nunito, sans-serif`; c.fillText('CREW', 0, w * .11);
+      c.fillStyle = '#0B1F3A'; c.font = `900 ${w * .14}px Nunito, sans-serif`; c.textAlign = 'center'; c.fillText('4052', 0, w * .02); c.font = `700 ${w * .08}px Nunito, sans-serif`; c.fillText('CREW', 0, w * .11);
     }, S * 1.1, S * 1.1, 0, hh * 0.42, 0.08, -0.1, 0, 128, this.pillars[1]);
     // mission patch board: a patch for every machine you've scanned
     const bw = hw * 0.075;
@@ -406,20 +407,20 @@ export class Cockpit {
     };
     // rocket doodle
     sticker((c, w, h) => {
-      c.fillStyle = '#e8ecf5'; c.fillRect(0, 0, w, h);
-      c.strokeStyle = '#2EC4B6'; c.lineWidth = w * 0.045; c.lineCap = 'round';
+      c.fillStyle = '#c2dde4'; c.fillRect(0, 0, w, h);
+      c.strokeStyle = '#C2DDE4'; c.lineWidth = w * 0.045; c.lineCap = 'round';
       c.beginPath(); c.moveTo(w * .5, h * .12); c.quadraticCurveTo(w * .75, h * .4, w * .62, h * .72); c.lineTo(w * .38, h * .72); c.quadraticCurveTo(w * .25, h * .4, w * .5, h * .12); c.stroke();
       c.beginPath(); c.arc(w * .5, h * .4, w * .07, 0, 7); c.stroke();
-      c.strokeStyle = '#D9622B'; c.beginPath(); c.moveTo(w * .42, h * .78); c.lineTo(w * .46, h * .92); c.moveTo(w * .58, h * .78); c.lineTo(w * .54, h * .92); c.stroke();
+      c.strokeStyle = '#C9374C'; c.beginPath(); c.moveTo(w * .42, h * .78); c.lineTo(w * .46, h * .92); c.moveTo(w * .58, h * .78); c.lineTo(w * .54, h * .92); c.stroke();
     }, S * 1.4, S * 1.7, hw * 0.12, -hh * 0.34, Z * 1.06, 0.14, 0, 256).userData.info = { title: 'Rocket doodle', text: 'Every machine in the Archive began its trip on top of a rocket. Somebody on this ship really liked drawing them.' };
     // Numan face
     sticker((c, w) => {
-      c.fillStyle = '#2EC4B6'; c.beginPath(); c.ellipse(w / 2, w * .55, w * .42, w * .38, 0, 0, 7); c.fill();
+      c.fillStyle = '#C2DDE4'; c.beginPath(); c.ellipse(w / 2, w * .55, w * .42, w * .38, 0, 0, 7); c.fill();
       c.fillStyle = '#fff'; c.beginPath(); c.arc(w * .36, w * .5, w * .1, 0, 7); c.arc(w * .64, w * .5, w * .1, 0, 7); c.fill();
-      c.fillStyle = '#0B1026'; c.beginPath(); c.arc(w * .37, w * .52, w * .06, 0, 7); c.arc(w * .65, w * .52, w * .06, 0, 7); c.fill();
-      c.strokeStyle = '#0B1026'; c.lineWidth = w * .03; c.beginPath(); c.arc(w / 2, w * .66, w * .08, 0.3, Math.PI - 0.3); c.stroke();
-      c.strokeStyle = '#2EC4B6'; c.lineWidth = w * .04; c.beginPath(); c.moveTo(w / 2, w * .18); c.lineTo(w / 2, w * .05); c.stroke();
-      c.fillStyle = '#F2B134'; c.beginPath(); c.arc(w / 2, w * .05, w * .05, 0, 7); c.fill();
+      c.fillStyle = '#0B1F3A'; c.beginPath(); c.arc(w * .37, w * .52, w * .06, 0, 7); c.arc(w * .65, w * .52, w * .06, 0, 7); c.fill();
+      c.strokeStyle = '#0B1F3A'; c.lineWidth = w * .03; c.beginPath(); c.arc(w / 2, w * .66, w * .08, 0.3, Math.PI - 0.3); c.stroke();
+      c.strokeStyle = '#C2DDE4'; c.lineWidth = w * .04; c.beginPath(); c.moveTo(w / 2, w * .18); c.lineTo(w / 2, w * .05); c.stroke();
+      c.fillStyle = '#C9374C'; c.beginPath(); c.arc(w / 2, w * .05, w * .05, 0, 7); c.fill();
     }, S, S, hw * 0.12, this.shelf.y - hh * 0.03, this.shelf.z + 0.11, -0.15, 0, 128);   // and one on the middle screen
     // holographic star (iridescent)
     sticker((c, w) => {
@@ -430,15 +431,15 @@ export class Cockpit {
     }, S * 1.2, S * 1.2, hw * 0.25, hh * 0.75, Z * 1.06, 0.3, 0, 128);
     // "scan, don't recover" ribbon on the overhead edge
     sticker((c, w, h) => {
-      c.fillStyle = '#D9622B'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = `900 ${h * .55}px Nunito, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('SCAN · DON\'T RECOVER', w / 2, h / 2 + 2);
+      c.fillStyle = '#C9374C'; c.fillRect(0, 0, w, h); c.fillStyle = '#fff'; c.font = `900 ${h * .55}px Nunito, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('SCAN · DON\'T RECOVER', w / 2, h / 2 + 2);
     }, S * 3, S * 0.45, hw * 0.35, -this.topBarH * 0.12, 0.092, -0.02, 0, 512, this.topBar).userData.info = { title: 'Scan, don\'t recover', text: 'The rule every recovery ship follows: scan a hologram copy for the Archive, and leave the real machine where it rests, as a monument.' };
 
     // workplace-safety-style sign on the canopy bar (the crew's sense of humor)
     sticker((c, w, h) => {
-      c.fillStyle = '#F2B134'; c.fillRect(0, 0, w, h); c.fillStyle = '#0B1026'; c.fillRect(w * .02, h * .08, w * .96, h * .84);
-      c.fillStyle = '#F2B134'; c.font = `800 ${h * .3}px Nunito, sans-serif`; c.textAlign = 'center';
+      c.fillStyle = '#C9374C'; c.fillRect(0, 0, w, h); c.fillStyle = '#0B1F3A'; c.fillRect(w * .02, h * .08, w * .96, h * .84);
+      c.fillStyle = '#C9374C'; c.font = `800 ${h * .3}px Nunito, sans-serif`; c.textAlign = 'center';
       c.fillText('DAYS SINCE LAST ASTEROID', w * .42, h * .58);
-      c.fillStyle = '#e8ecf5'; c.fillRect(w * .84, h * .18, w * .13, h * .64); c.fillStyle = '#D9622B'; c.font = `900 ${h * .55}px "Space Mono", monospace`; c.fillText('0', w * .905, h * .7);
+      c.fillStyle = '#c2dde4'; c.fillRect(w * .84, h * .18, w * .13, h * .64); c.fillStyle = '#C9374C'; c.font = `900 ${h * .55}px "Space Mono", monospace`; c.fillText('0', w * .905, h * .7);
     }, S * 3.4, S * 0.5, -hw * 0.38, -this.topBarH * 0.12, 0.092, 0.01, 0, 512, this.topBar).userData.info = { title: 'Days since last asteroid: 0', text: 'The crew\'s favorite joke. The counter has never gone above zero. That is why the Numans\' songs matter.' };
 
     // sticky note with your real best grade
@@ -448,22 +449,36 @@ export class Cockpit {
     sticker((c, w, h) => {
       c.fillStyle = '#f7f3e8'; c.fillRect(0, 0, w, h);
       c.fillStyle = 'rgba(200,220,240,.5)'; c.fillRect(w * .35, 0, w * .3, h * .07);
-      c.fillStyle = '#26324f'; c.font = `700 ${w * .085}px "Space Mono", monospace`;
+      c.fillStyle = '#133769'; c.font = `700 ${w * .085}px "Space Mono", monospace`;
       ['PRE-FLIGHT', '☑ Shield check', '☑ Calibrate lanes', '☑ Feed the Numans?', '☐ Call Earth'].forEach((l, i) => c.fillText(l, w * .08, h * (.2 + i * .16)));
     }, S * 1.6, S * 2.05, hw * 0.49, -hh * 0.53, Z * 1.06, 0.06, 0, 256).userData.info = { title: 'Pre-flight checklist', text: 'Left by the traveler before you. Nobody knows who ticked "Feed the Numans?" or whether Numans even eat. "Call Earth" still is not done.' };
-    // drawn Earth polaroid
-    sticker((c, w, h) => {
+    // polaroid on the dash: a REAL photo of Earth and the Moon, taken by Voyager 1 (NASA/JPL)
+    const dash = dashboardPhoto();
+    const img = new Image();
+    const drawPolaroid = (c, w, h) => {
       c.fillStyle = '#fbfbf7'; c.fillRect(0, 0, w, h);
-      c.fillStyle = '#0b1026'; c.fillRect(w * .08, w * .08, w * .84, w * .84);
-      const g = c.createRadialGradient(w * .45, w * .45, 4, w / 2, w / 2, w * .3); g.addColorStop(0, '#5aa8ff'); g.addColorStop(1, '#1d4f9c');
-      c.fillStyle = g; c.beginPath(); c.arc(w / 2, w / 2, w * .3, 0, 7); c.fill();
-      c.fillStyle = '#3fa34d'; c.beginPath(); c.ellipse(w * .44, w * .45, w * .1, w * .14, .4, 0, 7); c.fill(); c.beginPath(); c.ellipse(w * .6, w * .6, w * .07, w * .05, -.3, 0, 7); c.fill();
-      c.fillStyle = '#26324f'; c.font = `700 ${w * .08}px "Space Mono", monospace`; c.textAlign = 'center'; c.fillText('home ♥', w / 2, h * .92);
-    }, S * 1.25, S * 1.5, -hw * 0.52, this.shelf.y + S * 0.75, this.shelf.z, 0.05, 0.12, 256).userData.info = { title: 'Home', text: 'A drawing of Earth from orbit, taped up by an earlier traveler. In 4052 it is still the only home people have, and it still needs its shield.' };
+      const pad = w * 0.08; const box = w * 0.84;
+      c.fillStyle = '#03050c'; c.fillRect(pad, pad, box, box);
+      if (img.complete && img.naturalWidth) {
+        const k = Math.min(box / img.naturalWidth, box / img.naturalHeight);   // fit the whole photo
+        const iw = img.naturalWidth * k; const ih = img.naturalHeight * k;
+        c.drawImage(img, pad + (box - iw) / 2, pad + (box - ih) / 2, iw, ih);
+      }
+      c.fillStyle = '#133769'; c.textAlign = 'center';
+      c.font = `700 ${w * 0.075}px "Space Mono", monospace`;
+      c.fillText(dash ? 'home ♥ Earth + Moon' : 'home ♥', w / 2, h * 0.86);
+      if (dash) { c.font = `400 ${w * 0.058}px "Space Mono", monospace`; c.fillText(`by ${dash.camera} · ${dash.taken.split(' ').pop()}`, w / 2, h * 0.94); }
+    };
+    const polaroid = sticker(drawPolaroid, S * 1.25, S * 1.5, -hw * 0.52, this.shelf.y + S * 0.75, this.shelf.z, 0.05, 0.12, 256);
+    if (dash) {
+      img.onload = () => { const map = polaroid.material.map; drawPolaroid(map.image.getContext('2d'), map.image.width, map.image.height); map.needsUpdate = true; };
+      img.src = dash.file;
+      polaroid.userData.info = { title: `Home, photographed by ${dash.camera}`, kind: 'real', text: `${dash.caption} Taken ${dash.taken}. Credit: ${dash.credit}.` };
+    }
 
     // coffee mug on the dash
     const mug = new THREE.Group(); mug.position.set(-hw * 0.33, this.shelf.y, this.shelf.z);
-    const mugMat = new THREE.MeshStandardMaterial({ color: 0xd9622b, roughness: 0.45, envMap: this.env, envMapIntensity: 0.4 });
+    const mugMat = new THREE.MeshStandardMaterial({ color: 0xc9374c, roughness: 0.45, envMap: this.env, envMapIntensity: 0.4 });
     const cup = new THREE.Mesh(new THREE.CylinderGeometry(hh * 0.022, hh * 0.019, hh * 0.05, 20, 1, true), mugMat); cup.position.y = hh * 0.025; mug.add(cup);
     const bottom = new THREE.Mesh(new THREE.CircleGeometry(hh * 0.019, 20), mugMat); bottom.rotation.x = -Math.PI / 2; mug.add(bottom);
     const coffee = new THREE.Mesh(new THREE.CircleGeometry(hh * 0.021, 20), new THREE.MeshStandardMaterial({ color: 0x2a160c, roughness: 0.2 })); coffee.rotation.x = -Math.PI / 2; coffee.position.y = hh * 0.042; mug.add(coffee);
@@ -472,13 +487,13 @@ export class Cockpit {
     this.pokeable(mug, () => { foley.clink(); this.steam(mug); });
     // keycard lanyard hanging from the overhead panel (sways a little)
     this.lanyard = new THREE.Group(); this.lanyard.position.set(-hw * 0.22, hh * 0.86, Z + 0.32);
-    const strap = new THREE.Mesh(new THREE.BoxGeometry(hh * 0.008, hh * 0.18, hh * 0.002), new THREE.MeshStandardMaterial({ color: 0x2ec4b6, roughness: 0.8 }));
+    const strap = new THREE.Mesh(new THREE.BoxGeometry(hh * 0.008, hh * 0.18, hh * 0.002), new THREE.MeshStandardMaterial({ color: 0xc2dde4, roughness: 0.8 }));
     strap.position.y = -hh * 0.09; this.lanyard.add(strap);
     const card = sticker((c, w, h) => {
-      c.fillStyle = '#e8ecf5'; c.fillRect(0, 0, w, h); c.fillStyle = '#2EC4B6'; c.fillRect(0, 0, w, h * .25);
-      c.fillStyle = '#0B1026'; c.font = `900 ${w * .12}px Nunito, sans-serif`; c.fillText('RECOVERY', w * .08, h * .17);
-      c.fillStyle = '#A7ADBA'; c.fillRect(w * .08, h * .35, w * .35, h * .4);
-      c.fillStyle = '#26324f'; c.font = `700 ${w * .09}px "Space Mono", monospace`; c.fillText('TRAVELER', w * .5, h * .5); c.fillText('ID 4052', w * .5, h * .66);
+      c.fillStyle = '#c2dde4'; c.fillRect(0, 0, w, h); c.fillStyle = '#C2DDE4'; c.fillRect(0, 0, w, h * .25);
+      c.fillStyle = '#0B1F3A'; c.font = `900 ${w * .12}px Nunito, sans-serif`; c.fillText('RECOVERY', w * .08, h * .17);
+      c.fillStyle = '#9DB7C2'; c.fillRect(w * .08, h * .35, w * .35, h * .4);
+      c.fillStyle = '#133769'; c.font = `700 ${w * .09}px "Space Mono", monospace`; c.fillText('TRAVELER', w * .5, h * .5); c.fillText('ID 4052', w * .5, h * .66);
     }, hh * 0.05, hh * 0.07, 0, 0, 0, 0, 0, 128);
     this.group.remove(card); card.position.set(0, -hh * 0.2, 0.002); this.lanyard.add(card);
     this.group.add(this.lanyard);
@@ -589,44 +604,44 @@ export class Cockpit {
   draw(s, t, still, pulse) {
     const { ctx: c, cv } = s; const W = cv.width; const H = cv.height;
     c.fillStyle = '#06122a'; c.fillRect(0, 0, W, H);
-    c.strokeStyle = 'rgba(46,196,182,0.12)'; c.lineWidth = 1;
+    c.strokeStyle = 'rgba(194,221,228,0.12)'; c.lineWidth = 1;
     for (let x = 0; x < W; x += 16) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke(); }
     for (let y = 0; y < H; y += 16) { c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
-    c.font = '700 13px "Space Mono", monospace'; c.fillStyle = '#2EC4B6';
+    c.font = '700 13px "Space Mono", monospace'; c.fillStyle = '#C2DDE4';
     if (s.kind === 'radar') {
       const cx = W / 2; const cy = H / 2 + 6; const R = 62;
-      c.strokeStyle = 'rgba(46,196,182,.5)';
+      c.strokeStyle = 'rgba(194,221,228,.5)';
       for (const r of [R, R * 0.66, R * 0.33]) { c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.stroke(); }
       const a = still ? 0.6 : t * 1.4;
       const sweep = c.createConicGradient ? c.createConicGradient(a - 0.8, cx, cy) : null;
       if (sweep) {
-        sweep.addColorStop(0, 'rgba(46,196,182,0)'); sweep.addColorStop(0.12, 'rgba(46,196,182,0.45)'); sweep.addColorStop(0.13, 'rgba(46,196,182,0)');
+        sweep.addColorStop(0, 'rgba(194,221,228,0)'); sweep.addColorStop(0.12, 'rgba(194,221,228,0.45)'); sweep.addColorStop(0.13, 'rgba(194,221,228,0)');
         c.fillStyle = sweep; c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.fill();
       }
       for (let i = 0; i < 6; i++) {
         const ba = i * 1.9 + 0.4; const br = R * (0.3 + ((i * 37) % 60) / 100);
         const age = ((a - ba) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
-        c.fillStyle = `rgba(242,177,52,${Math.max(0.15, 1 - age / 4)})`;
+        c.fillStyle = `rgba(201,55,76,${Math.max(0.15, 1 - age / 4)})`;
         c.beginPath(); c.arc(cx + Math.cos(ba) * br, cy + Math.sin(ba) * br, 3, 0, Math.PI * 2); c.fill();
       }
-      c.fillStyle = '#2EC4B6'; c.fillText('ROCK SCAN', 8, 16);
+      c.fillStyle = '#C2DDE4'; c.fillText('ROCK SCAN', 8, 16);
       // a real near-Earth asteroid from this week's NASA NeoWs snapshot
       const rocks = getAsteroids();
       if (rocks.length) {
         const a = rocks[Math.floor(t / 4) % rocks.length];
-        c.fillStyle = '#F2B134'; c.font = '700 11px "Space Mono", monospace';
+        c.fillStyle = '#C9374C'; c.font = '700 11px "Space Mono", monospace';
         c.fillText(a.name.replace(/^\d+ /, '').slice(0, 22), 8, H - 10);
       }
     } else if (s.kind === 'wave') {
       c.fillText('NUMAN SIGNAL', 8, 16);
-      c.strokeStyle = '#2EC4B6'; c.lineWidth = 2; c.beginPath();
+      c.strokeStyle = '#C2DDE4'; c.lineWidth = 2; c.beginPath();
       for (let x = 0; x <= W; x += 3) {
         const p = x / W;
         const y = H / 2 + 10 + Math.sin(p * 18 + (still ? 0 : t * 4)) * 18 * (0.6 + pulse) * Math.sin(p * Math.PI) + Math.sin(p * 47 + t * 7) * 4;
         x ? c.lineTo(x, y) : c.moveTo(x, y);
       }
       c.stroke();
-      c.strokeStyle = 'rgba(217,98,43,.8)'; c.lineWidth = 1.5; c.beginPath();
+      c.strokeStyle = 'rgba(201,55,76,.8)'; c.lineWidth = 1.5; c.beginPath();
       for (let x = 0; x <= W; x += 3) {
         const p = x / W; const y = H / 2 + 10 + Math.sin(p * 9 - (still ? 0 : t * 2.3)) * 10 * Math.sin(p * Math.PI);
         x ? c.lineTo(x, y) : c.moveTo(x, y);
@@ -638,17 +653,17 @@ export class Cockpit {
       let got = 0; let total = 12;
       try { const { machines } = getHardware(); total = machines.length; got = machines.filter((m) => state.unlocked[m.id]).length; } catch { /* */ }
       c.fillText('MISSION CLOCK', 8, 16);
-      c.fillStyle = '#E8ECF5'; c.font = '700 22px "Space Mono", monospace';
+      c.fillStyle = '#C2DDE4'; c.font = '700 22px "Space Mono", monospace';
       c.fillText('4052.11.14', 8, 50);
-      c.fillStyle = '#F2B134'; c.fillText(`T+${mm}:${ss}`, 8, 80);
-      c.fillStyle = '#2EC4B6'; c.font = '700 13px "Space Mono", monospace';
+      c.fillStyle = '#C9374C'; c.fillText(`T+${mm}:${ss}`, 8, 80);
+      c.fillStyle = '#C2DDE4'; c.font = '700 13px "Space Mono", monospace';
       c.fillText(`ARCHIVE ${got}/${total}`, 8, 110);
-      c.fillStyle = 'rgba(46,196,182,.25)'; c.fillRect(8, 120, W - 16, 10);
-      c.fillStyle = '#2EC4B6'; c.fillRect(8, 120, (W - 16) * (got / Math.max(1, total)), 10);
-      if (!still && Math.floor(t * 1.5) % 2) { c.fillStyle = '#F2B134'; c.fillText('SHIELD LOW', 8, 150); }
+      c.fillStyle = 'rgba(194,221,228,.25)'; c.fillRect(8, 120, W - 16, 10);
+      c.fillStyle = '#C2DDE4'; c.fillRect(8, 120, (W - 16) * (got / Math.max(1, total)), 10);
+      if (!still && Math.floor(t * 1.5) % 2) { c.fillStyle = '#C9374C'; c.fillText('SHIELD LOW', 8, 150); }
     }
     const fk = (performance.now() - (s.flashT || 0)) / 600;
-    if (fk < 1) { c.fillStyle = `rgba(46,196,182,${(0.28 * (1 - fk)).toFixed(3)})`; c.fillRect(0, 0, W, H); }
+    if (fk < 1) { c.fillStyle = `rgba(194,221,228,${(0.28 * (1 - fk)).toFixed(3)})`; c.fillRect(0, 0, W, H); }
     // scan lines
     c.fillStyle = 'rgba(0,0,0,0.18)';
     for (let y = 0; y < H; y += 3) c.fillRect(0, y, W, 1);
@@ -661,9 +676,9 @@ export class Cockpit {
 // big glossy eyes, glowing antenna tips. Moon: the classic two antennae. Mars: one tall
 // antenna and freckles. Deep space: three eyes.
 const NUMAN_LOOK = {
-  moon: { body: 0xc9c3e6, cheek: 0xf2a1c4, glow: 0xe8ecf5 },
-  mars: { body: 0xe8804a, cheek: 0xffb08a, glow: 0x2ec4b6 },
-  deep: { body: 0x8f7cf7, cheek: 0xd9a6ff, glow: 0xf2b134 },
+  moon: { body: 0xc9c3e6, cheek: 0xf2a1c4, glow: 0xc2dde4 },
+  mars: { body: 0xe8804a, cheek: 0xffb08a, glow: 0xc2dde4 },
+  deep: { body: 0x8f7cf7, cheek: 0xd9a6ff, glow: 0xc9374c },
 };
 
 export function makeNuman(kind, r) {
@@ -671,7 +686,7 @@ export function makeNuman(kind, r) {
   const g = new THREE.Group();
   const felt = new THREE.MeshPhysicalMaterial({ color: look.body, roughness: 0.9, sheen: 0.35, sheenRoughness: 0.8, sheenColor: new THREE.Color(look.body).lerp(new THREE.Color(0xffffff), 0.3), emissive: look.body, emissiveIntensity: 0.08 });
   const white = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
-  const black = new THREE.MeshPhysicalMaterial({ color: 0x0b1026, roughness: 0.05, clearcoat: 1 });
+  const black = new THREE.MeshPhysicalMaterial({ color: 0x0b1f3a, roughness: 0.05, clearcoat: 1 });
   const glow = new THREE.MeshBasicMaterial({ color: look.glow });
   const cheekM = new THREE.MeshBasicMaterial({ color: look.cheek, transparent: true, opacity: 0.8 });
   const add = (geo, mat, x, y, z, sx = 1, sy = 1, sz = 1) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); g.add(m); return m; };
@@ -708,7 +723,7 @@ export function makeNuman(kind, r) {
   g.userData.antenna = antenna;
   // region details
   if (kind === 'mars') {
-    const freck = new THREE.MeshBasicMaterial({ color: 0x9c3b17 });
+    const freck = new THREE.MeshBasicMaterial({ color: 0x76101e });
     for (const [fx, fy] of [[-0.55, 0.92], [-0.48, 0.85], [0.55, 0.92], [0.48, 0.85]]) add(new THREE.CircleGeometry(r * 0.035, 8), freck, fx * r, fy * r, r * 0.97);
   }
   return g;

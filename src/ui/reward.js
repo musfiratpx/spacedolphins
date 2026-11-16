@@ -50,9 +50,9 @@ export function showReward(region) {
     const scene = new THREE.Scene();
     const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
     cam.position.set(0, 1.4, 7.2); cam.lookAt(0, 1.25, 0);
-    scene.add(new THREE.HemisphereLight(0xe8ecf5, 0x1a1030, 1.4));
+    scene.add(new THREE.HemisphereLight(0xc2dde4, 0x1a1030, 1.4));
     const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(2, 4, 5); scene.add(key);
-    const rim = new THREE.DirectionalLight(0x2ec4b6, 2); rim.position.set(-3, 2, -3); scene.add(rim);
+    const rim = new THREE.DirectionalLight(0xc2dde4, 2); rim.position.set(-3, 2, -3); scene.add(rim);
 
     const color = makeNuman(region.id, 1);
     const shadow = makeNuman(region.id, 1);

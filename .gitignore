@@ -8,3 +8,6 @@ Thumbs.db
 *.log
 .vscode/*
 !.vscode/extensions.json
+
+# Team-only to-do list (kept local, not published)
+TODOME.md

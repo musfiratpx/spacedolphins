@@ -109,7 +109,7 @@
       "mission": "InSight",
       "source": "https://images.nasa.gov/details/JPL-20190423-INSIGHf-0001-First%20Likely%20Marsquake%20Heard%20by%20NASAs%20InSight",
       "credit": "NASA/JPL-Caltech",
-      "clip": "12.9\u201324.5 s of the video (the \"[Likely marsquake]\" segment)"
+      "clip": "12.9–24.5 s of the video (the \"[Likely marsquake]\" segment)"
     },
     "ingenuity-hum": {
       "title": "Ingenuity in flight, heard by Perseverance",
@@ -120,7 +120,7 @@
       "mission": "Mars 2020 / Ingenuity",
       "source": "https://images.nasa.gov/details/JPL-20210506-Listen%20to%20NASA%E2%80%99s%20Ingenuity%20Helicopter%20as%20it%20Flies%20on%20Mars-1080",
       "credit": "NASA/JPL-Caltech",
-      "clip": "26\u201340 s of the video (steady 84.5 Hz blade hum, no narration)"
+      "clip": "26–40 s of the video (steady 84.5 Hz blade hum, no narration)"
     },
     "mars-wind": {
       "title": "Perseverance: First Sounds from Mars",
@@ -131,7 +131,7 @@
       "mission": "Mars 2020 Perseverance",
       "source": "https://images.nasa.gov/details/JPL-20210222-M2020f-0003a-M2020_Audio_A_002",
       "credit": "NASA/JPL-Caltech",
-      "clip": "4.0\u201317.5 s of the video"
+      "clip": "4.0–17.5 s of the video"
     },
     "atlas-launch": {
       "title": "Atlas V: Launch",
@@ -270,6 +270,99 @@
       "file": "assets/textures/moon-bump.jpg",
       "source": "https://svs.gsfc.nasa.gov/4720/",
       "credit": "NASA's Scientific Visualization Studio (CGI Moon Kit; LRO/LOLA data)"
+    }
+  },
+  "photos": {
+    "viking1-first": {
+      "title": "The first photo from the surface of Mars",
+      "file": "assets/photos/PIA00381.jpg",
+      "source": "https://images.nasa.gov/details/PIA00381",
+      "credit": "NASA/JPL",
+      "takenBy": "Viking Lander 1, camera 2"
+    },
+    "viking1-morning": {
+      "title": "Morning on Chryse Planitia",
+      "file": "assets/photos/PIA03163.jpg",
+      "source": "https://images.nasa.gov/details/PIA03163",
+      "credit": "NASA/JPL",
+      "takenBy": "Viking Lander 1, camera 1"
+    },
+    "opportunity-shadow-endurance": {
+      "title": "Opportunity's shadow",
+      "file": "assets/photos/PIA06739.jpg",
+      "source": "https://images.nasa.gov/details/PIA06739",
+      "credit": "NASA/JPL",
+      "takenBy": "Opportunity, front hazard-avoidance camera"
+    },
+    "opportunity-shadow-endeavour": {
+      "title": "A long shadow at Endeavour Crater",
+      "file": "assets/photos/PIA16120.jpg",
+      "source": "https://images.nasa.gov/details/PIA16120",
+      "credit": "NASA/JPL-Caltech",
+      "takenBy": "Opportunity"
+    },
+    "insight-first-selfie": {
+      "title": "InSight's first selfie",
+      "file": "assets/photos/PIA22876.jpg",
+      "source": "https://images.nasa.gov/details/PIA22876",
+      "credit": "NASA/JPL-Caltech",
+      "takenBy": "InSight, Instrument Deployment Camera on its robotic arm"
+    },
+    "insight-sunset": {
+      "title": "Sunset on Mars",
+      "file": "assets/photos/PIA23202.jpg",
+      "source": "https://images.nasa.gov/details/PIA23202",
+      "credit": "NASA/JPL-Caltech",
+      "takenBy": "InSight, Instrument Deployment Camera"
+    },
+    "insight-final-selfie": {
+      "title": "InSight's final selfie",
+      "file": "assets/photos/PIA25287.jpg",
+      "source": "https://images.nasa.gov/details/PIA25287",
+      "credit": "NASA/JPL-Caltech",
+      "takenBy": "InSight, Instrument Deployment Camera"
+    },
+    "ingenuity-first-flight": {
+      "title": "Ingenuity's shadow on its first flight",
+      "file": "assets/photos/PIA24584.jpg",
+      "source": "https://images.nasa.gov/details/PIA24584",
+      "credit": "NASA/JPL-Caltech",
+      "takenBy": "Ingenuity, black-and-white navigation camera"
+    },
+    "ingenuity-first-color": {
+      "title": "The first color photo of Mars from the air",
+      "file": "assets/photos/PIA24593.jpg",
+      "source": "https://images.nasa.gov/details/PIA24593",
+      "credit": "NASA/JPL-Caltech",
+      "takenBy": "Ingenuity, color camera"
+    },
+    "voyager1-earth-moon": {
+      "title": "Earth and Moon together",
+      "file": "assets/photos/PIA00013.jpg",
+      "source": "https://images.nasa.gov/details/PIA00013",
+      "credit": "NASA/JPL",
+      "takenBy": "Voyager 1"
+    },
+    "voyager1-pale-blue-dot": {
+      "title": "The Pale Blue Dot",
+      "file": "assets/photos/PIA00452.jpg",
+      "source": "https://images.nasa.gov/details/PIA00452",
+      "credit": "NASA/JPL",
+      "takenBy": "Voyager 1, narrow-angle camera"
+    },
+    "voyager2-uranus": {
+      "title": "Uranus",
+      "file": "assets/photos/PIA18182.jpg",
+      "source": "https://images.nasa.gov/details/PIA18182",
+      "credit": "NASA/JPL-Caltech",
+      "takenBy": "Voyager 2"
+    },
+    "voyager2-neptune": {
+      "title": "Neptune",
+      "file": "assets/photos/PIA02210.jpg",
+      "source": "https://images.nasa.gov/details/PIA02210",
+      "credit": "NASA/JPL",
+      "takenBy": "Voyager 2"
     }
   }
 }

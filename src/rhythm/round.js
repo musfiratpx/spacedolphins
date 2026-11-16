@@ -3,7 +3,7 @@
 // freezes the clock, so music and notes stay locked together.
 import { Sequencer } from '../audio/sequencer.js';
 import { generateChart } from '../audio/charts.js';
-import { unlockAudio, getContext, getAudioTime, getOutputLatency } from '../audio/clock.js';
+import { unlockAudio, getContext, getHeardTime } from '../audio/clock.js';
 import { sfx } from '../audio/sfx.js';
 import { settings } from '../core/settings.js';
 import { judging, debug, features } from '../core/config.js';
@@ -19,6 +19,13 @@ const OVERDRIVE_MS = 6000;
 const BASE_TRAVEL_SEC = 1.6;
 const PERSPECTIVE = 3.2;   // how strongly the track recedes into the distance
 const LANE_KEYS = { a: 'L', arrowleft: 'L', d: 'R', arrowright: 'R' };
+
+/** ms between the input happening and our handler running (0 if the browser can't say). */
+function eventLag(e) {
+  const ts = e.timeStamp;
+  if (!ts || ts > 1e12) return 0;                     // old browsers: epoch timestamps
+  return Math.max(0, Math.min(150, performance.now() - ts));
+}
 
 export function gradeFor(acc) {
   return judging.grades.find(([, min]) => acc >= min)[0];
@@ -123,10 +130,14 @@ export class Round {
     window.__hhRound = this;   // handy in the browser console for debugging/testing
   }
 
-  /** Song time the player is hearing right now, in ms (includes output latency + offset setting). */
-  heardMs() {
-    const pos = getAudioTime() - this.seq.startTime;
-    return (pos - getOutputLatency()) * 1000 - settings.audioOffsetMs;
+  /**
+   * Song time the player is hearing, in ms (includes output latency + offset setting).
+   * lagMs: how long ago the key/tap actually happened. A busy frame can delay the event
+   * handler; judging the press at the moment it happened stops hits counting as late.
+   */
+  heardMs(lagMs = 0) {
+    const pos = getHeardTime() - this.seq.startTime;
+    return pos * 1000 - settings.audioOffsetMs - lagMs;
   }
 
   onKey(e) {
@@ -136,7 +147,7 @@ export class Round {
     if (e.key === 'F2') { e.preventDefault(); debug.clickTrack = !debug.clickTrack; this.toast(`Click track ${debug.clickTrack ? 'on' : 'off'}`); return; }
     if (this.paused) { if (k === 'r' && !this.counting) { this.destroy(); this.onQuit?.('restart'); } return; }
     const lane = LANE_KEYS[k];
-    if (lane) { e.preventDefault(); this.press(this.oneLane ? 'L' : lane); }
+    if (lane) { e.preventDefault(); this.press(this.oneLane ? 'L' : lane, eventLag(e)); }
   }
 
   onPointer(e) {
@@ -150,7 +161,7 @@ export class Round {
     else if (x >= laneX + laneW && x < laneX + laneW * 2) lane = 'R';
     else lane = x < rect.width / 2 ? 'L' : 'R';
     this.pointerLanes.set(e.pointerId, lane);
-    this.press(lane);
+    this.press(lane, eventLag(e));
   }
 
   /** Letting go of a lane: finishes (or drops) a hold note. */
@@ -197,9 +208,9 @@ export class Round {
     n.holding = false; n.holdResult = 'ok';
     this.addScore(150 + Math.round(n.hold / 10));
     this.charge(0.06);
-    this.feedback = { text: 'Hold!', sub: '', time: performance.now(), color: '#2EC4B6' };
+    this.feedback = { text: 'Hold!', sub: '', time: performance.now(), color: '#C2DDE4' };
     try { sfx.hit('perfect', this.combo); } catch { /* */ }
-    if (!settings.reducedMotion) this.spawnSparks(n.lane, 16, '242,177,52');
+    if (!settings.reducedMotion) this.spawnSparks(n.lane, 16, '201,55,76');
     this.updateHud();
   }
 
@@ -208,14 +219,14 @@ export class Round {
     // letting go early: the note counts as Good at best, and the combo breaks
     if (n.judged === 'perfect' || n.judged === 'great') { this.counts[n.judged]--; this.counts.good++; n.judged = 'good'; }
     this.combo = 0;
-    this.feedback = { text: 'Drop', sub: 'Hold until the tail ends', time: performance.now(), color: '#F2B134' };
+    this.feedback = { text: 'Drop', sub: 'Hold until the tail ends', time: performance.now(), color: '#C9374C' };
     try { sfx.miss(); } catch { /* */ }
     this.updateHud();
   }
 
-  press(lane) {
-    if (!this.seq || this.ended) return;
-    const now = this.heardMs();
+  press(lane, lagMs = 0) {
+    if (!this.seq || this.ended || this.paused) return;
+    const now = this.heardMs(lagMs);
     this.lanePress[lane] = performance.now();
     // nearest unjudged note in this lane within the Good window
     let best = null; let bestAbs = Infinity;
@@ -250,8 +261,8 @@ export class Round {
       sfx.hit(j, this.combo);
       emit('note:hit', { judgement: j, lane: note.lane, offsetMs: offset });
       if (j === 'perfect') { fx.hitStop(40); fx.burst(); }
-      this.bursts.push({ lane: note.lane, time: performance.now(), color: j === 'perfect' ? '#2EC4B6' : '#E8ECF5' });
-      if (!settings.reducedMotion) this.spawnSparks(note.lane, j === 'perfect' ? 14 : 8, j === 'perfect' ? '46,196,182' : '232,236,245');
+      this.bursts.push({ lane: note.lane, time: performance.now(), color: j === 'perfect' ? '#C2DDE4' : '#C2DDE4' });
+      if (!settings.reducedMotion) this.spawnSparks(note.lane, j === 'perfect' ? 14 : 8, j === 'perfect' ? '194,221,228' : '194,221,228');
       if ([25, 50, 100, 150, 200].includes(this.combo)) {
         emit('combo', { combo: this.combo });
         sfx.milestone();
@@ -264,7 +275,7 @@ export class Round {
       }
     }
     const sub = j === 'perfect' || j === 'miss' ? '' : (offset < 0 ? 'Early' : 'Late');
-    const color = { perfect: '#2EC4B6', great: '#E8ECF5', good: '#A7ADBA', miss: '#F2B134' }[j];
+    const color = { perfect: '#C2DDE4', great: '#C2DDE4', good: '#9DB7C2', miss: '#C9374C' }[j];
     this.feedback = { text: j === 'perfect' ? 'Perfect!' : j[0].toUpperCase() + j.slice(1), sub, time: performance.now(), color };
     this.updateHud();
   }
@@ -359,7 +370,7 @@ export class Round {
     const cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(w / 2)); cv.height = Math.max(1, Math.round(h / 2));
     const c = cv.getContext('2d');
     const g = c.createRadialGradient(cv.width / 2, cv.height * 0.6, Math.min(cv.width, cv.height) * 0.35, cv.width / 2, cv.height * 0.6, Math.max(cv.width, cv.height) * 0.75);
-    g.addColorStop(0, 'rgba(46,196,182,0)'); g.addColorStop(1, 'rgba(46,196,182,0.55)');
+    g.addColorStop(0, 'rgba(194,221,228,0)'); g.addColorStop(1, 'rgba(194,221,228,0.55)');
     c.fillStyle = g; c.fillRect(0, 0, cv.width, cv.height);
     this.vignette = cv;
   }
@@ -401,7 +412,7 @@ export class Round {
       if (!this.lastTick || performance.now() - this.lastTick > 100) {
         this.lastTick = performance.now();
         this.addScore(10);
-        if (!settings.reducedMotion) this.spawnSparks(lane, 2, '242,177,52');
+        if (!settings.reducedMotion) this.spawnSparks(lane, 2, '201,55,76');
         this.updateHud();
       }
     }
@@ -427,7 +438,7 @@ export class Round {
     const db = this.prep?.dataBreak;
     const inBreak = db && now >= db.startSec * 1000 && now < db.endSec * 1000;
     // rail color climbs with your combo: teal -> amber (50) -> pink (100)
-    const railRGB = this.combo >= 100 ? '255,122,200' : this.combo >= 50 ? '242,177,52' : '46,196,182';
+    const railRGB = this.combo >= 100 ? '255,122,200' : this.combo >= 50 ? '201,55,76' : '194,221,228';
 
     // speed streaks rushing past both sides of the track (faster with a bigger combo)
     if (!still) {
@@ -449,13 +460,13 @@ export class Round {
     // track bed
     const bed = this.quad(NEAR, 1, -half - 10, half + 10);
     const grad = g.createLinearGradient(0, bed.d.y, 0, bed.a.y);
-    grad.addColorStop(0, 'rgba(11,16,38,0)');
-    grad.addColorStop(0.5, 'rgba(11,16,38,0.55)');
-    grad.addColorStop(1, 'rgba(11,16,38,0.85)');
+    grad.addColorStop(0, 'rgba(11,31,58,0)');
+    grad.addColorStop(0.5, 'rgba(11,31,58,0.55)');
+    grad.addColorStop(1, 'rgba(11,31,58,0.85)');
     g.fillStyle = grad; g.fill();
     if (inBreak) {
       this.quad(NEAR, 1, -half - 10, half + 10);
-      g.fillStyle = `rgba(123,108,246,${(0.16 + beatPulse * 0.08 + (still ? 0 : Math.sin(wall / 300) * 0.04)).toFixed(3)})`; g.fill();
+      g.fillStyle = `rgba(166,108,255,${(0.16 + beatPulse * 0.08 + (still ? 0 : Math.sin(wall / 300) * 0.04)).toFixed(3)})`; g.fill();
     }
 
     // lanes (light up on press)
@@ -466,7 +477,7 @@ export class Round {
       const lit = since < 160 ? 1 - since / 160 : 0;
       const q = this.quad(NEAR, 1, x0 + 3, x1 - 3);
       const lg = g.createLinearGradient(0, q.d.y, 0, q.a.y);
-      const rgb = lane === 'L' ? '217,98,43' : '46,196,182';
+      const rgb = lane === 'L' ? '217,98,43' : '194,221,228';
       lg.addColorStop(0, `rgba(${rgb},0)`);
       lg.addColorStop(1, `rgba(${rgb},${0.10 + lit * 0.35})`);
       g.fillStyle = lg; g.fill();
@@ -480,7 +491,7 @@ export class Round {
       if (p < NEAR) continue;
       const a = this.proj(p, -half); const b = this.proj(p, half);
       const fade = 1 - Math.max(0, p);
-      g.strokeStyle = `rgba(232,236,245,${(k % 4 === 0 ? 0.28 : 0.1) * fade})`;
+      g.strokeStyle = `rgba(194,221,228,${(k % 4 === 0 ? 0.28 : 0.1) * fade})`;
       g.lineWidth = Math.max(1, (k % 4 === 0 ? 2 : 1) * a.s);
       g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
     }
@@ -495,16 +506,16 @@ export class Round {
         g.strokeStyle = `rgba(${railRGB},${(0.18 + beatPulse * 0.22).toFixed(3)})`; g.lineWidth = 10 + beatPulse * 8;
         g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
       }
-      g.strokeStyle = edge ? `rgba(${railRGB},0.9)` : 'rgba(232,236,245,0.18)';
+      g.strokeStyle = edge ? `rgba(${railRGB},0.9)` : 'rgba(194,221,228,0.18)';
       g.lineWidth = edge ? 3 : 1.5;
       g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
     }
 
     // hit bar
     const hl = this.proj(0, -half - 6); const hr = this.proj(0, half + 6);
-    g.strokeStyle = 'rgba(46,196,182,0.25)'; g.lineWidth = 14;
+    g.strokeStyle = 'rgba(194,221,228,0.25)'; g.lineWidth = 14;
     g.beginPath(); g.moveTo(hl.x, hl.y); g.lineTo(hr.x, hr.y); g.stroke();
-    g.strokeStyle = 'rgba(232,236,245,0.95)'; g.lineWidth = 4;
+    g.strokeStyle = 'rgba(194,221,228,0.95)'; g.lineWidth = 4;
     g.beginPath(); g.moveTo(hl.x, hl.y); g.lineTo(hr.x, hr.y); g.stroke();
 
     // notes: piano-tile slabs with the lane's shape on top, drawn far to near
@@ -524,7 +535,7 @@ export class Round {
       const p0 = n.holding ? 0 : Math.max(0, (n.t - now) / travel);
       const p1 = Math.min(1, (n.t + n.hold - now) / travel);
       if (p1 <= p0) continue;
-      const rgb = n.lane === 'L' ? '217,98,43' : '46,196,182';
+      const rgb = n.lane === 'L' ? '217,98,43' : '194,221,228';
       this.quad(p0, p1, x0, x1);
       g.fillStyle = `rgba(${rgb},${n.holding ? 0.75 : 0.42})`; g.fill();
       if (n.holding) {
@@ -533,7 +544,7 @@ export class Round {
         g.fillStyle = 'rgba(255,244,214,0.85)'; g.fill();
         const c = this.proj(0, (x0 + x1) / 2);
         g.globalAlpha = 0.6 + 0.4 * Math.sin(wall / 60);
-        drawShape(g, n.lane, c.x, c.y, laneW * 0.13, n.lane === 'L' ? '#D9622B' : '#2EC4B6', '#fff', 3);
+        drawShape(g, n.lane, c.x, c.y, laneW * 0.13, n.lane === 'L' ? '#C9374C' : '#C2DDE4', '#fff', 3);
         g.globalAlpha = 1;
       }
     }
@@ -544,8 +555,8 @@ export class Round {
       const p = (n.t - now) / travel;
       const li = n.lane === 'L' || this.oneLane ? 0 : 1;
       const x0 = -half + li * laneW + laneW * 0.1; const x1 = x0 + laneW * 0.8;
-      const fill = n.lane === 'L' ? '#D9622B' : '#2EC4B6';
-      const dark = n.lane === 'L' ? '#7a3112' : '#16706a';
+      const fill = n.lane === 'L' ? '#C9374C' : '#C2DDE4';
+      const dark = n.lane === 'L' ? '#76101e' : '#133769';
       const alpha = Math.min(1, (1 - p) * 4);
       g.globalAlpha = alpha;
       // front face (thickness)
@@ -562,10 +573,10 @@ export class Round {
       this.quad(p + TILE * 0.28, p + TILE / 2, x0, x1);
       g.fillStyle = 'rgba(255,255,255,0.28)'; g.fill();
       this.quad(p - TILE / 2, p + TILE / 2, x0, x1);
-      g.strokeStyle = 'rgba(232,236,245,0.85)'; g.lineWidth = 1.5 * top.a.s; g.stroke();
+      g.strokeStyle = 'rgba(194,221,228,0.85)'; g.lineWidth = 1.5 * top.a.s; g.stroke();
       // emblem: circle (left) or diamond (right), always readable
       const c = this.proj(p, (x0 + x1) / 2);
-      drawShape(g, n.lane, c.x, c.y - 4 * c.s, laneW * 0.11 * c.s, '#0B1026', '#E8ECF5', 2.5 * c.s);
+      drawShape(g, n.lane, c.x, c.y - 4 * c.s, laneW * 0.11 * c.s, '#0B1F3A', '#C2DDE4', 2.5 * c.s);
       g.globalAlpha = 1;
     }
 
@@ -578,12 +589,12 @@ export class Round {
         const li = m.lane === 'L' || this.oneLane ? 0 : 1;
         const x0 = -half + li * laneW + laneW * 0.1; const x1 = x0 + laneW * 0.8; const mid = (x0 + x1) / 2;
         g.globalAlpha = (1 - k) * 0.8;
-        g.fillStyle = m.lane === 'L' ? '#7a3112' : '#16706a';
+        g.fillStyle = m.lane === 'L' ? '#76101e' : '#133769';
         const drop = k * 0.04; const spread = k * laneW * 0.12;
         this.quad(-drop - TILEm / 2, -drop + TILEm / 2, x0 - spread, mid - spread); g.fill();
         this.quad(-drop - TILEm / 2, -drop + TILEm / 2, mid + spread, x1 + spread); g.fill();
         const c0 = this.proj(-drop, mid);
-        g.strokeStyle = '#F2B134'; g.lineWidth = 2;
+        g.strokeStyle = '#C9374C'; g.lineWidth = 2;
         g.beginPath(); g.moveTo(c0.x, c0.y - 10); g.lineTo(c0.x - 6, c0.y - 2); g.lineTo(c0.x + 4, c0.y + 4); g.lineTo(c0.x - 2, c0.y + 12); g.stroke();
       }
       g.globalAlpha = 1;
@@ -610,8 +621,8 @@ export class Round {
       const lane = this.oneLane ? 'L' : i === 0 ? 'L' : 'R';
       const c = this.proj(0, -half + i * laneW + laneW / 2);
       const pressed = wall - this.lanePress[lane] < 100;
-      drawShape(g, lane, c.x, c.y, laneW * 0.16, pressed ? 'rgba(46,196,182,.35)' : null, pressed ? '#2EC4B6' : 'rgba(232,236,245,0.7)', 3);
-      g.fillStyle = 'rgba(232,236,245,0.6)';
+      drawShape(g, lane, c.x, c.y, laneW * 0.16, pressed ? 'rgba(194,221,228,.35)' : null, pressed ? '#C2DDE4' : 'rgba(194,221,228,0.7)', 3);
+      g.fillStyle = 'rgba(194,221,228,0.6)';
       g.font = '700 16px Nunito, system-ui, sans-serif';
       g.textAlign = 'center';
       g.fillText(this.oneLane ? 'A / D' : lane === 'L' ? 'A  ←' : 'D  →', c.x, hitY + laneW * 0.16 + 34);
@@ -638,7 +649,7 @@ export class Round {
       g.globalAlpha = 1;
     }
     if (inBreak) {
-      g.fillStyle = 'rgba(11,16,38,0.7)';
+      g.fillStyle = 'rgba(11,31,58,0.7)';
       const bw = Math.min(w - 32, 520);
       g.fillRect((w - bw) / 2, 52, bw, 34);
       g.fillStyle = '#c9c0ff'; g.font = '800 16px Nunito, system-ui, sans-serif'; g.textAlign = 'center';
@@ -651,7 +662,7 @@ export class Round {
       for (const pl of this.pulses) {
         const k = (wall - pl.time) / 1200;
         const c = this.proj(0, 0);
-        g.strokeStyle = `rgba(46,196,182,${(0.8 * (1 - k)).toFixed(3)})`; g.lineWidth = 10 * (1 - k) + 2;
+        g.strokeStyle = `rgba(194,221,228,${(0.8 * (1 - k)).toFixed(3)})`; g.lineWidth = 10 * (1 - k) + 2;
         g.beginPath(); g.ellipse(c.x, c.y, (still ? 0.6 : k) * w * 0.9, (still ? 0.6 : k) * w * 0.32, 0, 0, Math.PI * 2); g.stroke();
       }
     }
@@ -659,18 +670,18 @@ export class Round {
       const k = (wall - this.banner.time) / 2600;
       g.globalAlpha = k < 0.1 ? k / 0.1 : k > 0.8 ? (1 - k) / 0.2 : 1;
       const bw = Math.min(w - 32, 620);
-      g.fillStyle = 'rgba(11,16,38,0.82)'; g.fillRect((w - bw) / 2, h * 0.2, bw, 62);
-      g.strokeStyle = 'rgba(46,196,182,0.7)'; g.lineWidth = 2; g.strokeRect((w - bw) / 2, h * 0.2, bw, 62);
+      g.fillStyle = 'rgba(11,31,58,0.82)'; g.fillRect((w - bw) / 2, h * 0.2, bw, 62);
+      g.strokeStyle = 'rgba(194,221,228,0.7)'; g.lineWidth = 2; g.strokeRect((w - bw) / 2, h * 0.2, bw, 62);
       g.textAlign = 'center';
-      g.fillStyle = '#2EC4B6'; g.font = '900 20px Nunito, system-ui, sans-serif'; g.fillText(this.banner.title, w / 2, h * 0.2 + 26, bw - 20);
-      g.fillStyle = '#E8ECF5'; g.font = '700 14px Nunito, system-ui, sans-serif'; g.fillText(this.banner.sub, w / 2, h * 0.2 + 48, bw - 20);
+      g.fillStyle = '#C2DDE4'; g.font = '900 20px Nunito, system-ui, sans-serif'; g.fillText(this.banner.title, w / 2, h * 0.2 + 26, bw - 20);
+      g.fillStyle = '#C2DDE4'; g.font = '700 14px Nunito, system-ui, sans-serif'; g.fillText(this.banner.sub, w / 2, h * 0.2 + 48, bw - 20);
       g.globalAlpha = 1;
     }
 
     // lead-in countdown
     if (now < 0) {
       const secs = Math.ceil(-now / 1000);
-      g.fillStyle = '#E8ECF5';
+      g.fillStyle = '#C2DDE4';
       g.font = '900 72px Nunito, system-ui, sans-serif';
       g.textAlign = 'center';
       g.fillText(secs > 0 ? String(secs) : '', w / 2, h * 0.42);
@@ -697,8 +708,8 @@ export class Round {
 
     // progress bar
     const prog = Math.max(0, Math.min(1, now / this.chart.lengthMs));
-    g.fillStyle = 'rgba(232,236,245,0.15)'; g.fillRect(0, 0, w, 4);
-    g.fillStyle = '#2EC4B6'; g.fillRect(0, 0, w * prog, 4);
+    g.fillStyle = 'rgba(194,221,228,0.15)'; g.fillRect(0, 0, w, 4);
+    g.fillStyle = '#C2DDE4'; g.fillRect(0, 0, w * prog, 4);
   }
 
   finish() {
