@@ -14,6 +14,9 @@ import { on } from '../core/bus.js';
 import { getManifest } from '../core/manifest.js';
 import { getAsteroids } from '../core/data.js';
 import { makeRockGeometry, makeRockMaterial, sizeFromDiameter } from './asteroids.js';
+import { getGLTFLoader } from './loader.js';
+import { getModel } from '../core/manifest.js';
+import { fitObject, polish } from './viewer.js';
 
 const EARTH = new THREE.Vector3(0, 0, 0);
 const MOON = new THREE.Vector3(-7, 1.4, -9);
@@ -23,7 +26,7 @@ const REGION_CENTER = { moon: MOON, mars: MARS, deep: DEEP };
 const REGION_RADIUS = { moon: 0.6, mars: 1, deep: 1.4 };
 
 const NEBULA = {
-  earth: [0x0b1026, 0x1c2a6b],
+  earth: [0x0b1f3a, 0x1c2a6b],
   moon: [0x0d0f17, 0x3a3f4d],
   mars: [0x1a0c0a, 0x6b2a14],
   deep: [0x0c0820, 0x3b2370],
@@ -31,15 +34,28 @@ const NEBULA = {
 
 const v = (x, y, z) => new THREE.Vector3(x, y, z);
 
+// Title screen: open sky (side-lit by the Sun) with three real NASA machines floating
+// on the right, instead of Earth. Earth stays the centre of the hub and the story.
+const TITLE_POS = v(-6, 1.5, 16);
+const TITLE_DIR = v(-0.63, 0.06, 0.77).normalize();
+const TITLE_TARGET = TITLE_POS.clone().addScaledVector(TITLE_DIR, 10);
+const SHOWCASE = [
+  // [model, size, right, up, forward, spin]
+  ['voyager', 1.25, 1.35, 0.42, 3.7, 0.05],
+  ['opportunity', 0.78, 1.95, -0.62, 3.2, -0.08],
+  ['ingenuity', 0.55, 0.62, -0.52, 2.7, 0.12],
+];
+
 /** Camera shot for a screen. */
 function shotFor(id, params = {}) {
   const region = params.region || 'mars';
   const c = REGION_CENTER[region] || MARS;
   const r = REGION_RADIUS[region] ?? 1;
   switch (id) {
-    case 'title':   return { pos: v(1.5, 0.3, 3.9), target: v(-1.15, 0.2, 0), nebula: 'earth', asteroids: EARTH };
+    case 'title':   return { pos: TITLE_POS.clone(), target: TITLE_TARGET.clone(), nebula: 'deep', asteroids: TITLE_POS, rocks: 4 };
     case 'intro':   return { pos: v(0.1, 0.1, 3.4), target: v(0, -0.35, 0), cockpit: true, nebula: 'earth', asteroids: EARTH };
-    case 'hub':     return { pos: v(-0.2, 0.15, 4.6), target: v(0.25, -0.7, 0), cockpit: true, nebula: 'earth', asteroids: EARTH };
+    // Earth centred and low in the window, framed between the two hub panels
+    case 'hub':     return { pos: v(0, 0.2, 6.4), target: v(0, 0.75, 0), cockpit: true, nebula: 'earth', asteroids: EARTH };
     case 'preround':return { pos: c.clone().add(v(0, r * 1.5, r * 2.6 + 0.6)), target: c.clone().add(v(0, r * 1.35, -1)), nebula: region, asteroids: c, depth: 10 };
     case 'round':   return { pos: c.clone().add(v(0, r * 1.18 + 0.05, r * 1.9 + 0.3)), target: c.clone().add(v(0, r * 1.3 + 0.1, -2)), nebula: region, asteroids: c, depth: 10, lite: true };
     case 'results': return { pos: c.clone().add(v(r * 2.2 + 0.5, r * 0.4, r * 2.6 + 1)), target: c.clone(), nebula: region, asteroids: c };
@@ -64,8 +80,8 @@ export class World {
     this.pulse = 0;
     this.mouse = new THREE.Vector2();
     this.mouseS = new THREE.Vector2();      // smoothed pointer (no jitter)
-    this.camPos = v(1.5, 0.3, 3.9);
-    this.camTarget = v(-1.15, 0.2, 0);
+    this.camPos = TITLE_POS.clone();
+    this.camTarget = TITLE_TARGET.clone();
     this.glide = null;
     this.texLoader = new THREE.TextureLoader();
     this.dynScale = 1;          // dynamic resolution multiplier
@@ -91,6 +107,7 @@ export class World {
     this.cockpit = new Cockpit(this.renderer, this.cockpitCam);
     this.cockpitShow = 0;
     this.cockpitWant = 0;
+    this.showcaseReady = this.buildShowcase();
 
     on('beat', () => { this.pulse = 1; });
     // poke things in the cockpit (plushies, mug, screens...) when clicking open window, never UI
@@ -206,7 +223,7 @@ export class World {
     const size = new Float32Array(count);
     const phase = new Float32Array(count);
     const col = new Float32Array(count * 3);
-    const tint = [new THREE.Color(0xe8ecf5), new THREE.Color(0xbfd4ff), new THREE.Color(0xffe2c0), new THREE.Color(0x9ff5ec)];
+    const tint = [new THREE.Color(0xc2dde4), new THREE.Color(0xbfd4ff), new THREE.Color(0xffe2c0), new THREE.Color(0x9ff5ec)];
     for (let i = 0; i < count; i++) {
       const u = Math.random() * 2 - 1; const t = Math.random() * Math.PI * 2;
       const s = Math.sqrt(1 - u * u);
@@ -244,7 +261,7 @@ export class World {
 
   atmosphere(radius, color, power = 3, strength = 1.2) {
     return new THREE.Mesh(
-      new THREE.SphereGeometry(radius, 64, 32),
+      new THREE.SphereGeometry(radius, 48, 24),
       new THREE.ShaderMaterial({
         side: THREE.BackSide, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
         uniforms: { uColor: { value: new THREE.Color(color) }, uPow: { value: power }, uStr: { value: strength } },
@@ -260,7 +277,7 @@ export class World {
     this.earth = new THREE.Group();
     const map = this.tex('earth');
     const globe = new THREE.Mesh(
-      new THREE.SphereGeometry(1, 96, 64),
+      new THREE.SphereGeometry(1, 64, 40),
       new THREE.MeshStandardMaterial({ map, color: map ? 0xffffff : 0x2a5aa0, roughness: 0.7, metalness: 0 }),
     );
     globe.rotation.z = 0.41;          // axial tilt
@@ -271,22 +288,53 @@ export class World {
     // The failing shield (Story): a geodesic lattice that shimmers softly.
     this.shield = new THREE.LineSegments(
       new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.16, 3)),
-      new THREE.LineBasicMaterial({ color: 0x2ec4b6, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false }),
+      new THREE.LineBasicMaterial({ color: 0xc2dde4, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending, depthWrite: false }),
     );
     this.earth.add(this.shield);
     this.shieldSegments = this.shield.geometry.attributes.position.count;
     this.shieldLevel = 0.5;
-    this.earth.add(this.atmosphere(1.2, 0x2ec4b6, 3, 0.35));
+    this.earth.add(this.atmosphere(1.2, 0xc2dde4, 3, 0.35));
     this.earth.position.copy(EARTH);
     this.scene.add(this.earth);
+  }
+
+  /** Three NASA models floating on the title screen. Resolves when loaded (or failed). */
+  async buildShowcase() {
+    this.showcase = new THREE.Group();
+    this.scene.add(this.showcase);
+    const right = new THREE.Vector3().crossVectors(TITLE_DIR, new THREE.Vector3(0, 1, 0)).normalize();
+    const up = new THREE.Vector3().crossVectors(right, TITLE_DIR).normalize();
+    const fill = new THREE.DirectionalLight(0xc2dde4, 0.9);       // soft fill from the camera side
+    fill.position.copy(TITLE_POS).addScaledVector(right, -4).addScaledVector(up, 2);
+    fill.target.position.copy(TITLE_POS).addScaledVector(TITLE_DIR, 3);
+    this.showcase.add(fill, fill.target);
+    await Promise.all(SHOWCASE.map(async ([id, size, r, u, f, spin], i) => {
+      const { url } = getModel(id);
+      if (!url) return;
+      try {
+        const gltf = await getGLTFLoader().loadAsync(url);
+        polish(gltf.scene);
+        gltf.scene.traverse((o) => {
+          if (!o.isMesh) return;
+          for (const m of Array.isArray(o.material) ? o.material : [o.material]) { m.envMap = this.cockpit.env; m.envMapIntensity = 0.7; }
+        });
+        const { wrap } = fitObject(gltf.scene, size);
+        const holder = new THREE.Group();
+        holder.add(wrap);
+        holder.position.copy(TITLE_POS).addScaledVector(TITLE_DIR, f).addScaledVector(right, r).addScaledVector(up, u);
+        holder.rotation.set(0.25 * (i - 1), i * 2.1 + 0.6, 0.15 * i);
+        holder.userData = { spin, bob: i * 1.7, y: holder.position.y };
+        this.showcase.add(holder);
+      } catch (err) { console.warn(`[world] showcase model ${id} failed`, err); }
+    }));
   }
 
   buildMoon() {
     const map = this.tex('moon');
     const bump = this.tex('moon-bump', false);
     this.moon = new THREE.Mesh(
-      new THREE.SphereGeometry(REGION_RADIUS.moon, 96, 64),
-      new THREE.MeshStandardMaterial({ map, bumpMap: bump, bumpScale: 0.35, color: map ? 0xffffff : 0xa7adba, roughness: 1 }),
+      new THREE.SphereGeometry(REGION_RADIUS.moon, 64, 40),
+      new THREE.MeshStandardMaterial({ map, bumpMap: bump, bumpScale: 0.35, color: map ? 0xffffff : 0x9db7c2, roughness: 1 }),
     );
     this.moon.position.copy(MOON);
     this.scene.add(this.moon);
@@ -296,8 +344,8 @@ export class World {
     this.mars = new THREE.Group();
     const map = this.tex('mars');
     this.marsGlobe = new THREE.Mesh(
-      new THREE.SphereGeometry(1, 96, 64),
-      new THREE.MeshStandardMaterial({ map, color: map ? 0xffffff : 0xd9622b, roughness: 0.95 }),
+      new THREE.SphereGeometry(1, 64, 40),
+      new THREE.MeshStandardMaterial({ map, color: map ? 0xffffff : 0xc9374c, roughness: 0.95 }),
     );
     this.marsGlobe.rotation.z = 0.44;
     this.mars.add(this.marsGlobe);
@@ -342,7 +390,7 @@ export class World {
     const map = new THREE.CanvasTexture(cv); map.colorSpace = THREE.SRGBColorSpace;
     const r = REGION_RADIUS.deep;
     this.giant = new THREE.Group();
-    const globe = new THREE.Mesh(new THREE.SphereGeometry(r, 96, 64), new THREE.MeshStandardMaterial({ map, roughness: 0.9 }));
+    const globe = new THREE.Mesh(new THREE.SphereGeometry(r, 64, 40), new THREE.MeshStandardMaterial({ map, roughness: 0.9 }));
     this.giant.add(globe);
     this.giant.add(this.atmosphere(r * 1.05, 0xf0d9a8, 1.8, 0.6));
     // rings: radial gradient strip with gaps
@@ -413,7 +461,7 @@ export class World {
   setShield(pct) {
     const k = Math.max(0, Math.min(1, pct / 100));
     this.shieldLevel = k;
-    this.shield.material.color.lerpColors(new THREE.Color(0xf2b134), new THREE.Color(0x2ec4b6), Math.min(1, k * 1.6));
+    this.shield.material.color.lerpColors(new THREE.Color(0xc9374c), new THREE.Color(0xc2dde4), Math.min(1, k * 1.6));
     // missing panels where the shield is damaged (whole line segments, so it reads as holes)
     const keep = Math.floor((0.45 + 0.55 * k) * this.shieldSegments / 2) * 2;
     this.shield.geometry.setDrawRange(0, keep);
@@ -528,6 +576,14 @@ export class World {
       this.moon.rotation.y += dt * 0.01;
       this.giantGlobe.rotation.y += dt * 0.04;
     }
+    if (this.showcase) {
+      this.showcase.visible = this.camPos.distanceTo(TITLE_POS) < 2.5;   // only on the title shot
+      if (this.showcase.visible && !still) for (const h of this.showcase.children) {
+        if (!h.userData.spin) continue;
+        h.rotation.y += dt * h.userData.spin * 2;
+        h.position.y = h.userData.y + Math.sin(t * 0.6 + h.userData.bob) * 0.04;
+      }
+    }
     for (const m of this.marsMoons) {
       if (!still) m.userData.a += dt * m.userData.speed;
       m.position.set(Math.cos(m.userData.a) * m.userData.dist, Math.sin(m.userData.a) * m.userData.dist * 0.15, Math.sin(m.userData.a) * m.userData.dist);
@@ -554,9 +610,13 @@ export class World {
     this.starUniforms.uTime.value = t;
     this.starUniforms.uPulse.value = this.pulse;
     this.starUniforms.uStill.value = still ? 1 : 0;
-    // calm screens (reading, rounds) redraw the slow-moving background at half rate
-    this.odd = !this.odd;
-    if (this.calm && !this.glide && this.cockpitShow === this.cockpitWant && this.odd && !this.pendingDraw) return;
+    // The background moves slowly, so it doesn't need every frame. While the camera
+    // is parked: menus redraw at half rate, rounds at a third (the note highway gets
+    // the frame budget, so key presses register on time). Camera flights stay smooth.
+    this.skip = (this.skip || 0) + 1;
+    const every = this.lite ? 3 : 2;
+    const parked = !this.glide && this.cockpitShow === this.cockpitWant;
+    if (parked && !this.pendingDraw && this.skip % every !== 0) return;
     this.pendingDraw = false;
     this.renderer.render(this.scene, cam);
     if (cg.visible) {

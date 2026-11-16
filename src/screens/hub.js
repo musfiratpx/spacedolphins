@@ -1,10 +1,14 @@
 // Ship hub. Phase 2 restyles this as a cockpit screen (features.cockpitHub).
 import { wire, esc, tag, toast } from '../ui/dom.js';
-import { getHardware, machinesIn, getAsteroids, getAsteroidSnapshot } from '../core/data.js';
+import { getHardware, machinesIn } from '../core/data.js';
 import { state, save, resetProgress } from '../core/state.js';
 import { settings, setSetting } from '../core/settings.js';
 import { features } from '../core/config.js';
 import { showReward } from '../ui/reward.js';
+import { openTutorial } from '../ui/tutorial.js';
+import { startTour } from '../ui/tour.js';
+
+let tourTimer = 0;
 
 function regionUnlocked(region, regions) {
   if (region.id === 'mars' || region.id === 'moon') return true;   // Moon (tutorial) and Mars are open from the start
@@ -16,10 +20,8 @@ function regionUnlocked(region, regions) {
   return machinesIn(prev.id).filter((m) => state.unlocked[m.id]).length >= 3;
 }
 
-let neoTimer = 0;
-
 export default {
-  unmount() { clearInterval(neoTimer); },
+  unmount() { clearTimeout(tourTimer); },
   mount(el, _params, go) {
     const { regions, machines } = getHardware();
     const total = machines.length;
@@ -29,7 +31,7 @@ export default {
       <section class="screen hub-screen">
         <header class="hub-head">
           <div>
-            <p class="eyebrow">Recovery ship · Year 4052</p>
+            <p class="eyebrow">Recovery ship · <b>Year 4052</b></p>
             <h1>Ship hub</h1>
           </div>
           <div class="head-meters">
@@ -45,16 +47,9 @@ export default {
             </div>
           </div>
         </header>
-        <div class="neo-strip" aria-live="polite">
-          <span class="neo-label">📡 Near-Earth watch ${tag('real')}</span>
-          <span class="neo-count"></span>
-          <span class="neo-card"></span>
-        </div>
-
         <div class="hub-grid">
           <div class="panel explore">
-            <h2>Explore</h2>
-            <p>Pick a region, then a machine to hunt.</p>
+            <h2>Where to?</h2>
             <ul class="regions">
               ${regions.map((r) => {
                 const open = regionUnlocked(r, regions);
@@ -62,23 +57,25 @@ export default {
                 return `<li>
                   <button class="region ${open ? '' : 'locked'}" style="--accent:${r.color}" ${open ? `data-go="preround" data-params='${JSON.stringify({ region: r.id })}'` : 'disabled'}>
                     <span class="region-name">${esc(r.name)}</span>
-                    <span class="region-sub">${open ? `${n}/${machinesIn(r.id).length} scanned` : '🔒 Scan 3 Mars machines to unlock'}</span>
+                    <span class="region-sub">${open ? `${n}/${machinesIn(r.id).length} scanned` : '🔒 Scan 3 Mars machines'}</span>
                   </button></li>`;
               }).join('')}
             </ul>
           </div>
 
-          <div class="panel side">
-            <h2>Ship systems</h2>
+          <nav class="panel side" aria-label="Ship">
+            <button class="btn" data-go="dex">Hardwaredex</button>
             <div class="side-grid">
-              <button class="btn" data-go="dex">Hardwaredex</button>
               <button class="btn btn-ghost" data-go="map">Map</button>
               <button class="btn btn-ghost" data-go="records">Records</button>
               <button class="btn btn-ghost" data-go="radiolog">Radio log</button>
-              <button class="btn btn-ghost" data-act="settings">⚙ Settings</button>
+              <button class="btn btn-ghost" data-act="tutorial">How to play</button>
             </div>
-            <button class="link-btn side-credits" data-go="credits">Credits</button>
-          </div>
+            <div class="side-foot">
+              <button class="link-btn" data-act="settings">⚙ Settings</button>
+              <button class="link-btn" data-go="credits">Credits</button>
+            </div>
+          </nav>
         </div>
             <dialog class="settings-dialog panel" aria-label="Settings">
               <form method="dialog" class="quick-settings">
@@ -97,34 +94,16 @@ export default {
               <label class="check"><input type="checkbox" ${settings.reducedMotion ? 'checked' : ''} data-set="reducedMotion"> Reduced motion</label>
               <label class="check"><input type="checkbox" ${settings.dyslexiaFont ? 'checked' : ''} data-set="dyslexiaFont"> Easy-read font (extra spacing)</label>
               <label class="check"><input type="checkbox" ${settings.readAloud ? 'checked' : ''} data-set="readAloud"> Read radio lines aloud</label>
+              <label class="check"><input type="checkbox" ${settings.bgMusic !== false ? 'checked' : ''} data-set="bgMusic"> Background music on menus</label>
               <label>Tester code <span class="hint">For playtesting: unlocks every region, machine and song</span>
                 <span class="tester-row"><input type="text" class="tester-code" autocomplete="off" spellcheck="false" aria-label="Tester code"><button type="button" class="btn btn-small" data-act="tester">Unlock</button></span></label>
+              <button type="button" class="btn btn-ghost btn-small" data-act="tour">Replay the ship tour</button>
               <button type="button" class="btn btn-ghost btn-small danger" data-act="reset">Reset progress…</button>
               </form>
             </dialog>
       </section>`;
 
     window.__hhWorld?.setShield(state.shield ?? 50);
-
-    // Real asteroids from NASA's NeoWs snapshot, one at a time
-    const rocks = getAsteroids();
-    const snap = getAsteroidSnapshot();
-    const neo = el.querySelector('.neo-strip');
-    if (!rocks.length) neo.remove();
-    else {
-      const fmt = (n) => Math.round(n).toLocaleString('en-US');
-      el.querySelector('.neo-count').textContent = `${rocks.length} passed Earth${snap?.range ? ` ${snap.range.start} → ${snap.range.end}` : ' this week'}`;
-      const card = el.querySelector('.neo-card');
-      let i = 0;
-      const show = () => {
-        const a = rocks[i++ % rocks.length];
-        card.innerHTML = `<a class="neo-name" href="${esc(a.nasaUrl)}" target="_blank" rel="noopener" title="Open JPL record">${esc(a.name)}</a>${a.hazardous ? ' <span class="neo-haz">Potentially hazardous</span>' : ''}
-          <span class="neo-facts">${fmt(a.diameterMinM)}–${fmt(a.diameterMaxM)} m wide · ${fmt(a.speedKph)} km/h · missed Earth by ${fmt(a.missDistanceKm)} km</span>`;
-        card.classList.remove('swap'); void card.offsetWidth; card.classList.add('swap');
-      };
-      show();
-      neoTimer = setInterval(show, 6000);
-    }
 
     el.querySelectorAll('[data-set]').forEach((input) => {
       const apply = () => {
@@ -140,6 +119,8 @@ export default {
     dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });   // click outside closes
     wire(el, go, {
       settings: () => dlg.showModal(),
+      tutorial: () => openTutorial(),
+      tour: () => { dlg.close(); startTour(); },
       tester: () => {
         const code = el.querySelector('.tester-code').value.trim().toLowerCase();
         if (code !== 'nasa') { toast('That code didn\'t work'); return; }
@@ -159,6 +140,9 @@ export default {
         go('title');
       },
     });
+
+    // First time in the hub: a guided tour of every button (skippable).
+    if (!state.seenTour) tourTimer = setTimeout(() => { if (el.isConnected) startTour(); }, settings.reducedMotion ? 200 : 1400);
 
     // A Numan plushie joins the dashboard for every fully scanned region (Story).
     state.plushies ||= [];

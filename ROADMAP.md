@@ -1,6 +1,6 @@
 # Roadmap
 
-Deadline: Nov 15, 2026, 11:59 PM (aim for 9:00 PM). Human tasks live in [TODOME.md](TODOME.md).
+Deadline: Nov 15, 2026, 11:59 PM (aim for 9:00 PM). Human tasks live in the team's private to-do list (TODOME.md, kept out of the public repo).
 
 ## Phase 1: Base demo (Mars) ✅
 

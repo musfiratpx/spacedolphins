@@ -16,6 +16,7 @@ const defaults = {
   colorblind: false,
   dyslexiaFont: false,   // 'easy-read' font: plain sans-serif with extra spacing
   readAloud: false,      // speak radio lines with the browser's speech voice
+  bgMusic: true,         // background ship ambience on menus (round music is separate)
 };
 
 function load() {

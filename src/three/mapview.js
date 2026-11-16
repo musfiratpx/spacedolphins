@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { getManifest } from '../core/manifest.js';
 import { settings } from '../core/settings.js';
 
-const PIN_COLOR = { alive: 0x2ec4b6, quiet: 0xa7adba, monument: 0xf2b134 };
+const PIN_COLOR = { alive: 0x5be38f, quiet: 0x9db7c2, monument: 0xc9374c };   // green = still active as of 2026
 
 /** lat/lon (degrees) -> point on a THREE.SphereGeometry-mapped globe (texture centered on 0° lon). */
 export function latLonToVec(lat, lon, r) {
@@ -76,7 +76,7 @@ export class MapView {
       const pos = latLonToVec(m.lat, m.lon, R);
       const n = pos.clone().normalize();
       const pin = new THREE.Group();
-      const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.1, 6), new THREE.MeshBasicMaterial({ color: 0xe8ecf5 }));
+      const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.1, 6), new THREE.MeshBasicMaterial({ color: 0xc2dde4 }));
       stick.position.y = 0.05; pin.add(stick);
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.022, 16, 12), new THREE.MeshBasicMaterial({ color: PIN_COLOR[kind] }));
       head.position.y = 0.105; pin.add(head);
@@ -93,7 +93,7 @@ export class MapView {
   }
 
   addOrbiter(m, R) {
-    const path = new THREE.Mesh(new THREE.TorusGeometry(R * 1.35, 0.004, 6, 120), new THREE.MeshBasicMaterial({ color: 0x2ec4b6, transparent: true, opacity: 0.5 }));
+    const path = new THREE.Mesh(new THREE.TorusGeometry(R * 1.35, 0.004, 6, 120), new THREE.MeshBasicMaterial({ color: 0xc2dde4, transparent: true, opacity: 0.5 }));
     path.rotation.x = Math.PI / 2.2; this.globe.add(path);
     const sat = new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 8), new THREE.MeshBasicMaterial({ color: PIN_COLOR.alive }));
     const hit = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), new THREE.MeshBasicMaterial({ visible: false }));

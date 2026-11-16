@@ -38,7 +38,7 @@ export async function renderThumbs(jobs, onEach) {
   pmrem.dispose();
   scene.environment = env;
   const key = new THREE.DirectionalLight(0xffffff, 2); key.position.set(3, 4, 5); scene.add(key);
-  const rim = new THREE.DirectionalLight(0x2ec4b6, 2.2); rim.position.set(-4, 2, -4); scene.add(rim);
+  const rim = new THREE.DirectionalLight(0xc2dde4, 2.2); rim.position.set(-4, 2, -4); scene.add(rim);
   const camera = new THREE.PerspectiveCamera(32, W / H, 0.01, 100);
   camera.position.set(2.6, 1.3, 3.4);
   camera.lookAt(0, 0, 0);

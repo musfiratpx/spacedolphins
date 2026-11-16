@@ -41,7 +41,7 @@ export function startStars(canvas) {
       const py = still ? 0 : my * 12 * s.z;
       const tw = still ? 0.8 : 0.6 + 0.4 * Math.sin(t * 0.002 * s.z + s.tw);
       g.globalAlpha = Math.min(1, tw * s.z + pulse * 0.15 * s.z);
-      g.fillStyle = '#E8ECF5';
+      g.fillStyle = '#C2DDE4';
       const r = s.z * 1.4;
       g.fillRect(s.x + px, s.y + py, r, r);
     }

@@ -7,6 +7,7 @@ import { acquireViewer, releaseViewer } from '../three/viewer.js';
 import { loadRadio } from '../core/data.js';
 import { playRadio } from '../ui/radio.js';
 import { save } from '../core/state.js';
+import { openTutorial } from '../ui/tutorial.js';
 
 let choice = { difficulty: 'normal' };
 let viewer = null;
@@ -65,7 +66,12 @@ export default {
       wire(el, go, {
         pick: (b) => { choice.machine = b.dataset.id; render(); },
         diff: (b) => { choice.difficulty = b.dataset.d; render(); },
-        start: () => go('round', { region: region.id, machine: choice.machine, difficulty: choice.difficulty }),
+        start: () => {
+          const begin = () => go('round', { region: region.id, machine: choice.machine, difficulty: choice.difficulty });
+          // first round ever: a quick How to play first
+          if (!state.seenTutorial) { openTutorial({ onClose: () => { state.seenTutorial = true; save(); begin(); } }); return; }
+          begin();
+        },
       });
     };
     onEnter = (e) => {
