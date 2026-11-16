@@ -102,8 +102,8 @@ export class World {
     this.cockpitScene = new THREE.Scene();
     this.cockpitCam = new THREE.PerspectiveCamera(45, 1, 0.01, 50);
     this.cockpitScene.add(this.cockpitCam);
-    this.cockpitScene.add(new THREE.AmbientLight(0x6070b0, 0.5));
-    const cSun = new THREE.DirectionalLight(0xfff4e0, 1.4); cSun.position.set(2, 3, 1); this.cockpitScene.add(cSun);
+    this.cockpitScene.add(new THREE.AmbientLight(0x6070b0, 0.35));
+    const cSun = new THREE.DirectionalLight(0xfff4e0, 1.0); cSun.position.set(2, 3, 1); this.cockpitScene.add(cSun);
     this.cockpit = new Cockpit(this.renderer, this.cockpitCam);
     this.cockpitShow = 0;
     this.cockpitWant = 0;
